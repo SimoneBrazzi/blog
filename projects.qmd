@@ -1,0 +1,12 @@
+---
+title: "Projects"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: TRUE
+  sort-ui: FALSE
+  filter-ui: FALSE
+page-layout: full
+title-block-banner: TRUE
+---

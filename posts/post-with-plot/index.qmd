@@ -1,0 +1,14 @@
+---
+title: "Post With Plot"
+author: "Simone Brazzi"
+date: "2023-12-28"
+categories: [code, analysis, plot]
+image: "image.jpg"
+---
+
+This is a post with plot.
+
+```{r}
+plot(mtcars$mpg)
+```
+

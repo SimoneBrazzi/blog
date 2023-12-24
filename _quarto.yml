@@ -1,0 +1,42 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Simone Brazzi"
+  favicon: images/favicon.png
+  page-footer:
+    center: |
+      [Contact Simone Brazzi](mailto:simonebrazzi@icloud.com)
+    left: |
+      Made with [Quarto](https://quarto.org/)
+
+  search:
+    location: navbar
+    type: overlay
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Projects
+        href: projects.qmd
+      - text: Resume
+        href: resume.qmd
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/
+      - icon: twitter
+        href: https://twitter.com
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    code-link: TRUE
+    code-fold: show
+    code-tools: TRUE
+    highlight-style: monokai
+
+editor: visual
+

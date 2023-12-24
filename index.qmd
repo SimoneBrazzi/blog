@@ -1,0 +1,23 @@
+---
+title: "Simone Brazzi"
+image: images/chloé.heic
+about:
+  template: jolla
+  image-width: 20em
+  image-shape: round
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/simone-brazzi-289028160/
+    - icon: github
+      text: GitHub
+      href: https://github.com/SimoneBrazzi?tab=repositories
+    - icon: envelope
+      text: Contact me
+      href: 
+        "mailto: simonebrazzi@icloud.com"
+        
+---
+
+I am a (data) nerd, with lot of passion and some mistake along the way. Data analyst by day, aspiring data wizard by night! I love using data to tell stories and drive business decisions. But I'm not content with stopping there. My passion for data and desire to expand my skillset has led me on a quest to become a data scientist. I'm a fearless problem solver with an insatiable curiosity, and I'm always seeking new challenges and opportunities to learn and grow. Let's make some magic with data!
+When I don't stare tolines of code or spreadsheet, I like to read and play video game or spend quality time with my dog.

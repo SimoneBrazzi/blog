@@ -1,0 +1,17 @@
+{
+  "hash": "c8678d68d1602340b8b223574ee37914",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Post With Plot\"\nauthor: \"Simone Brazzi\"\ndate: \"2023-12-22\"\ncategories: [code, analysis, plot]\nimage: \"image.jpg\"\n---\n\n\nThis is a post with plot.\n\n\n::: {.cell}\n\n```{.r .cell-code}\nplot(mtcars$mpg)\n```\n\n::: {.cell-output-display}\n![](index_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

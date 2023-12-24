@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this blog"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "Post With Plot\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\nplot\n\n\n\n\n\n\n\n\n\nDec 28, 2023\n\n\nSimone Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nDec 22, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nDec 19, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/post-with-plot/index.html",
+    "href": "posts/post-with-plot/index.html",
+    "title": "Post With Plot",
+    "section": "",
+    "text": "This is a post with plot.\n\n\nCode\nplot(mtcars$mpg)"
+  },
+  {
+    "objectID": "resume.html",
+    "href": "resume.html",
+    "title": "",
+    "section": "",
+    "text": "Code"
+  },
+  {
+    "objectID": "posts/post-with-code/index.html",
+    "href": "posts/post-with-code/index.html",
+    "title": "Post With Code",
+    "section": "",
+    "text": "This is a post with executable code.\n\n\nCode\n1 + 1\n\n\n[1] 2"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Simone Brazzi",
+    "section": "",
+    "text": "I am a (data) nerd, with lot of passion and some mistake along the way. Data analyst by day, aspiring data wizard by night! I love using data to tell stories and drive business decisions. But I’m not content with stopping there. My passion for data and desire to expand my skillset has led me on a quest to become a data scientist. I’m a fearless problem solver with an insatiable curiosity, and I’m always seeking new challenges and opportunities to learn and grow. Let’s make some magic with data! When I don’t stare tolines of code or spreadsheet, I like to read and play video game or spend quality time with my dog."
+  }
+]

@@ -1,1 +1,14 @@
+---
+title: "Eurostat Homicide Data"
+description: "A primer on Shiny to analyze gender differences in homicide rates"
+author: "Simone Brazzi"
+date: "2023-12-29"
+categories:
+  - code
+  - shiny
+  - R
+---
 
+Hi there and welcome to my first project for the blog! The topic is a sad one, but I would like to explain why I decided to start with this. I was trying Shiny for different dashboards, but I wasn't satisfied to learn using the classic examples. Unfortunately, italian crime news suffocated the public debate with a case of homicide, in which the victim is a young women. The public debate was focusing so baaaaaadly on the concept of feminicide and the data, that I decided to clear the situation with a simple dashboard.
+
+First of all, at this link you can find the dashboard published using [shinyapps.io](https://d4jtd9-simonebrazzi.shinyapps.io/Homicide_Eurostat/).

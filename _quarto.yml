@@ -7,7 +7,7 @@ website:
   favicon: images/favicon.png
   page-footer:
     center: |
-      [Contact Simone Brazzi](mailto:simonebrazzi@icloud.com)
+      [Contact me](mailto:simonebrazzi@icloud.com)
     left: |
       Made with [Quarto](https://quarto.org/)
 

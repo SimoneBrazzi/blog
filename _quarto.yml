@@ -31,8 +31,8 @@ website:
 format:
   html:
     theme:
-      light: flatly
-      dark: darkly
+      light: [flatly, theme_light_custom.scss] 
+      dark: [darkly, theme_dark_custom.scss]
     code-link: TRUE
     code-fold: show
     code-tools: TRUE

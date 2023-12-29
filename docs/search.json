@@ -11,14 +11,7 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Post With Plot\n\n\n\n\n\n\ncode\n\n\nanalysis\n\n\nplot\n\n\n\n\n\n\n\n\n\nDec 28, 2023\n\n\nSimone Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nDec 22, 2023\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nDec 19, 2023\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/post-with-plot/index.html",
-    "href": "posts/post-with-plot/index.html",
-    "title": "Post With Plot",
-    "section": "",
-    "text": "This is a post with plot.\n\n\nCode\nplot(mtcars$mpg)"
+    "text": "Welcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nDec 29, 2023\n\n\nSimone Brazzi\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "resume.html",
@@ -28,18 +21,11 @@
     "text": "Code"
   },
   {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
-    "section": "",
-    "text": "This is a post with executable code.\n\n\nCode\n1 + 1\n\n\n[1] 2"
-  },
-  {
     "objectID": "posts/welcome/index.html",
     "href": "posts/welcome/index.html",
     "title": "Welcome To My Blog",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "This is the first post. Welcome!\n\nNice to meet you! My name is Simone Brazzi. I am 33 years old guy from Bologna, Italy.\nI decided to open this blog as a personal journal (what a new idea! Who ever thought about this?) of my data journey. This also means it is an opportunity to display my portfolio and shares my projects.\nAt the date of writing, I am a self made data professional. I am currently working as a Data Analyst/Engineer for UniCredit Group.\nI have too many hobbies, but I will try to summarize them in a sparse order:\n\nTraining: my 2024 goal is to be able to run at least an half marathon.\nStudy: I am studying data science to further improve my knowledge in the data field. I would like to do a Master Degree in the field, but it is difficult to combine the private life with an international MSc, at least for now.\nGaming, movies and manga: of course! I mean, it is part of being a nerd, right?! For cliche purpose, I love Quentin Tarantino blabbering, Nolan craziness, even though my favorite genre is horror. My favorites directors are Jordan Pelee and Ari Aster. I am currently reading Berserker, My Hero Academia, Jujutsu Kaisen, One Piece, Chainsaw Man and Kagurabachi.\nCooking, I think it is in my vein being italian (joking!) and considering my mother is a chef.\n\nFor now, I think I have annoyed you enough: stay tuned for future posts!"
   },
   {
     "objectID": "index.html",

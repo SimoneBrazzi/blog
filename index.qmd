@@ -1,6 +1,6 @@
 ---
 title: "Simone Brazzi"
-image: images/chloé.heic
+image: images/round.png
 about:
   template: jolla
   image-width: 20em

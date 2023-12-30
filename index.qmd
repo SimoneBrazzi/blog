@@ -3,7 +3,7 @@ title: "Simone Brazzi"
 image: images/round.png
 about:
   template: jolla
-  image-width: 10em
+  image-width: 20em
   image-shape: round
   links:
     - icon: linkedin

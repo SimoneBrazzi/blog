@@ -1,0 +1,44 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Nice to meet you! My name is Simone Brazzi. I am 33 years old guy from Bologna, Italy.\nI decided to open this blog as a personal journal (what a new idea! Who ever thought about this?) of my data journey. This also means it is an opportunity to display my portfolio and shares my projects.\nAt the date of writing, I am a self made data professional. I am currently working as a Data Analyst/Engineer for UniCredit Group.\nI have too many hobbies, but I will try to summarize them in a sparse order:\n\nTraining: my 2024 goal is to be able to run at least an half marathon.\nStudy: I am studying data science to further improve my knowledge in the data field. I would like to do a Master Degree in the field, but it is difficult to combine the private life with an international MSc, at least for now.\nGaming, movies and manga: of course! I mean, it is part of being a nerd, right?! For cliche purpose, I love Quentin Tarantino blabbering, Nolan craziness, even though my favorite genre is horror. My favorites directors are Jordan Pelee and Ari Aster. I am currently reading Berserker, My Hero Academia, Jujutsu Kaisen, One Piece, Chainsaw Man and Kagurabachi.\nCooking, I think it is in my vein being italian (joking!) and considering my mother is a chef.\n\nFor now, I think I have annoyed you enough: stay tuned for future posts!"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "Eurostat Homicide Data\n\n\n\n\n\n\ncode\n\n\nshiny\n\n\nR\n\n\n\nA primer on Shiny to analyze gender differences in homicide rates\n\n\n\n\n\nDec 29, 2023\n\n\nSimone Brazzi\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/eurostat_homicide_rate/eurostat_homicide_rate.html",
+    "href": "posts/eurostat_homicide_rate/eurostat_homicide_rate.html",
+    "title": "Eurostat Homicide Data",
+    "section": "",
+    "text": "Hi there and welcome to my first project for the blog! The topic is a sad one, but I would like to explain why I decided to start with this. I was trying Shiny for different dashboards, but I wasn’t satisfied to learn using the classic examples. Unfortunately, italian crime news suffocated the public debate with a case of homicide, in which the victim is a young women. The public debate was focusing so baaaaaadly on the concept of femicide and the data, that I decided to clear the situation with a simple dashboard.\nFirst of all, at this link you can find the dashboard published using shinyapps.io. Also at this link you can find the Github repo. As you can see, even if it is the main branch, there are some details which are not uber perfect, but that don’t interfere with the code.\nNow lets jump into the detail of how to create a Shiny dashboard!"
+  },
+  {
+    "objectID": "posts/eurostat_homicide_rate/eurostat_homicide_rate.html#global.r",
+    "href": "posts/eurostat_homicide_rate/eurostat_homicide_rate.html#global.r",
+    "title": "Eurostat Homicide Data",
+    "section": "global.R",
+    "text": "global.R\nAs said, this file is our usual R Script file. First thing first, we import our libraries:\n\n\nCode\n# wrangling\nlibrary(\"tidyverse\")\nlibrary(\"readr\")\nlibrary(\"stringr\")\nlibrary(\"dplyr\")\nlibrary(\"magrittr\")\nlibrary(\"forcats\")\nlibrary(\"lubridate\")\nlibrary(\"writexl\")\nlibrary(\"eurostat\")\n# plotting and dashboarding\nlibrary(\"shiny\")\nlibrary(\"shinythemes\")\nlibrary(\"ggplot2\")\nlibrary(\"plotly\")\nlibrary(\"scales\")\nlibrary(\"RColorBrewer\")\nlibrary(\"waiter\")\n# connecting and other\nlibrary(\"rsconnect\")\nlibrary(\"markdown\")\n\n\nLots of packages! The division is merely to remember how everything is managed and because I have OCD for this type of things.\nI want to focus on some packages:\n\ntidyverse, we all know it. As you can see, I also imported lots of single packages which compose the tidyverse, because I was getting errors of missing methods.\neurostat, which lets data flows from the eurostat website to my dashboard. This also lets the dashboard automatically updates when new data is available.\nscales, to nicely scaling my x and y axis.\nRColorBrewer, because I wanted to have a colorblind safe dashboard, even tough I am not.\nwaiter, for nice waiting images while the dashboard is loading.\n\nNow we can focus on the data importing and wrangling. For this, the eurostat library does the job. Lets focus on the crim_hom_vrel dataset.\n\n\nCode\n# search in eurostat db\nhomicide &lt;- search_eurostat(\"homicide\")\n\n# import data to variable\ncrim_hom_vrel &lt;- get_eurostat(\"crim_hom_vrel\", time_format = \"date\")\n\n# convert all observations to understandable data\ncrim_hom_vrel &lt;- label_eurostat(crim_hom_vrel)\n\n# label_eurostat_vars(crim_hom_vrel)\n\n# order data by country and date for time series purpose\ncrim_hom_vrel &lt;- crim_hom_vrel %&gt;% \n  arrange(geo, time)\n\ncrim_hom_vrel_grouped &lt;- crim_hom_vrel %&gt;% \n  dplyr::group_by(geo, time, sex, pers_cat, unit) %&gt;% \n  dplyr::summarise(values_grouped = sum(values), .groups = \"drop\") %&gt;% \n  filter(unit == \"Number\") %&gt;% \n  arrange(geo, time, sex)\n\n\nEverything pretty simple. I would like to highlight something about the dplyr::group_by and dplyr::summarise. As you can see, after having grouped and summarized, I need to drop the groups with the method .groups = \"drop\". With dplyr v.1.1.0 we can do the same with the help of the .by method in summarise.\n\n\nCode\ncrim_hom_vrel_grouped &lt;- crim_hom_vrel %&gt;% \n  dplyr::summarise(\n    values_grouped = sum(values),\n    .by = c(geo, time, sex, pers_cat, unit)\n    ) %&gt;% \n  filter(unit == \"Number\") %&gt;% \n  arrange(geo, time, sex)\n\n\nCopying from the dplyr website the differences between .by and group_by() are:\n\n\n\n.by\ngroup_by()\n\n\n\n\nGrouping only affects a single verb\nGrouping is persistent across multiple verbs\n\n\nSelects variables with tidy-select\nComputes expressions with data-masking\n\n\nSummaries use existing order of group keys\nSummaries sort group keys in ascending order\n\n\n\nLast part is all about colors.\n\n\nCode\n# brewer.pal(11, \"RdYlBu\")\npalette &lt;- c(\"#A50026\", \"#D73027\", \"#F46D43\", \"#FDAE61\", \"#FEE090\", \"#FFFFBF\", \"#E0F3F8\", \"#ABD9E9\", \"#74ADD1\", \"#4575B4\", \"#313695\")\n\npalette_crim_hom_vrel_grouped &lt;- rep(\n  palette,\n  length.out = crim_hom_vrel_grouped$geo %&gt;% str_unique() %&gt;% length()\n  )\n\n\nHere I defined the palette using ColorBrewer. Using rep I replicated the 11 colours for the length of the unique geo values."
+  },
+  {
+    "objectID": "posts/eurostat_homicide_rate/eurostat_homicide_rate.html#ui.r",
+    "href": "posts/eurostat_homicide_rate/eurostat_homicide_rate.html#ui.r",
+    "title": "Eurostat Homicide Data",
+    "section": "ui.R",
+    "text": "ui.R"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Simone Brazzi",
+    "section": "",
+    "text": "I am a (data) nerd, with lot of passion and some mistake along the way. Data analyst by day, aspiring data wizard by night! I love using data to tell stories and drive business decisions. But I’m not content with stopping there. My passion for data and desire to expand my skillset has led me on a quest to become a data scientist. I’m a fearless problem solver with an insatiable curiosity, and I’m always seeking new challenges and opportunities to learn and grow. Let’s make some magic with data! When I don’t stare tolines of code or spreadsheet, I like to read and play video game or spend quality time with my dog."
+  }
+]

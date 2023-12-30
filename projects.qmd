@@ -6,7 +6,7 @@ listing:
   type: default
   categories: TRUE
   sort-ui: FALSE
-  filter-ui: FALSE
+  filter-ui: [title, date, categories]
 page-layout: full
 title-block-banner: TRUE
 ---

@@ -5,6 +5,7 @@ project:
 website:
   title: "Simone Brazzi"
   favicon: images/favicon.png
+  site-url: "https://simonebrazzi.github.io/blog/"
   page-footer:
     center: |
       [Contact me](mailto:simonebrazzi@icloud.com)

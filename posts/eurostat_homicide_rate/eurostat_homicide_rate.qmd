@@ -7,8 +7,139 @@ categories:
   - code
   - shiny
   - R
+toc: TRUE
 ---
 
-Hi there and welcome to my first project for the blog! The topic is a sad one, but I would like to explain why I decided to start with this. I was trying Shiny for different dashboards, but I wasn't satisfied to learn using the classic examples. Unfortunately, italian crime news suffocated the public debate with a case of homicide, in which the victim is a young women. The public debate was focusing so baaaaaadly on the concept of feminicide and the data, that I decided to clear the situation with a simple dashboard.
+# Introduction
 
-First of all, at this link you can find the dashboard published using [shinyapps.io](https://d4jtd9-simonebrazzi.shinyapps.io/Homicide_Eurostat/).
+Hi there and welcome to my first project for the blog! The topic is a sad one, but I would like to explain why I decided to start with this. I was trying Shiny for different dashboards, but I wasn't satisfied to learn using the classic examples. Unfortunately, italian crime news suffocated the public debate with a case of homicide, in which the victim is a young women. The public debate was focusing so baaaaaadly on the concept of femicide and the data, that I decided to clear the situation with a simple dashboard.
+
+First of all, at this link you can find the dashboard published using [shinyapps.io](https://d4jtd9-simonebrazzi.shinyapps.io/Homicide_Eurostat/). Also at this link you can find the [Github](https://github.com/SimoneBrazzi/eurostat_homicide) repo. As you can see, even if it is the main branch, there are some details which are not uber perfect, but that don't interfere with the code.
+
+Now lets jump into the detail of how to create a Shiny dashboard!
+
+# The structure
+
+You can create a very basic shiny dashboard with RStudio by creating a new project and select Shiny Application.
+
+By default, a Shiny Application consists of a server.R file, in which there a 2 functions:
+
+1.  `ui()`, which defines the **U**ser **I**nterface.
+2.  `server()`, which defines the back-end of your application.
+
+But wait!? My code is different! This is because when a shiny app become bigger, it is useful to separate the code in different files:
+
+1.  `global.R` file to declare all the variables and all the packages.
+2.  `ui.R` file for the front-end.
+3.  `server.R` for the back-end.
+
+Doing so has its pros and cons: each part of the application has its own *raison de vivre* and is self contained; still, you need to be very precise in commenting each part of the code, so you can remember all the interconnection of the ui with the server file.
+
+**could be nice to have a diagram of the 3 files which convergence in the app.**
+
+# The code
+
+In this part we are going to analyze how the app is composed. I would like to follow the files flow.
+
+## global.R
+
+As said, this file is our usual R Script file. First thing first, we import our libraries:
+
+```{r}
+# wrangling
+library("tidyverse")
+library("readr")
+library("stringr")
+library("dplyr")
+library("magrittr")
+library("forcats")
+library("lubridate")
+library("writexl")
+library("eurostat")
+# plotting and dashboarding
+library("shiny")
+library("shinythemes")
+library("ggplot2")
+library("plotly")
+library("scales")
+library("RColorBrewer")
+library("waiter")
+# connecting and other
+library("rsconnect")
+library("markdown")
+```
+
+Lots of packages! The division is merely to remember how everything is managed and because I have OCD for this type of things.
+
+I want to focus on some packages:
+
+-   **tidyverse**, we all know it. As you can see, I also imported lots of single packages which compose the tidyverse, because I was getting errors of missing methods.
+
+-   **eurostat**, which lets data flows from the eurostat website to my dashboard. This also lets the dashboard automatically updates when new data is available.
+
+-   **scales**, to nicely scaling my x and y axis.
+
+-   **RColorBrewer**, because I wanted to have a colorblind safe dashboard, even tough I am not.
+
+-   **waiter**, for nice waiting images while the dashboard is loading.
+
+Now we can focus on the data importing and wrangling. For this, the **eurostat** library does the job. Lets focus on the *crim_hom_vrel* dataset.
+
+```{r}
+# search in eurostat db
+homicide <- search_eurostat("homicide")
+
+# import data to variable
+crim_hom_vrel <- get_eurostat("crim_hom_vrel", time_format = "date")
+
+# convert all observations to understandable data
+crim_hom_vrel <- label_eurostat(crim_hom_vrel)
+
+# label_eurostat_vars(crim_hom_vrel)
+
+# order data by country and date for time series purpose
+crim_hom_vrel <- crim_hom_vrel %>% 
+  arrange(geo, time)
+
+crim_hom_vrel_grouped <- crim_hom_vrel %>% 
+  dplyr::group_by(geo, time, sex, pers_cat, unit) %>% 
+  dplyr::summarise(values_grouped = sum(values), .groups = "drop") %>% 
+  filter(unit == "Number") %>% 
+  arrange(geo, time, sex)
+```
+
+Everything pretty simple. I would like to highlight something about the `dplyr::group_by` and `dplyr::summarise`. As you can see, after having grouped and summarized, I need to drop the groups with the method `.groups = "drop"`. With dplyr v.1.1.0 we can do the same with the help of the `.by` method in `summarise`.
+
+```{r}
+crim_hom_vrel_grouped <- crim_hom_vrel %>% 
+  dplyr::summarise(
+    values_grouped = sum(values),
+    .by = c(geo, time, sex, pers_cat, unit)
+    ) %>% 
+  filter(unit == "Number") %>% 
+  arrange(geo, time, sex)
+```
+
+Copying from the [dplyr website](https://dplyr.tidyverse.org/reference/dplyr_by.html) the differences between `.by` and `group_by()` are:
+
+| .by                                                                                                | group_by()                                                                                         |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| Grouping only affects a single verb                                                                | Grouping is persistent across multiple verbs                                                       |
+| Selects variables with [tidy-select](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html) | Computes expressions with [data-masking](https://rlang.r-lib.org/reference/args_data_masking.html) |
+| Summaries use existing order of group keys                                                         | Summaries sort group keys in ascending order                                                       |
+
+Last part is all about colors.
+
+```{r}
+# brewer.pal(11, "RdYlBu")
+palette <- c("#A50026", "#D73027", "#F46D43", "#FDAE61", "#FEE090", "#FFFFBF", "#E0F3F8", "#ABD9E9", "#74ADD1", "#4575B4", "#313695")
+
+palette_crim_hom_vrel_grouped <- rep(
+  palette,
+  length.out = crim_hom_vrel_grouped$geo %>% str_unique() %>% length()
+  )
+```
+
+Here I defined the palette using ColorBrewer. Using `rep` I replicated the 11 colours for the length of the unique geo values.
+
+## ui.R

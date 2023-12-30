@@ -4,7 +4,7 @@ execute:
   enabled: false
   #freeze: auto
   cache: true
-  
+image: eurostat.jpg
 description: "A primer on Shiny to analyze gender differences in homicide rates"
 author: "Simone Brazzi"
 date: "2023-12-29"

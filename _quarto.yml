@@ -36,6 +36,8 @@ format:
       dark: [darkly, theme_dark_custom.scss]
     code-link: TRUE
     code-fold: show
+    # code-line-numbers: TRUE
+    code-copy: TRUE
     highlight-style: monokai
 
 editor: visual

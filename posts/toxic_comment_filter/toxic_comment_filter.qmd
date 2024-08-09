@@ -1,0 +1,743 @@
+---
+title: "Toxic Comment Filter"
+execute:
+  cache: true
+  freeze: true
+# image: "eurostat.png"
+description: "BiLSTM model to make a multi label classification for a toxic comment filter"
+author: "Simone Brazzi"
+date: "2024-08-02"
+categories:
+  - code
+  - Deep Learning
+  - Python, R
+toc: TRUE
+---
+
+# Introduction
+
+-   Costruire un modello in grado di filtrare i commenti degli utenti in base al grado di dannosità del linguaggio.
+-   Preprocessare il testo eliminando l'insieme di token che non danno contributo significativo a livello semantico.
+-   Trasformare il corpus testuale in sequenze.
+-   Costruire un modello di Deep Learning comprendente dei layer ricorrenti per un task di classificazione multilabel.
+
+In prediction time, il modello deve ritornare un vettore contenente un 1 o uno 0 in corrispondenza di ogni label presente nel dataset (toxic, severe_toxic, obscene, threat, insult, identity_hate).
+In questo modo, un commento non dannoso sarà classificato da un vettore di soli 0 \[0,0,0,0,0,0\].
+Al contrario, un commento pericoloso presenterà almeno un 1 tra le 6 labels.
+
+# Setup
+
+Leveraging Quarto and RStudio, I will setup an R and Python enviroment.
+
+## Import R libraries
+
+Import R libraries.
+These will be used for both the rendering of the document and data analysis.
+The reason is I prefer `ggplot2` over `matplotlib`.
+I will also use colorblind safe palettes.
+
+```{r}
+#| warning: FALSE
+#| message: FALSE
+
+library(tidyverse, verbose = FALSE)
+library(tidymodels, verbose = FALSE)
+library(reticulate)
+library(ggplot2)
+library(plotly)
+library(RColorBrewer)
+library(bslib)
+library(Metrics)
+
+reticulate::use_virtualenv("r-tf")
+```
+
+## Import Python packages
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+import keras
+import keras_nlp
+
+from keras.backend import clear_session
+from keras.models import Model, load_model
+from keras.layers import TextVectorization, Input, Dense, Embedding, Dropout, GlobalAveragePooling1D, LSTM, Bidirectional, GlobalMaxPool1D, Flatten, LayerNormalization
+from keras.metrics import Precision, Recall, AUC
+
+from sklearn.model_selection import train_test_split, KFold
+from sklearn.metrics import multilabel_confusion_matrix, classification_report, ConfusionMatrixDisplay, precision_recall_curve, f1_score, recall_score, roc_auc_score
+```
+
+Create a Config class to store all the useful parameters for the model and for the project.
+
+## Class Config
+
+I created a `class` with all the basic configuration of the model, to improve the readability.
+
+```{python}
+class Config():
+    def __init__(self):
+        self.url = "https://s3.eu-west-3.amazonaws.com/profession.ai/datasets/Filter_Toxic_Comments_dataset.csv"
+        self.path = "/Users/simonebrazzi/datasets/toxic_comment/Filter_Toxic_Comments_dataset.csv"
+        self.max_tokens = 20000
+        self.output_sequence_length = 911 # check the analysis done to establish this value
+        self.embedding_dim = 128
+        self.batch_size = 32
+        self.epochs = 100
+        self.temp_split = 0.3
+        self.test_split = 0.5
+        self.random_state = 42
+        self.total_samples = 159571 # total train samples
+        self.train_samples = 111699
+        self.val_samples = 23936
+        self.features = 'comment_text'
+        self.labels = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
+        self.new_labels = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate', "clean"]
+        self.label_mapping = {label: i for i, label in enumerate(self.labels)}
+        self.new_label_mapping = {label: i for i, label in enumerate(self.labels)}
+        self.test = "_final"
+        self.checkpoint_file = "checkpoint.lstm_model" + self.test + ".keras"
+        self.history_file = "lstm_model" + self.test + ".xlsx"
+        self.matrix_file = "confusion_matrices" + self.test + ".png"
+        self.metrics = [
+            Precision(name='precision'),
+            Recall(name='recall'),
+            AUC(name='auc', multi_label=True, num_labels=len(self.labels))
+        ]
+    def get_early_stopping(self):
+        early_stopping = keras.callbacks.EarlyStopping(
+            monitor="val_recall",
+            min_delta=0.2,
+            patience=10,
+            verbose=0,
+            mode="max",
+            restore_best_weights=True,
+            start_from_epoch=3
+        )
+        return early_stopping
+
+    def get_model_checkpoint(self, filepath):
+        model_checkpoint = keras.callbacks.ModelCheckpoint(
+            filepath=filepath,
+            monitor="val_recall",
+            verbose=0,
+            save_best_only=True,
+            save_weights_only=False,
+            mode="max",
+            save_freq="epoch"
+        )
+        return model_checkpoint
+    
+    def find_optimal_threshold_cv(self, ytrue, yproba, metric, thresholds=np.arange(.05, .35, .05), n_splits=7):
+      
+      # instantiate KFold
+      kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+      threshold_scores = []
+      
+      for threshold in thresholds:
+        
+        cv_scores = []
+        for train_index, val_index in kf.split(ytrue):
+          
+          ytrue_val = ytrue[val_index]
+          yproba_val = yproba[val_index]
+          
+          ypred_val = (yproba_val >= threshold).astype(int)
+          score = metric(ytrue_val, ypred_val, average="micro")
+          cv_scores.append(score)
+        
+        mean_score = np.mean(cv_scores)
+        threshold_scores.append((threshold, mean_score))
+        
+        # Find the threshold with the highest mean score
+        best_threshold, best_score = max(threshold_scores, key=lambda x: x[1])
+      return best_threshold, best_score
+      
+config = Config()
+```
+
+# Data
+
+The dataset is accessible using `tf.keras.utils.get_file` to get the file from the url.
+*N.B.* For reproducibility purpose, I also downloaded the dataset.
+There was time in which the link was not available.
+
+```{python}
+# df = pd.read_csv(config.path)
+file = tf.keras.utils.get_file("Filter_Toxic_Comments_dataset.csv", config.url)
+df = pd.read_csv(file)
+```
+
+```{r}
+#| label: tbl-head
+#| tbl-cap: First 5 elemtns
+
+library(reticulate)
+
+py$df %>%
+  tibble() %>% 
+  head(5)
+```
+
+Lets create a *clean* variable for EDA purpose: I want to visually see how many observation are clean vs the others labels.
+
+```{python}
+df.loc[df.sum_injurious == 0, "clean"] = 1
+df.loc[df.sum_injurious != 0, "clean"] = 0
+```
+
+## EDA
+
+First a check on the dataset to find possible missing values and imbalances.
+
+### Frequency
+```{r}
+#| label: tbl-frequency
+#| tbl-cap: Absolute and relative labels frequency
+
+library(reticulate)
+df_r <- py$df
+new_labels_r <- py$config$new_labels
+
+df_r_grouped <- df_r %>% 
+  select(all_of(new_labels_r)) %>%
+  pivot_longer(
+    cols = all_of(new_labels_r),
+    names_to = "label",
+    values_to = "value"
+  ) %>% 
+  group_by(label) %>%
+  summarise(count = sum(value)) %>% 
+  mutate(freq = round(count / sum(count), 4))
+
+df_r_grouped
+```
+
+### Barchart
+```{r}
+#| label: fig-barchart
+#| fig.cap: "Imbalance in the dataset with clean variable"
+#| fig.width: 10
+#| fig.height: 6
+#| fig-responsive: true
+
+library(reticulate)
+barchart <- df_r_grouped %>%
+  ggplot(aes(x = reorder(label, count), y = count, fill = label)) +
+  geom_col() +
+  labs(
+    x = "Labels",
+    y = "Count"
+  ) +
+  # sort bars in descending order
+  scale_x_discrete(limits = df_r_grouped$label[order(df_r_grouped$count, decreasing = TRUE)]) +
+  scale_fill_brewer(type = "seq", palette = "RdYlBu")
+ggplotly(barchart)
+```
+
+It is visible how much the dataset in imbalanced.
+This means it could be useful to check for the class weight and use this argument during the training.
+
+```{r}
+#| echo: false
+
+library(reticulate)
+clean_perc <- df_r_grouped %>%
+  filter(label == "clean") %>% 
+  pull(freq)
+```
+
+It is clear that most of our text are clean.
+We are talking about `r clean_perc` of the observations which are clean.
+Only `r 1 - clean_perc` are toxic comments.
+
+## Sequence lenght definition
+
+To convert the text in a useful input for a NN, it is necessary to use a `TextVectorization layer`.
+See the @sec-preprocessing section.
+
+One of the method is `output_sequence_length`: to better define it, it is useful to analyze our text length.
+To simulate what the model we do, we are going to remove the punctuation and the new lines from the comments.
+
+### Summary
+```{r}
+#| label: tbl-summary
+#| tbl-cap: Summary of text length
+
+library(reticulate)
+df_r %>% 
+  mutate(
+    comment_text_clean = comment_text %>%
+      tolower() %>% 
+      str_remove_all("[[:punct:]]") %>% 
+      str_replace_all("\n", " "),
+    text_length = comment_text_clean %>% str_count()
+    ) %>% 
+  pull(text_length) %>% 
+  summary() %>% 
+  as.list() %>% 
+  as_tibble()
+```
+
+### Boxplot
+```{r}
+#| label: fig-boxplot
+#| fig.cap: "Text length boxplot"
+#| fig.width: 10
+#| fig.height: 6
+
+library(reticulate)
+boxplot <- df_r %>% 
+  mutate(
+    comment_text_clean = comment_text %>%
+      tolower() %>% 
+      str_remove_all("[[:punct:]]") %>% 
+      str_replace_all("\n", " "),
+    text_length = comment_text_clean %>% str_count()
+    ) %>% 
+  # pull(text_length) %>% 
+  ggplot(aes(y = text_length)) +
+  geom_boxplot() +
+  theme_minimal()
+ggplotly(boxplot)
+```
+
+### Histogram
+```{r}
+#| label: fig-histogram
+#| fig.cap: "Text length histogram with boxplot upper fence"
+#| fig.width: 10
+#| fig.height: 6
+
+library(reticulate)
+df_ <- df_r %>% 
+  mutate(
+    comment_text_clean = comment_text %>%
+      tolower() %>% 
+      str_remove_all("[[:punct:]]") %>% 
+      str_replace_all("\n", " "),
+    text_length = comment_text_clean %>% str_count()
+  )
+
+Q1 <- quantile(df_$text_length, 0.25)
+Q3 <- quantile(df_$text_length, 0.75)
+IQR <- Q3 - Q1
+upper_fence <- as.integer(Q3 + 1.5 * IQR)
+
+histogram <- df_ %>% 
+  ggplot(aes(x = text_length)) +
+  geom_histogram(bins = 50) +
+  geom_vline(aes(xintercept = upper_fence), color = "red", linetype = "dashed", linewidth = 1) +
+  theme_minimal() +
+  xlab("Text Length") +
+  ylab("Frequency") +
+  xlim(0, max(df_$text_length, upper_fence))
+ggplotly(histogram)
+```
+
+Considering all the above analysis, I think a good starting value for the `output_sequence_length` is `r upper_fence`, the upper fence of the boxplot.
+In the last plot, it is the dashed red vertical line..
+Doing so, we are removing the outliers, which are a small part of our dataset.
+
+## Dataset
+
+Now we can split the dataset in 3: *train*, *test* and *validation* sets.
+Considering there is not a function in sklearn which lets split in these 3 sets, we can do the following: - split between a *train* and *temp*orary set with a 0.3 split.
+- split the *temp*orary set in 2 equal sized *test* and *val* sets.
+
+```{python}
+x = df[config.features].values
+y = df[config.labels].values
+
+xtrain, xtemp, ytrain, ytemp = train_test_split(
+  x,
+  y,
+  test_size=config.temp_split, # .3
+  random_state=config.random_state
+  )
+xtest, xval, ytest, yval = train_test_split(
+  xtemp,
+  ytemp,
+  test_size=config.test_split, # .5
+  random_state=config.random_state
+  )
+```
+
+xtrain shape: `py$xtrain.shape`
+ytrain shape: `py$ytrain.shape`
+xtest shape: `py$xtest.shape`
+ytest shape: `py$ytest.shape`
+xval shape: `py$xval.shape`
+yval shape: `py$yval.shape`
+
+
+The datasets are created using the `tf.data.Dataset` function. It creates a data input pipeline.
+The `tf.data` API makes it possible to handle large amounts of data, read from different data formats, and perform complex transformations.
+The `tf.data.Dataset` is an abstraction that represents a sequence of elements, in which each element consists of one or more components.
+Here each dataset is creates using `from_tensor_slices`. It create a tf.data.Dataset from a tuple (features, labels).
+`.batch` let us work in batches to improve performance, while `.prefetch` overlaps the preprocessing and model execution of a training step. While the model is executing training step s, the input pipeline is reading the data for step s+1. Check the [documentation](https://www.tensorflow.org/guide/data_performance) for further informations.
+
+
+```{python}
+train_ds = (
+    tf.data.Dataset
+    .from_tensor_slices((xtrain, ytrain))
+    .shuffle(xtrain.shape[0])
+    .batch(config.batch_size)
+    .prefetch(tf.data.experimental.AUTOTUNE)
+)
+
+test_ds = (
+    tf.data.Dataset
+    .from_tensor_slices((xtest, ytest))
+    .batch(config.batch_size)
+    .prefetch(tf.data.experimental.AUTOTUNE)
+)
+
+val_ds = (
+    tf.data.Dataset
+    .from_tensor_slices((xval, yval))
+    .batch(config.batch_size)
+    .prefetch(tf.data.experimental.AUTOTUNE)
+)
+
+```
+
+```{python}
+print(
+  f"train_ds cardinality: {train_ds.cardinality()}\n",
+  f"val_ds cardinality: {val_ds.cardinality()}\n",
+  f"test_ds cardinality: {test_ds.cardinality()}\n"
+  )
+```
+
+Check the first element of the dataset to be sure that the preprocessing is done correctly.
+
+```{python}
+train_ds.as_numpy_iterator().next()
+```
+
+And we check also the shape. We expect a feature of shape (batch, ) and a target of shape (batch, number of labels).
+```{python}
+print(
+  f"text train shape: {train_ds.as_numpy_iterator().next()[0].shape}\n",
+  f" text train type: {train_ds.as_numpy_iterator().next()[0].dtype}\n",
+  f"label train shape: {train_ds.as_numpy_iterator().next()[1].shape}\n",
+  f"label train type: {train_ds.as_numpy_iterator().next()[1].dtype}\n"
+  )
+```
+
+# Preprocessing {#sec-preprocessing}
+
+Of course preprocessing!
+Text is not the type of input a NN can handle.
+The *`TextVectorization`* layer is meant to handle natural language inputs. The processing of each example contains the following steps: 
+1. `Standardize` each example (usually lowercasing + punctuation stripping)
+2. `Split` each example into substrings (usually words)
+3. Recombine substrings into `tokens` (usually ngrams)
+4. `Index` tokens (associate a unique int value with each token)
+5. `Transform` each example using this index, either into a vector of ints or a dense float vector.
+
+For more reference, see the documentation at the following [link](https://keras.io/api/layers/preprocessing_layers/text/text_vectorization/).
+
+```{python}
+text_vectorization = TextVectorization(
+  max_tokens=config.max_tokens,
+  standardize="lower_and_strip_punctuation",
+  split="whitespace",
+  output_mode="int",
+  output_sequence_length=config.output_sequence_length,
+  pad_to_max_tokens=True
+  )
+
+# prepare a dataset that only yields raw text inputs (no labels)
+text_train_ds = train_ds.map(lambda x, y: x)
+# adapt the text vectorization layer to the text data to index the dataset vocabulary
+text_vectorization.adapt(text_train_ds)
+```
+
+This layer is set to:
+- `max_tokens`: 20000. It is common for text classification. It is the *maximum size* of the vocabulary for this layer.
+- `output_sequence_length`: `r upper_fence`. See @fig-histogram for the reason why. Only valid in `"int"` mode.
+- `output_mode`: outputs integer indices, one integer index per split string token. When output_mode == "int", 0 is reserved for masked locations; this reduces the vocab size to max_tokens - 2 instead of max_tokens - 1.
+- `standardize`: `"lower_and_strip_punctuation"`.
+- `split`: on whitespace.
+
+To preserve the original comments as text and also have a tf.data.Dataset in which the text is preprocessed by the TextVectorization function, it is possible to map it to the features of each dataset.
+```{python}
+processed_train_ds = train_ds.map(
+    lambda x, y: (text_vectorization(x), y),
+    num_parallel_calls=tf.data.experimental.AUTOTUNE
+)
+processed_val_ds = val_ds.map(
+    lambda x, y: (text_vectorization(x), y),
+    num_parallel_calls=tf.data.experimental.AUTOTUNE
+)
+processed_test_ds = test_ds.map(
+    lambda x, y: (text_vectorization(x), y),
+    num_parallel_calls=tf.data.experimental.AUTOTUNE
+)
+```
+
+# Model
+
+## Definition
+
+Define the model using the *Functional* API.
+
+```{python}
+def get_deeper_lstm_model():
+    clear_session()
+    inputs = Input(shape=(None,), dtype=tf.int64, name="inputs")
+    embedding = Embedding(
+        input_dim=config.max_tokens,
+        output_dim=config.embedding_dim,
+        mask_zero=True,
+        name="embedding"
+    )(inputs)
+    x = Bidirectional(LSTM(256, return_sequences=True, name="bilstm_1"))(embedding)
+    x = Bidirectional(LSTM(128, return_sequences=True, name="bilstm_2"))(x)
+    # Global average pooling
+    x = GlobalAveragePooling1D()(x)
+    # Add regularization
+    x = Dropout(0.3)(x)
+    x = Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
+    x = LayerNormalization()(x)
+    outputs = Dense(len(config.labels), activation='sigmoid', name="outputs")(x)
+    model = Model(inputs, outputs)
+    model.compile(optimizer='adam', loss="binary_crossentropy", metrics=config.metrics, steps_per_execution=32)
+    
+    return model
+
+lstm_model = get_deeper_lstm_model()
+lstm_model.summary()
+```
+
+## Callbacks
+
+Finally, the model has been trained using 2 callbacks:
+- Early Stopping, to avoid to consume the kaggle GPU time.
+- Model Checkpoint, to retrieve model training information.
+
+```{python}
+# callbacks
+my_es = config.get_early_stopping()
+my_mc = config.get_model_checkpoint(filepath="/kaggle/working/checkpoint.keras")
+callbacks = [my_es, my_mc]
+```
+
+## Final preparation before fit
+
+Considering the dataset is imbalanced, to increase the performance we need to calculate the class weight. This will be passed during the training of the model.
+```{python}
+lab = pd.DataFrame(columns=config.labels, data=ytrain)
+r = lab.sum() / len(ytrain)
+class_weight = dict(zip(range(len(config.labels)), r))
+class_weight
+```
+
+It is also useful to define the steps per epoch for train and validation dataset. This step is required to avoid 
+```{python}
+steps_per_epoch = config.train_samples // config.batch_size
+validation_steps = config.val_samples // config.batch_size
+```
+
+## Fit
+
+The fit has been done on Kaggle to levarage the GPU. Some considerations about the model:
+
+- `.repeat()` ensure the model sees all the daataset.
+- `epocs` is set to 100.
+- `validation_data` has the same repeat.
+- `callbacks` are the one defined before.
+- `class_weight` ensure the model is trained using the frequency of each class, because our dataset is imbalanced.
+- `steps_per_epoch` and `validation_steps` depend on the use of `repeat`.
+
+
+```{python}
+#| eval: false
+history_deeper_lstm_model = model.fit(
+  processed_train_ds.repeat(),
+  epochs=config.epochs,
+  validation_data=processed_val_ds.repeat(),
+  callbacks=callbacks,
+  class_weight=class_weight,
+  steps_per_epoch=steps_per_epoch,
+  validation_steps=validation_steps
+  )
+```
+
+Now we can import the model and the history trained on Kaggle.
+```{python}
+import keras
+from keras.models import load_model
+
+model = load_model(filepath="/Users/simonebrazzi/R/professionAI_deep_learning/Progetto_Finale/history/model.keras")
+
+history = pd.read_excel("~/R/professionAI_deep_learning/Progetto_Finale/history/deep_lstm_model.xlsx")
+```
+
+## Evaluate
+
+```{python}
+#| output: false
+#| message: false
+
+validation = model.evaluate(
+  processed_val_ds.repeat(),
+  steps=validation_steps, # 748
+  verbose=0
+  )
+```
+
+```{r}
+#| label: tbl-val-metrics
+#| tbl-cap: Model validation metric
+
+tibble(
+  metric = c("loss", "precision", "recall", "auc"),
+  value = py$validation
+  )
+```
+
+## Predict
+
+For the prediction, the model does not need to repeat the dataset, because the model has already been trained and now it has just to consume the data to make the prediction.
+```{python}
+#| output: false
+#| message: false
+
+predictions = model.predict(processed_test_ds, verbose=0)
+```
+
+## Confusion Matrix
+
+The best way to assess the performance of a multi label classification is using a confusion matrix. Sklearn has a specific function to create a multi label classification matrix to handle the fact that there could be multiple labels for one prediction.
+
+
+### Grid Search Cross Validation for best threshold
+
+Grid Search CV is a technique for fine-tuning hyperparameter of a ML model. It systematically search through a set of hyperparamenter values to find the combination which led to the best model performance.
+In this case, I am using a `KFold` Cross Validation is a resempling technique to split the data into k consecutive folds. Each fold is used once as a validation while the k - 1 remaining folds are the training set. See the [documentation](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html) for more information.
+
+The model is trained to optimize the recall. The decision was made because the cost of missing a True Positive is greater than a False Positive. In this case, missing a injurious observation is worst than classifying a clean one as bad.
+
+Having said this, I still want to test different metrics other than the `recall_score` to have more possibility of decision of the best threshold.
+
+#### f1_score
+```{python}
+#| eval: false
+
+ytrue = ytest.astype(int)
+y_pred_proba = predictions
+optimal_threshold_f1, best_score_f1 = config.find_optimal_threshold_cv(ytrue, y_pred_proba, f1_score)
+
+print(f"Optimal threshold: {optimal_threshold_f1}")
+print(f"Best score: {best_score_f1}")
+
+# Use the optimal threshold to make predictions
+final_predictions_f1 = (y_pred_proba >= optimal_threshold_f1).astype(int)
+```
+
+#### recall_score
+```{python}
+ytrue = ytest.astype(int)
+y_pred_proba = predictions
+optimal_threshold_recall, best_score_recall = config.find_optimal_threshold_cv(ytrue, y_pred_proba, recall_score)
+
+# Use the optimal threshold to make predictions
+final_predictions_recall = (y_pred_proba >= optimal_threshold_recall).astype(int)
+```
+
+Optimal threshold recall: `r py$optimal_threshold_recall`.
+Best score: `r py$best_score_recall`.
+
+#### roc_auc_score
+```{python}
+#| eval: false
+
+ytrue = ytest.astype(int)
+y_pred_proba = predictions
+optimal_threshold_roc, best_score_roc = config.find_optimal_threshold_cv(ytrue, y_pred_proba, roc_auc_score)
+
+print(f"Optimal threshold: {optimal_threshold_roc}")
+print(f"Best score: {best_score_roc}")
+
+# Use the optimal threshold to make predictions
+final_predictions_roc = (y_pred_proba >= optimal_threshold_roc).astype(int)
+```
+
+
+### Confusion Matrix Plot
+
+The confusion matrix is plotted using the `multilabel_confusion_matrix` function in scikit-learn. We have to plot a confusion matrix for each label. To plot the confusion matrix, we need to convert the predicted probability of a label to a proper prediction. To do so, we use the calculated optimal threshold for the recall, which is `r py$optimal_threshold_recall`.
+The confusion matrix plotted hete, considering we have a multi label task, is not a big one with all the labels as columns and indices. We plot a confusion matrix for each label with a simple for loop, which extract for each loop the confusion matrix and the associated label.
+
+```{python}
+#| fig.cap: "Multi Label Confusion matrix"
+#| label: fig-mcm
+#| fig.width: 10
+#| fig.height: 6
+
+# convert probability predictions to predictions
+ypred = predictions >=  optimal_threshold_recall # .05
+ypred = ypred.astype(int)
+
+# create a plot with 3 by 2 subplots
+fig, axes = plt.subplots(3, 2, figsize=(15, 15))
+axes = axes.flatten()
+mcm = multilabel_confusion_matrix(ytrue, ypred)
+# plot the confusion matrices for each label
+for i, (cm, label) in enumerate(zip(mcm, config.labels)):
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot(ax=axes[i], colorbar=False)
+    axes[i].set_title(f"Confusion matrix for label: {label}")
+plt.tight_layout()
+plt.show()
+```
+
+## Classification Report
+
+```{python}
+#| output: false
+#| message: false
+
+cr = classification_report(
+  ytrue,
+  ypred,
+  target_names=config.labels,
+  digits=4,
+  output_dict=True
+  )
+df_cr = pd.DataFrame.from_dict(cr).reset_index()
+```
+
+```{r}
+#| label: tbl-classification-report
+#| tbl-cap: Classification report
+
+library(reticulate)
+df_cr <- py$df_cr %>% dplyr::rename(names = index)
+cols <- df_cr %>% colnames()
+df_cr %>% 
+  pivot_longer(
+    cols = -names,
+    names_to = "metrics",
+    values_to = "values"
+  ) %>% 
+  pivot_wider(
+    names_from = names,
+    values_from = values
+  )
+```
+
+
+# Conclusions
+
+The BiLSTM model optimized to have an high recall is performing good enough to make predictions for each label, except for the threat one. See @tbl-frequency and @fig-barchart: the threat label is only 0.27 % of the observations. 
+The model has been optimized for recall because the cost of not identifying a injurious comment as such is higher than the cost of considering a clean comment as injurious.
+
+Possibile improvements could be to increase the number of observations, expecially for the threat one. In general there are too many clean comments. This could be avoided doing an undersampling of the clean comment, which I explicitly avoided to check the performance on the BiLSTM with an imbalanced dataset, leveraging the class weight method.

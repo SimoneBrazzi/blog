@@ -93,7 +93,7 @@ class Config():
         self.new_labels = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate', "clean"]
         self.label_mapping = {label: i for i, label in enumerate(self.labels)}
         self.new_label_mapping = {label: i for i, label in enumerate(self.labels)}
-        self.path = "~/R/blog/posts/toxic_comment_filter/history/f1score"
+        self.path = "/Users/simonebrazzi/R/blog/posts/toxic_comment_filter/history/f1score/"
         self.model =  self.path + "model_f1.keras"
         self.checkpoint = self.path + "checkpoint.lstm_model_f1.keras"
         self.history = self.path + "lstm_model_f1.xlsx"
@@ -525,7 +525,6 @@ library(reticulate)
 py$df_class_weight
 ```
 
-
 It is also useful to define the steps per epoch for train and validation dataset. This step is required to avoid
 
 ```{python}
@@ -583,7 +582,7 @@ validation = model.evaluate(
 #| tbl-cap: Model validation metric
 
 tibble(
-  metric = c("loss", "precision", "recall", "auc"),
+  metric = c("loss", "precision", "recall", "auc", "f1_score"),
   value = py$validation
   )
 ```
@@ -627,7 +626,7 @@ print(f"Best score: {best_score_f1}")
 final_predictions_f1 = (y_pred_proba >= optimal_threshold_f1).astype(int)
 ```
 
-Optimal threshold recall: `r py$optimal_threshold_f1`. Best score: `r py$best_score_f1`.
+Optimal threshold f1 score: `r py$optimal_threshold_f1`. Best score: `r py$best_score_f1`.
 
 #### recall_score
 
@@ -660,7 +659,7 @@ print(f"Best score: {best_score_roc}")
 final_predictions_roc = (y_pred_proba >= optimal_threshold_roc).astype(int)
 ```
 
-Optimal threshold recall: `r py$optimal_threshold_roc`. Best score: `r py$best_score_roc`.
+Optimal threshold roc: `r py$optimal_threshold_roc`. Best score: `r py$best_score_roc`.
 
 ### Confusion Matrix Plot
 

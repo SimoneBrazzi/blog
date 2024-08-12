@@ -1,8 +1,5 @@
 ---
 title: "Toxic Comment Filter"
-# execute:
-  # cache: true
-  # freeze: true
 # image: "eurostat.png"
 description: "BiLSTM model to make a multi label classification for a toxic comment filter"
 author: "Simone Brazzi"

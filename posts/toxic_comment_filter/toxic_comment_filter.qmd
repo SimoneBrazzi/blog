@@ -10,8 +10,8 @@ categories:
   - Python, R
 toc: TRUE
 toc-title: "Table of Contents"
-number-sections: TRUE
 toc-depth: 3
+number-sections: TRUE
 other-links:
   - icon: file-code
     text: Kaggle
@@ -37,7 +37,7 @@ Import R libraries. These will be used for both the rendering of the document an
 
 ```{r}
 #| warning: FALSE
-#| message: FALSE
+
 
 library(tidyverse, verbose = FALSE)
 library(tidymodels, verbose = FALSE)
@@ -301,7 +301,6 @@ boxplot <- df_r %>%
   # pull(text_length) %>% 
   ggplot(aes(y = text_length)) +
   geom_boxplot() +
-  coord_flip() +
   theme_minimal()
 ggplotly(boxplot)
 ```
@@ -577,7 +576,7 @@ history = pd.read_excel(config.history)
 
 ```{python}
 #| output: false
-#| message: false
+
 
 validation = model.evaluate(
   processed_val_ds.repeat(),
@@ -603,7 +602,7 @@ For the prediction, the model does not need to repeat the dataset, because it ha
 
 ```{python}
 #| output: false
-#| message: false
+
 
 predictions = model.predict(processed_test_ds, verbose=0)
 ```
@@ -719,7 +718,7 @@ plt.show()
 
 ```{python}
 #| output: false
-#| message: false
+
 
 cr = classification_report(
   ytrue,

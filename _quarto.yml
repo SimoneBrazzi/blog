@@ -32,11 +32,11 @@ website:
 format:
   html:
     theme:
-      light: [flatly, theme_light_custom.scss] 
       dark: [darkly, theme_dark_custom.scss]
+      light: [flatly, theme_light_custom.scss] 
     code-link: TRUE
     code-fold: show
-    # code-line-numbers: TRUE
+    code-line-numbers: TRUE
     code-copy: TRUE
     highlight-style: monokai
 

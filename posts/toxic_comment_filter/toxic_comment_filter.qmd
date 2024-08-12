@@ -591,10 +591,11 @@ validation = model.evaluate(
 #| label: tbl-val-metrics
 #| tbl-cap: Model validation metric
 
-tibble(
+val_metrics <- tibble(
   metric = c("loss", "precision", "recall", "auc", "f1_score"),
   value = py$validation
   )
+val_metrics
 ```
 
 ## Predict
@@ -632,8 +633,11 @@ I decide to train the model on the F1 score to have a balanced model in both pre
 
 Moreover, the model has been trained on the **macro avarage F1 score**, which is a single performance indicator obtained by the mean of the Precision and Recall scores of **individual classses**.
 
+$$
+F1\ macro\ avg = \frac{\sum_{i=1}^{n} F1_i}{n}
+$$
 
-It is usegule for **imbalanced** classes, because it weights each classes equally. It is not influenced by the number of samples of each classes. This is sette both in the `config.metrics` and `find_optimal_threshold_cv`.
+It is useful with **imbalanced** classes, because it weights each classes equally. It is not influenced by the number of samples of each classes. This is sette both in the `config.metrics` and `find_optimal_threshold_cv`.
 
 #### f1_score
 

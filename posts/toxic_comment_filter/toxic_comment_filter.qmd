@@ -305,7 +305,6 @@ boxplot <- df_r %>%
 ggplotly(boxplot)
 ```
 
-
 ### Histogram
 
 ```{r}
@@ -497,9 +496,7 @@ lstm_model.summary()
 
 ## Callbacks
 
-Finally, the model has been trained using 2 callbacks:
-- Early Stopping, to avoid to consume the kaggle GPU time.
-- Model Checkpoint, to retrieve the best model training information.
+Finally, the model has been trained using 2 callbacks: - Early Stopping, to avoid to consume the kaggle GPU time. - Model Checkpoint, to retrieve the best model training information.
 
 ```{python}
 #| eval: false
@@ -621,11 +618,10 @@ The model is trained to optimize the recall. The decision was made because the c
 
 Whilst the KFold GDCV technique is usefull to test multiple hyperparameter, it is important to understand the problem we are facing. A multi label deep learning classifier outputs a vector of **per-class** probabilities. These need to be converted to a **binary vector** using a **confidence threshold**.
 
-- The higher the threshold, the less classes the model predicts, increasing model confidence [higher Precision] and increasing missed classes [lower Recall].
-- The lower the threshold, the more classes the model predicts, decreasing model confidence [lower Precision] and decreasing missed classes [higher Recall].
+-   The higher the threshold, the less classes the model predicts, increasing model confidence \[higher Precision\] and increasing missed classes \[lower Recall\].
+-   The lower the threshold, the more classes the model predicts, decreasing model confidence \[lower Precision\] and decreasing missed classes \[higher Recall\].
 
-Threshold selection mean we have to decide which metric to prioritize, based on the problem we are facing and the relative cost of misduging.
-We can consider the toxic comment filtering a problem similiar to cancer diagnostic. It is better to predict cancer in people who do not have it [False Positive] and perform further analysis than do not predict cancer when the patient has the disease [False Negative].
+Threshold selection mean we have to decide which metric to prioritize, based on the problem we are facing and the relative cost of misduging. We can consider the toxic comment filtering a problem similiar to cancer diagnostic. It is better to predict cancer in people who do not have it \[False Positive\] and perform further analysis than do not predict cancer when the patient has the disease \[False Negative\].
 
 I decide to train the model on the F1 score to have a balanced model in both precision and recall and leave to the threshold selection to increase the recall performance.
 
@@ -689,7 +685,6 @@ final_predictions_roc = (y_pred_proba >= optimal_threshold_roc).astype(int)
 Optimal threshold roc: `r py$optimal_threshold_roc`. Best score: `r py$best_score_roc`.
 
 ### Confusion Matrix Plot
-
 
 ```{python}
 #| fig.cap: "Multi Label Confusion matrix"

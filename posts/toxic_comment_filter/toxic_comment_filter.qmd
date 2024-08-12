@@ -1,16 +1,19 @@
 ---
 title: "Toxic Comment Filter"
-image: "toxic_comment.png"
+image: "toxic_comment.jpg"
 description: "BiLSTM model for multi label classification"
 author: "Simone Brazzi"
 date: "2024-08-12"
+execute:
+  cache: true
 categories:
   - code
   - Deep Learning
   - Python, R
 toc: TRUE
 links:
-  - text: Kaggle
+  - icon: default
+    text: Kaggle
     href: https://www.kaggle.com/code/simonebrazzi/toxic-comment-filter-bilstm
 ---
 
@@ -232,7 +235,8 @@ barchart <- df_r_grouped %>%
   ) +
   # sort bars in descending order
   scale_x_discrete(limits = df_r_grouped$label[order(df_r_grouped$count, decreasing = TRUE)]) +
-  scale_fill_brewer(type = "seq", palette = "RdYlBu")
+  scale_fill_brewer(type = "seq", palette = "RdYlBu") +
+  theme_minimal()
 ggplotly(barchart)
 ```
 
@@ -296,6 +300,7 @@ boxplot <- df_r %>%
   # pull(text_length) %>% 
   ggplot(aes(y = text_length)) +
   geom_boxplot() +
+  coord_flip() +
   theme_minimal()
 ggplotly(boxplot)
 ```

@@ -6,18 +6,26 @@
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/projects.html</loc>
-    <lastmod>2023-12-30T14:05:03.638Z</lastmod>
+    <lastmod>2024-08-12T10:45:20.711Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/resume.html</loc>
-    <lastmod>2023-12-29T10:17:01.907Z</lastmod>
+    <lastmod>2024-08-12T10:45:20.712Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/eurostat_homicide_rate/eurostat_homicide_rate.html</loc>
-    <lastmod>2023-12-30T14:12:05.110Z</lastmod>
+    <lastmod>2024-08-12T10:45:20.710Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/index.html</loc>
-    <lastmod>2023-12-30T14:16:21.506Z</lastmod>
+    <lastmod>2024-08-12T10:45:20.710Z</lastmod>
+  </url>
+  <url>
+    <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/toxic_comment_filter.html</loc>
+    <lastmod>2024-08-12T10:48:06.850Z</lastmod>
+  </url>
+  <url>
+    <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/history/f1score/toxic-comment-filter-bilstm.html</loc>
+    <lastmod>2024-08-10T16:05:49.319Z</lastmod>
   </url>
 </urlset>

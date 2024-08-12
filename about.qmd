@@ -15,7 +15,7 @@ about:
       href: https://github.com
 ---
 
-Nice to meet you! My name is Simone Brazzi. I am 33 years old guy from Bologna, Italy.
+Nice to meet you! My name is Simone Brazzi. I am 34 years old guy from Bologna, Italy.
 
 I decided to open this blog as a personal journal (what a new idea! Who ever thought about this?) of my data journey. This also means it is an opportunity to display my portfolio and shares my projects.
 

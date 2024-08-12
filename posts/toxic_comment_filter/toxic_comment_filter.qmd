@@ -4,15 +4,13 @@ image: "toxic_comment.jpg"
 description: "BiLSTM model for multi label classification"
 author: "Simone Brazzi"
 date: "2024-08-12"
-execute:
-  cache: true
 categories:
   - code
   - Deep Learning
   - Python, R
 toc: TRUE
 links:
-  - icon: default
+  - icon: file-code
     text: Kaggle
     href: https://www.kaggle.com/code/simonebrazzi/toxic-comment-filter-bilstm
 ---
@@ -286,7 +284,7 @@ df_r %>%
 #| label: fig-boxplot
 #| fig.cap: "Text length boxplot"
 #| fig.width: 10
-#| fig.height: 6
+#| fig.height: 14
 
 library(reticulate)
 boxplot <- df_r %>% 
@@ -304,6 +302,7 @@ boxplot <- df_r %>%
   theme_minimal()
 ggplotly(boxplot)
 ```
+
 
 ### Histogram
 

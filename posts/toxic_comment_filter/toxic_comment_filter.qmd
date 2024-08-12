@@ -488,7 +488,9 @@ lstm_model.summary()
 
 ## Callbacks
 
-Finally, the model has been trained using 2 callbacks: - Early Stopping, to avoid to consume the kaggle GPU time. - Model Checkpoint, to retrieve model training information.
+Finally, the model has been trained using 2 callbacks:
+- Early Stopping, to avoid to consume the kaggle GPU time.
+- Model Checkpoint, to retrieve the best model training information.
 
 ```{python}
 #| eval: false
@@ -522,7 +524,7 @@ library(reticulate)
 py$df_class_weight
 ```
 
-It is also useful to define the steps per epoch for train and validation dataset. This step is required to avoid
+It is also useful to define the steps per epoch for train and validation dataset. This step is required to avoid to not consume entirely the dataset during the fit, which happened to me.
 
 ```{python}
 steps_per_epoch = config.train_samples // config.batch_size
@@ -533,7 +535,7 @@ validation_steps = config.val_samples // config.batch_size
 
 The fit has been done on Kaggle to levarage the GPU. Some considerations about the model:
 
--   `.repeat()` ensure the model sees all the daataset.
+-   `.repeat()` ensure the model sees all the dataset.
 -   `epocs` is set to 100.
 -   `validation_data` has the same repeat.
 -   `callbacks` are the one defined before.
@@ -586,7 +588,7 @@ tibble(
 
 ## Predict
 
-For the prediction, the model does not need to repeat the dataset, because the model has already been trained and now it has just to consume the data to make the prediction.
+For the prediction, the model does not need to repeat the dataset, because it has already been trained on all of the train data. Now it has just to consume the new data to make the prediction.
 
 ```{python}
 #| output: false
@@ -605,7 +607,22 @@ Grid Search CV is a technique for fine-tuning hyperparameter of a ML model. It s
 
 The model is trained to optimize the recall. The decision was made because the cost of missing a True Positive is greater than a False Positive. In this case, missing a injurious observation is worst than classifying a clean one as bad.
 
-Having said this, I still want to test different metrics other than the `recall_score` to have more possibility of decision of the best threshold.
+### Confidence threshold and Precision-Recall trade off
+
+Whilst the KFold GDCV technique is usefull to test multiple hyperparameter, it is important to understand the problem we are facing. A multi label deep learning classifier outputs a vector of **per-class** probabilities. These need to be converted to a **binary vector** using a **confidence threshold**.
+
+- The higher the threshold, the less classes the model predicts, increasing model confidence [higher Precision] and increasing missed classes [lower Recall].
+- The lower the threshold, the more classes the model predicts, decreasing model confidence [lower Precision] and decreasing missed classes [higher Recall].
+
+Threshold selection mean we have to decide which metric to prioritize, based on the problem we are facing and the relative cost of misduging.
+We can consider the toxic comment filtering a problem similiar to cancer diagnostic. It is better to predict cancer in people who do not have it [False Positive] and perform further analysis than do not predict cancer when the patient has the disease [False Negative].
+
+I decide to train the model on the F1 score to have a balanced model in both precision and recall and leave to the threshold selection to increase the recall performance.
+
+Moreover, the model has been trained on the **macro avarage F1 score**, which is a single performance indicator obtained by the mean of the Precision and Recall scores of **individual classses**.
+
+
+It is usegule for **imbalanced** classes, because it weights each classes equally. It is not influenced by the number of samples of each classes. This is sette both in the `config.metrics` and `find_optimal_threshold_cv`.
 
 #### f1_score
 
@@ -660,7 +677,6 @@ Optimal threshold roc: `r py$optimal_threshold_roc`. Best score: `r py$best_scor
 
 ### Confusion Matrix Plot
 
-The confusion matrix is plotted using the `multilabel_confusion_matrix` function in scikit-learn. We have to plot a confusion matrix for each label. To plot the confusion matrix, we need to convert the predicted probability of a label to a proper prediction. To do so, we use the calculated optimal threshold for the recall, which is `r py$optimal_threshold_recall`. The confusion matrix plotted hete, considering we have a multi label task, is not a big one with all the labels as columns and indices. We plot a confusion matrix for each label with a simple for loop, which extract for each loop the confusion matrix and the associated label.
 
 ```{python}
 #| fig.cap: "Multi Label Confusion matrix"
@@ -722,6 +738,6 @@ df_cr %>%
 
 # Conclusions
 
-The BiLSTM model optimized to have an high recall is performing good enough to make predictions for each label, except for the threat one. See @tbl-frequency and @fig-barchart: the threat label is only 0.27 % of the observations. The model has been optimized for recall because the cost of not identifying a injurious comment as such is higher than the cost of considering a clean comment as injurious.
+The BiLSTM model is optimized to have an high recall is performing good enough to make predictions for each label. Considering the low support for the *threat* label, the performance is not bad. See @tbl-frequency and @fig-barchart: the threat label is only 0.27 % of the observations. The model has been optimized for recall because the cost of not identifying a injurious comment as such is higher than the cost of considering a clean comment as injurious.
 
 Possibile improvements could be to increase the number of observations, expecially for the threat one. In general there are too many clean comments. This could be avoided doing an undersampling of the clean comment, which I explicitly avoided to check the performance on the BiLSTM with an imbalanced dataset, leveraging the class weight method.

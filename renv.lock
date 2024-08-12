@@ -94,6 +94,13 @@
       ],
       "Hash": "1920b2f11133b12350024297d8a4ff4a"
     },
+    "Metrics": {
+      "Package": "Metrics",
+      "Version": "0.1.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "1fdc9b3adfe2e2f8f77c22a59cf322ec"
+    },
     "PKI": {
       "Package": "PKI",
       "Version": "0.1-14",

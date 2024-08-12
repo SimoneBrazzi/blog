@@ -8,15 +8,14 @@ categories:
   - code
   - Deep Learning
   - Python, R
-html:
-  toc: TRUE
-  toc-title: "Table of Contents"
-  number-sections: TRUE
-  toc-depth: 3
-    other-links:
-    - icon: file-code
-      text: Kaggle
-      href: https://www.kaggle.com/code/simonebrazzi/toxic-comment-filter-bilstm
+toc: TRUE
+toc-title: "Table of Contents"
+number-sections: TRUE
+toc-depth: 3
+other-links:
+  - icon: file-code
+    text: Kaggle
+    href: https://www.kaggle.com/code/simonebrazzi/toxic-comment-filter-bilstm
 ---
 
 # Introduction

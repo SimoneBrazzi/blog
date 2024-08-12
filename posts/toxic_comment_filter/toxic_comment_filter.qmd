@@ -1,14 +1,17 @@
 ---
 title: "Toxic Comment Filter"
-# image: "eurostat.png"
-description: "BiLSTM model to make a multi label classification for a toxic comment filter"
+image: "toxic_comment.png"
+description: "BiLSTM model for multi label classification"
 author: "Simone Brazzi"
-date: "2024-08-02"
+date: "2024-08-12"
 categories:
   - code
   - Deep Learning
   - Python, R
 toc: TRUE
+links:
+  - text: Kaggle
+    href: https://www.kaggle.com/code/simonebrazzi/toxic-comment-filter-bilstm
 ---
 
 # Introduction

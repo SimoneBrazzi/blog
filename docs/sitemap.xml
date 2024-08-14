@@ -1,31 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://simonebrazzi.github.io/blog/about.html</loc>
-    <lastmod>2024-08-13T06:08:57.916Z</lastmod>
-  </url>
-  <url>
     <loc>https://simonebrazzi.github.io/blog/projects.html</loc>
-    <lastmod>2024-08-12T10:45:20.711Z</lastmod>
-  </url>
-  <url>
-    <loc>https://simonebrazzi.github.io/blog/resume.html</loc>
-    <lastmod>2024-08-12T18:02:06.125Z</lastmod>
+    <lastmod>2024-08-13T06:27:54.837Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/eurostat_homicide_rate/eurostat_homicide_rate.html</loc>
-    <lastmod>2024-08-12T10:45:20.710Z</lastmod>
-  </url>
-  <url>
-    <loc>https://simonebrazzi.github.io/blog/index.html</loc>
-    <lastmod>2024-08-12T10:45:20.710Z</lastmod>
+    <lastmod>2024-08-13T16:11:28.440Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/toxic_comment_filter.html</loc>
-    <lastmod>2024-08-13T06:04:56.667Z</lastmod>
+    <lastmod>2024-08-13T16:11:37.310Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/history/f1score/toxic-comment-filter-bilstm.html</loc>
     <lastmod>2024-08-10T16:05:49.319Z</lastmod>
+  </url>
+  <url>
+    <loc>https://simonebrazzi.github.io/blog/about.html</loc>
+    <lastmod>2024-08-13T06:08:57.916Z</lastmod>
   </url>
 </urlset>

@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://simonebrazzi.github.io/blog/projects.html</loc>
-    <lastmod>2024-08-13T06:27:54.837Z</lastmod>
+    <lastmod>2024-08-14T09:07:18.649Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/eurostat_homicide_rate/eurostat_homicide_rate.html</loc>
-    <lastmod>2024-08-13T16:11:28.440Z</lastmod>
+    <lastmod>2024-08-14T09:07:18.649Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/toxic_comment_filter.html</loc>
@@ -19,5 +19,13 @@
   <url>
     <loc>https://simonebrazzi.github.io/blog/about.html</loc>
     <lastmod>2024-08-13T06:08:57.916Z</lastmod>
+  </url>
+  <url>
+    <loc>https://simonebrazzi.github.io/blog/index.html</loc>
+    <lastmod>2024-08-12T10:45:20.710Z</lastmod>
+  </url>
+  <url>
+    <loc>https://simonebrazzi.github.io/blog/resume.html</loc>
+    <lastmod>2024-08-12T18:02:06.125Z</lastmod>
   </url>
 </urlset>

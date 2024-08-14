@@ -74,11 +74,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -258,27 +258,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># wrangling</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tidyverse"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"readr"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"stringr"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"dplyr"</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"magrittr"</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"forcats"</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"lubridate"</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"writexl"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"eurostat"</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting and dashboarding</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"shiny"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"shinythemes"</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ggplot2"</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"plotly"</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"scales"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"RColorBrewer"</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"waiter"</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># connecting and other</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"rsconnect"</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"markdown"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># wrangling</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(<span class="st">"tidyverse"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(<span class="st">"readr"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(<span class="st">"stringr"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(<span class="st">"dplyr"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">library</span>(<span class="st">"magrittr"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">library</span>(<span class="st">"forcats"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="fu">library</span>(<span class="st">"lubridate"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="fu">library</span>(<span class="st">"writexl"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="fu">library</span>(<span class="st">"eurostat"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="co"># plotting and dashboarding</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="fu">library</span>(<span class="st">"shiny"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="fu">library</span>(<span class="st">"shinythemes"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="fu">library</span>(<span class="st">"ggplot2"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="fu">library</span>(<span class="st">"plotly"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="fu">library</span>(<span class="st">"scales"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="fu">library</span>(<span class="st">"RColorBrewer"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18"></a><span class="fu">library</span>(<span class="st">"waiter"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co"># connecting and other</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a><span class="fu">library</span>(<span class="st">"rsconnect"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21"></a><span class="fu">library</span>(<span class="st">"markdown"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Lots of packages! The division is merely to remember how everything is managed and because I have OCD for this type of things.</p>
@@ -294,39 +294,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># search in eurostat db</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>homicide <span class="ot">&lt;-</span> <span class="fu">search_eurostat</span>(<span class="st">"homicide"</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># import data to variable</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>crim_hom_vrel <span class="ot">&lt;-</span> <span class="fu">get_eurostat</span>(<span class="st">"crim_hom_vrel"</span>, <span class="at">time_format =</span> <span class="st">"date"</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># convert all observations to understandable data</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>crim_hom_vrel <span class="ot">&lt;-</span> <span class="fu">label_eurostat</span>(crim_hom_vrel)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># label_eurostat_vars(crim_hom_vrel)</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># order data by country and date for time series purpose</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>crim_hom_vrel <span class="ot">&lt;-</span> crim_hom_vrel <span class="sc">%&gt;%</span> </span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo, time)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>crim_hom_vrel_grouped <span class="ot">&lt;-</span> crim_hom_vrel <span class="sc">%&gt;%</span> </span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(geo, time, sex, pers_cat, unit) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">values_grouped =</span> <span class="fu">sum</span>(values), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(unit <span class="sc">==</span> <span class="st">"Number"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo, time, sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># search in eurostat db</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>homicide <span class="ot">&lt;-</span> <span class="fu">search_eurostat</span>(<span class="st">"homicide"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># import data to variable</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>crim_hom_vrel <span class="ot">&lt;-</span> <span class="fu">get_eurostat</span>(<span class="st">"crim_hom_vrel"</span>, <span class="at">time_format =</span> <span class="st">"date"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># convert all observations to understandable data</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>crim_hom_vrel <span class="ot">&lt;-</span> <span class="fu">label_eurostat</span>(crim_hom_vrel)</span>
+<span id="cb2-9"><a href="#cb2-9"></a></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co"># label_eurostat_vars(crim_hom_vrel)</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co"># order data by country and date for time series purpose</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>crim_hom_vrel <span class="ot">&lt;-</span> crim_hom_vrel <span class="sc">%&gt;%</span> </span>
+<span id="cb2-14"><a href="#cb2-14"></a>  <span class="fu">arrange</span>(geo, time)</span>
+<span id="cb2-15"><a href="#cb2-15"></a></span>
+<span id="cb2-16"><a href="#cb2-16"></a>crim_hom_vrel_grouped <span class="ot">&lt;-</span> crim_hom_vrel <span class="sc">%&gt;%</span> </span>
+<span id="cb2-17"><a href="#cb2-17"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(geo, time, sex, pers_cat, unit) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-18"><a href="#cb2-18"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">values_grouped =</span> <span class="fu">sum</span>(values), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-19"><a href="#cb2-19"></a>  <span class="fu">filter</span>(unit <span class="sc">==</span> <span class="st">"Number"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-20"><a href="#cb2-20"></a>  <span class="fu">arrange</span>(geo, time, sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Everything pretty simple. I would like to highlight something about the <code>dplyr::group_by</code> and <code>dplyr::summarise</code>. As you can see, after having grouped and summarized, I need to drop the groups with the method <code>.groups = "drop"</code>. With dplyr v.1.1.0 we can do the same with the help of the <code>.by</code> method in <code>summarise</code>.</p>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>crim_hom_vrel_grouped <span class="ot">&lt;-</span> crim_hom_vrel <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_grouped =</span> <span class="fu">sum</span>(values),</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(geo, time, sex, pers_cat, unit)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(unit <span class="sc">==</span> <span class="st">"Number"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(geo, time, sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>crim_hom_vrel_grouped <span class="ot">&lt;-</span> crim_hom_vrel <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
+<span id="cb3-3"><a href="#cb3-3"></a>    <span class="at">values_grouped =</span> <span class="fu">sum</span>(values),</span>
+<span id="cb3-4"><a href="#cb3-4"></a>    <span class="at">.by =</span> <span class="fu">c</span>(geo, time, sex, pers_cat, unit)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="fu">filter</span>(unit <span class="sc">==</span> <span class="st">"Number"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7"></a>  <span class="fu">arrange</span>(geo, time, sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Copying from the <a href="https://dplyr.tidyverse.org/reference/dplyr_by.html">dplyr website</a> the differences between <code>.by</code> and <code>group_by()</code> are:</p>
@@ -356,13 +356,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># brewer.pal(11, "RdYlBu")</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>palette <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#A50026"</span>, <span class="st">"#D73027"</span>, <span class="st">"#F46D43"</span>, <span class="st">"#FDAE61"</span>, <span class="st">"#FEE090"</span>, <span class="st">"#FFFFBF"</span>, <span class="st">"#E0F3F8"</span>, <span class="st">"#ABD9E9"</span>, <span class="st">"#74ADD1"</span>, <span class="st">"#4575B4"</span>, <span class="st">"#313695"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>palette_crim_hom_vrel_grouped <span class="ot">&lt;-</span> <span class="fu">rep</span>(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  palette,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">length.out =</span> crim_hom_vrel_grouped<span class="sc">$</span>geo <span class="sc">%&gt;%</span> <span class="fu">str_unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>()</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># brewer.pal(11, "RdYlBu")</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>palette <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#A50026"</span>, <span class="st">"#D73027"</span>, <span class="st">"#F46D43"</span>, <span class="st">"#FDAE61"</span>, <span class="st">"#FEE090"</span>, <span class="st">"#FFFFBF"</span>, <span class="st">"#E0F3F8"</span>, <span class="st">"#ABD9E9"</span>, <span class="st">"#74ADD1"</span>, <span class="st">"#4575B4"</span>, <span class="st">"#313695"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a>palette_crim_hom_vrel_grouped <span class="ot">&lt;-</span> <span class="fu">rep</span>(</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  palette,</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="at">length.out =</span> crim_hom_vrel_grouped<span class="sc">$</span>geo <span class="sc">%&gt;%</span> <span class="fu">str_unique</span>() <span class="sc">%&gt;%</span> <span class="fu">length</span>()</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Here I defined the palette using ColorBrewer. Using <code>rep</code> I replicated the 11 colours for the length of the unique geo values.</p>
@@ -511,7 +511,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
+  const darkModeDefault = true;
   let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {

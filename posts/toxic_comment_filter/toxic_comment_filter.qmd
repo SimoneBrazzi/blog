@@ -8,24 +8,33 @@ categories:
   - code
   - Deep Learning
   - Python, R
-toc: TRUE
-toc-title: "Table of Contents"
-toc-depth: 3
-number-sections: TRUE
 other-links:
   - icon: file-code
     text: Kaggle
     href: https://www.kaggle.com/code/simonebrazzi/toxic-comment-filter-bilstm
+
+toc: true
+toc-title: "Table of Contents"
+toc-depth: 3
+number-sections: true
+number-depth: 3
+embed-resources: true
+anchor-sections: true
+smooth-scroll: true
+highlight-style: monokai
+code-line-numbers: true
+code-copy: true
+code-link: true
 ---
 
 # Introduction
 
--   Costruire un modello in grado di filtrare i commenti degli utenti in base al grado di dannosità del linguaggio.
--   Preprocessare il testo eliminando l'insieme di token che non danno contributo significativo a livello semantico.
--   Trasformare il corpus testuale in sequenze.
--   Costruire un modello di Deep Learning comprendente dei layer ricorrenti per un task di classificazione multilabel.
+Build a model that can filter user comments based on the degree of language maliciousness:
 
-In prediction time, il modello deve ritornare un vettore contenente un 1 o uno 0 in corrispondenza di ogni label presente nel dataset (toxic, severe_toxic, obscene, threat, insult, identity_hate). In questo modo, un commento non dannoso sarà classificato da un vettore di soli 0 \[0,0,0,0,0,0\]. Al contrario, un commento pericoloso presenterà almeno un 1 tra le 6 labels.
+- Preprocess the text by eliminating the set of tokens that do not make significant contribution at the semantic level.
+- Transform the text corpus into sequences.
+- Build a Deep Learning model including recurrent layers for a multilabel classification task.
+- At prediction time, the model should return a vector containing a 1 or a 0 at each label in the dataset (toxic, severe_toxic, obscene, threat, insult, identity_hate). In this way, a non-harmful comment will be classified by a vector of only 0s [0,0,0,0,0]. In contrast, a dangerous comment will exhibit at least a 1 among the 6 labels.
 
 # Setup
 
@@ -572,9 +581,6 @@ history = pd.read_excel(config.history)
 ## Evaluate
 
 ```{python}
-#| output: false
-
-
 validation = model.evaluate(
   processed_val_ds.repeat(),
   steps=validation_steps, # 748
@@ -598,9 +604,6 @@ val_metrics
 For the prediction, the model does not need to repeat the dataset, because it has already been trained on all of the train data. Now it has just to consume the new data to make the prediction.
 
 ```{python}
-#| output: false
-
-
 predictions = model.predict(processed_test_ds, verbose=0)
 ```
 
@@ -713,7 +716,6 @@ plt.show()
 
 ```{python}
 #| output: false
-
 
 cr = classification_report(
   ytrue,

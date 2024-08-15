@@ -31,10 +31,10 @@ code-link: true
 
 Build a model that can filter user comments based on the degree of language maliciousness:
 
-- Preprocess the text by eliminating the set of tokens that do not make significant contribution at the semantic level.
-- Transform the text corpus into sequences.
-- Build a Deep Learning model including recurrent layers for a multilabel classification task.
-- At prediction time, the model should return a vector containing a 1 or a 0 at each label in the dataset (toxic, severe_toxic, obscene, threat, insult, identity_hate). In this way, a non-harmful comment will be classified by a vector of only 0s [0,0,0,0,0]. In contrast, a dangerous comment will exhibit at least a 1 among the 6 labels.
+-   Preprocess the text by eliminating the set of tokens that do not make significant contribution at the semantic level.
+-   Transform the text corpus into sequences.
+-   Build a Deep Learning model including recurrent layers for a multilabel classification task.
+-   At prediction time, the model should return a vector containing a 1 or a 0 at each label in the dataset (toxic, severe_toxic, obscene, threat, insult, identity_hate). In this way, a non-harmful comment will be classified by a vector of only 0s \[0,0,0,0,0\]. In contrast, a dangerous comment will exhibit at least a 1 among the 6 labels.
 
 # Setup
 

@@ -5,7 +5,7 @@ listing:
   sort: "date desc"
   type: default
   categories: TRUE
-  # sort-ui: FALSE
+  sort-ui: FALSE
   filter-ui: [title, date, categories]
 page-layout: full
 title-block-banner: TRUE

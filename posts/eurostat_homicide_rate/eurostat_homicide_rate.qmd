@@ -8,11 +8,18 @@ image: "eurostat.png"
 description: "A primer on Shiny to analyze gender differences in homicide rates"
 author: "Simone Brazzi"
 date: "2023-12-29"
+draft: true
 categories:
   - code
   - shiny
   - R
 toc: TRUE
+toc-title: "Table of Contents"
+toc-depth: 3
+number-sections: TRUE
+other-links:
+  - text: Shiny App
+    href: https://d4jtd9-simonebrazzi.shinyapps.io/Homicide_Eurostat/
 ---
 
 # Introduction

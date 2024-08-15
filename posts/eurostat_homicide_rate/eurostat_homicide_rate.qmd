@@ -135,7 +135,7 @@ crim_hom_vrel_grouped <- crim_hom_vrel %>%
 Copying from the [dplyr website](https://dplyr.tidyverse.org/reference/dplyr_by.html) the differences between `.by` and `group_by()` are:
 
 | .by                                                                                                | group_by()                                                                                         |
-|------------------------------------|------------------------------------|
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | Grouping only affects a single verb                                                                | Grouping is persistent across multiple verbs                                                       |
 | Selects variables with [tidy-select](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html) | Computes expressions with [data-masking](https://rlang.r-lib.org/reference/args_data_masking.html) |
 | Summaries use existing order of group keys                                                         | Summaries sort group keys in ascending order                                                       |

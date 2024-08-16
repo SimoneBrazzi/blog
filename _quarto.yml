@@ -26,9 +26,9 @@ website:
     right:
       - about.qmd
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/SimoneBrazzi?tab=repositories
+      - icon: linkedin
+        href: https://www.linkedin.com/in/simone-brazzi-289028160/
 format:
   html:
     theme:

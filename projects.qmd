@@ -4,9 +4,9 @@ listing:
   contents: posts
   sort: "date desc"
   type: default
-  categories: TRUE
-  sort-ui: FALSE
+  categories: true
+  sort-ui: false
   filter-ui: [title, date, categories]
 page-layout: full
-title-block-banner: TRUE
+title-block-banner: true
 ---

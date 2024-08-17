@@ -56,6 +56,7 @@ library(plotly)
 library(RColorBrewer)
 library(bslib)
 library(Metrics)
+library(gt)
 
 reticulate::use_virtualenv("r-tf")
 ```
@@ -188,7 +189,30 @@ library(reticulate)
 
 py$df %>%
   tibble() %>% 
-  head(5)
+  head(5) %>% 
+  gt() %>% 
+  tab_header(
+    title = "First five observations"
+  ) %>% 
+   cols_align(
+    align = "center",
+    columns = c("toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate", "sum_injurious", "clean")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = comment_text
+  ) %>% 
+  cols_label(
+    comment_text = "Comments",
+    toxic = "Toxic",
+    severe_toxic = "Severe Toxic",
+    obscene = "Obscene",
+    threat = "Threat",
+    insult = "Insult",
+    identity_hate = "Identity Hate",
+    sum_injurious = "Sum Injurious",
+    clean = "Clean"
+    )
 ```
 
 Lets create a *clean* variable for EDA purpose: I want to visually see how many observation are clean vs the others labels.
@@ -223,7 +247,37 @@ df_r_grouped <- df_r %>%
   summarise(count = sum(value)) %>% 
   mutate(freq = round(count / sum(count), 4))
 
-df_r_grouped
+df_r_grouped %>% 
+  gt() %>% 
+  tab_header(
+    title = "Labels frequency",
+    subtitle = "Absolute and relative frequency"
+  ) %>% 
+  fmt_number(
+    columns = "count",
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = TRUE,
+    use_seps = TRUE
+  ) %>% 
+  fmt_percent(
+    columns = "freq",
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = c("count", "freq")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = label
+  ) %>% 
+  cols_label(
+    label = "Label",
+    count = "Absolute Frequency",
+    freq = "Relative frequency"
+  )
 ```
 
 ### Barchart

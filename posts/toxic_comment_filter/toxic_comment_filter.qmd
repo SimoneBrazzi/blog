@@ -196,7 +196,11 @@ py$df %>%
   ) %>% 
    cols_align(
     align = "center",
+<<<<<<< HEAD
     columns = c("toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate", "sum_injurious")
+=======
+    columns = c("toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate", "sum_injurious", "clean")
+>>>>>>> 3b10bbc8151b5cecde674b7ac0f95b00df939aad
   ) %>% 
   cols_align(
     align = "left",
@@ -210,7 +214,12 @@ py$df %>%
     threat = "Threat",
     insult = "Insult",
     identity_hate = "Identity Hate",
+<<<<<<< HEAD
     sum_injurious = "Sum Injurious"
+=======
+    sum_injurious = "Sum Injurious",
+    clean = "Clean"
+>>>>>>> 3b10bbc8151b5cecde674b7ac0f95b00df939aad
     )
 ```
 

@@ -6,7 +6,11 @@
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/toxic_comment_filter.html</loc>
+<<<<<<< HEAD
     <lastmod>2024-08-17T08:25:08.978Z</lastmod>
+=======
+    <lastmod>2024-08-16T16:24:58.101Z</lastmod>
+>>>>>>> 3b10bbc8151b5cecde674b7ac0f95b00df939aad
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/history/f1score/toxic-comment-filter-bilstm.html</loc>

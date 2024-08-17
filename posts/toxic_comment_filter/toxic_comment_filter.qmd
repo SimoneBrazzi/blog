@@ -56,6 +56,7 @@ library(plotly)
 library(RColorBrewer)
 library(bslib)
 library(Metrics)
+library(gt)
 
 reticulate::use_virtualenv("r-tf")
 ```
@@ -188,7 +189,29 @@ library(reticulate)
 
 py$df %>%
   tibble() %>% 
-  head(5)
+  head(5) %>% 
+  gt() %>% 
+  tab_header(
+    title = "First five observations"
+  ) %>% 
+   cols_align(
+    align = "center",
+    columns = c("toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate", "sum_injurious")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = comment_text
+  ) %>% 
+  cols_label(
+    comment_text = "Comments",
+    toxic = "Toxic",
+    severe_toxic = "Severe Toxic",
+    obscene = "Obscene",
+    threat = "Threat",
+    insult = "Insult",
+    identity_hate = "Identity Hate",
+    sum_injurious = "Sum Injurious"
+    )
 ```
 
 Lets create a *clean* variable for EDA purpose: I want to visually see how many observation are clean vs the others labels.
@@ -223,7 +246,37 @@ df_r_grouped <- df_r %>%
   summarise(count = sum(value)) %>% 
   mutate(freq = round(count / sum(count), 4))
 
-df_r_grouped
+df_r_grouped %>% 
+  gt() %>% 
+  tab_header(
+    title = "Labels frequency",
+    subtitle = "Absolute and relative frequency"
+  ) %>% 
+  fmt_number(
+    columns = "count",
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = TRUE,
+    use_seps = TRUE
+  ) %>% 
+  fmt_percent(
+    columns = "freq",
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = c("count", "freq")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = label
+  ) %>% 
+  cols_label(
+    label = "Label",
+    count = "Absolute Frequency",
+    freq = "Relative frequency"
+  )
 ```
 
 ### Barchart
@@ -287,7 +340,28 @@ df_r %>%
   pull(text_length) %>% 
   summary() %>% 
   as.list() %>% 
-  as_tibble()
+  as_tibble() %>% 
+  gt() %>% 
+  tab_header(
+    title = "Summary Statistics",
+    subtitle = "of text length"
+  ) %>% 
+  fmt_number(
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = TRUE,
+    use_seps = TRUE
+  ) %>% 
+  cols_align(
+    align = "center",
+  ) %>% 
+  cols_label(
+    Min. = "Min",
+    `1st Qu.` = "Q1",
+    Median = "Median",
+    `3rd Qu.` = "Q3",
+    Max. = "Max"
+  )
+  
 ```
 
 ### Boxplot
@@ -508,8 +582,6 @@ lstm_model.summary()
 Finally, the model has been trained using 2 callbacks: - Early Stopping, to avoid to consume the kaggle GPU time. - Model Checkpoint, to retrieve the best model training information.
 
 ```{python}
-#| eval: false
-# callbacks
 my_es = config.get_early_stopping()
 my_mc = config.get_model_checkpoint(filepath="/checkpoint.keras")
 callbacks = [my_es, my_mc]
@@ -536,7 +608,13 @@ df_class_weight.index = config.labels
 #| tbl-cap: Class weight
 
 library(reticulate)
-py$df_class_weight
+py$df_class_weight %>% 
+  gt() %>% 
+  fmt_percent(
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = TRUE
+  )
 ```
 
 It is also useful to define the steps per epoch for train and validation dataset. This step is required to avoid to not consume entirely the dataset during the fit, which happened to me.
@@ -596,7 +674,27 @@ val_metrics <- tibble(
   metric = c("loss", "precision", "recall", "auc", "f1_score"),
   value = py$validation
   )
-val_metrics
+val_metrics %>% 
+  gt() %>% 
+  fmt_number(
+    columns = c("value"),
+    decimals = 4,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = TRUE
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = metric
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = value
+  ) %>% 
+  cols_label(
+    metric = "Metric",
+    value = "Value"
+  )
+  
 ```
 
 ## Predict
@@ -743,6 +841,32 @@ df_cr %>%
   pivot_wider(
     names_from = names,
     values_from = values
+  ) %>% 
+  gt() %>%
+  tab_header(
+    title = "Confusion Matrix",
+    subtitle = "Threshold optimization favoring recall"
+  ) %>% 
+  fmt_number(
+    columns = c("precision", "recall", "f1-score", "support"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = c("precision", "recall", "f1-score", "support")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = metrics
+  ) %>% 
+  cols_label(
+    metrics = "Metrics",
+    precision = "Precision",
+    recall = "Recall",
+    `f1-score` = "F1-Score",
+    support = "Support"
   )
 ```
 

@@ -8,7 +8,7 @@ image: "eurostat.png"
 description: "A primer on Shiny to analyze gender differences in homicide rates"
 author: "Simone Brazzi"
 date: "2023-12-29"
-draft: true
+draft: false
 categories:
   - code
   - shiny
@@ -23,6 +23,10 @@ other-links:
 ---
 
 # Introduction
+
+:::{.callout-important}
+The post is not finished. Stay tuned for updates!
+:::
 
 Hi there and welcome to my first project for the blog! The topic is a sad one, but I would like to explain why I decided to start with this. I was trying Shiny for different dashboards, but I wasn't satisfied to learn using the classic examples. Unfortunately, italian crime news suffocated the public debate with a case of homicide, in which the victim is a young women. The public debate was focusing so baaaaaadly on the concept of femicide and the data, that I decided to clear the situation with a simple dashboard.
 
@@ -135,7 +139,7 @@ crim_hom_vrel_grouped <- crim_hom_vrel %>%
 Copying from the [dplyr website](https://dplyr.tidyverse.org/reference/dplyr_by.html) the differences between `.by` and `group_by()` are:
 
 | .by                                                                                                | group_by()                                                                                         |
-|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+|------------------------------------|------------------------------------|
 | Grouping only affects a single verb                                                                | Grouping is persistent across multiple verbs                                                       |
 | Selects variables with [tidy-select](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html) | Computes expressions with [data-masking](https://rlang.r-lib.org/reference/args_data_masking.html) |
 | Summaries use existing order of group keys                                                         | Summaries sort group keys in ascending order                                                       |

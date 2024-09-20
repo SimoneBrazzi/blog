@@ -8,6 +8,11 @@
       }
     ]
   },
+  "Python": {
+    "Version": "3.11.7",
+    "Type": "virtualenv",
+    "Name": "/Users/simonebrazzi/venv/nlp"
+  },
   "Packages": {
     "DBI": {
       "Package": "DBI",
@@ -2756,6 +2761,18 @@
         "graphics"
       ],
       "Hash": "07909200e8bbe90426fbfeb73e1e27aa"
+    },
+    "wordcloud": {
+      "Package": "wordcloud",
+      "Version": "2.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "RColorBrewer",
+        "Rcpp",
+        "methods"
+      ],
+      "Hash": "dddb6538141ed1e2435cb63c6c748d16"
     },
     "workflows": {
       "Package": "workflows",

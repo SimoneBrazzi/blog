@@ -1,0 +1,311 @@
+---
+title: "Spam Detection"
+# image: "toxic_comment.jpg"
+description: "BiLSTM model for multi label classification"
+author: "Simone Brazzi"
+date: "2024-09-05"
+draft: true
+categories:
+  - code
+  - NLP
+  - Natural Language, Processing
+  - Python, R
+other-links:
+  - icon: file-code
+    text: Kaggle
+    href: https://www.kaggle.com/code/simonebrazzi/toxic-comment-filter-bilstm
+toc: true
+toc-title: "Table of Contents"
+toc-depth: 3
+number-sections: true
+number-depth: 3
+embed-resources: true
+anchor-sections: true
+smooth-scroll: true
+highlight-style: monokai
+code-line-numbers: true
+code-copy: true
+code-link: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Introduction
+
+
+# Import
+
+## R libraries
+
+```{r}
+library(tidyverse, verbose = FALSE)
+library(ggplot2)
+library(gt)
+library(reticulate)
+library(plotly)
+
+# renv::use_python("/Users/simonebrazzi/venv/nlp/bin/python3")
+```
+
+## Python packages
+
+```{python}
+import pandas as pd
+import numpy as np
+import spacy
+import nltk
+import string
+import gensim
+import gensim.corpora as corpora
+import gensim.downloader
+
+from nltk.corpus import stopwords
+from gensim.models import Word2Vec
+from scipy.spatial.distance import cosine
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+nltk.download('stopwords')
+glove_vector = gensim.downloader.load("glove-wiki-gigaword-300")
+```
+
+# Dataset
+
+```{python}
+file = "~/R/blog/posts/toxic_comment_filter/spam_dataset.csv"
+df = pd.read_csv(file, index_col=0)
+```
+
+```{r}
+library(reticulate)
+df <- py$df
+```
+
+## EDA
+
+```{r}
+#| label: tbl-eda
+#| tbl-cap: Absolute and relative frequencies
+df_g <- df %>% 
+  summarise(
+    freq_abs = n(),
+    freq_rel = n() / nrow(df),
+    .by = label
+  )
+
+df_g %>% 
+  gt() %>% 
+  fmt_auto() %>% 
+  cols_width(
+    label ~ pct(20),
+    freq_abs ~ pct(35),
+    freq_rel ~ pct(35)
+    ) %>% 
+  cols_align(
+    align = "center",
+    columns = c(freq_abs, freq_rel)
+  ) %>% 
+  tab_header(
+    title = "Label frequency",
+    subtitle = "Absolute and relative frequencies"
+  ) %>% 
+  cols_label(
+    label = "Label",
+    freq_abs = "Absolute frequency",
+    freq_rel = "Relative frequency"
+  ) %>% 
+  tab_options(
+    table.width = pct(100)
+  )
+  
+```
+
+```{r}
+#| label: fig-barchart
+#| fig-cap: "Absolute frequency barchart"
+g <- ggplot(df_g) +
+  geom_col(aes(x = freq_abs, y = label, fill = label)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() +
+  ggtitle("Absolute frequency barchart") +
+  xlab("Absolute frequency") +
+  ylab("Label") +
+  labs(fill = "Label")
+ggplotly(g)
+```
+
+# Preprocessing
+
+Preprocessing is the sum of the following steps:
+
+1.  lowercasing
+2.  punctuation removal
+3.  lemmatization
+4.  tokenization
+5.  stopwords removal
+
+`nlp.pipe` return a generator that yields `Doc` objects, not a list. To use it as a list, it has to be defined as such.
+
+To speed up the process, is it possible to enable the multi process method in `nlp.pipe`.
+
+```{python}
+stop_words = stopwords.words('english')
+nlp = spacy.load("en_core_web_lg")
+
+doc = list(nlp.pipe(df.text))
+```
+
+Normalization:
+1. remove punctuation.
+2. remove stop words.
+3. remove spaces.
+4. remove "subject" token.
+5. lemmatization.
+
+```{python}
+punctuation = set(string.punctuation)
+stop_words = set(stop_words)
+lemmas = [
+    [
+      t.lemma_ for t in d 
+      if (text := t.text.lower()) not in punctuation 
+      and text not in stop_words 
+      and not t.is_space 
+      and text != "subject" 
+      and not t.is_digit
+      and len(text) >=5
+      ]
+      for d in doc
+      ]
+
+entities = [
+    [
+      t.lemma_ for t in d 
+      if (text := t.text.lower()) not in punctuation 
+      and text not in stop_words 
+      and not t.is_space 
+      and text != "subject" 
+      and not t.is_digit
+      and len(text) >=5
+      and t.ent_type_ == "ORG"
+      ]
+      for d in doc
+      ]
+
+df["lemmas"] = lemmas
+df["entities"] = entities
+```
+
+# Tasks
+
+## Classification
+
+## Topic Modeling for spam content
+
+Filter data to have a spam dataframe and create a variable with the lemmas column to work with.
+
+```{python}
+spam = df[df.label == "spam"]
+x = spam.lemmas
+```
+
+LDA algortihm needs the corpus as a **bag of word**.
+
+### Create corpus
+
+```{python}
+id2word = corpora.Dictionary(x)
+corpus = [id2word.doc2bow(t) for t in x]
+```
+
+### Model
+
+```{python}
+lda = gensim.models.LdaMulticore(
+  corpus=corpus,
+  id2word=id2word,
+  num_topics=10,
+  passes=10, # number of times the algorithm see the corpus
+  workers=4, # parellalize
+  random_state=42
+)
+topic_words = lda.show_topics(num_topics=10, num_words=5, formatted=False)
+
+data = []
+
+# Iterate over topic_words to extract the data
+data = [
+    (topic, w, p)
+    for topic, words in topic_words
+    for w, p in words
+]
+
+# Create the DataFrame
+topics_df = pd.DataFrame(data, columns=['topic', 'word', 'proba'])
+```
+
+```{r}
+py$topics_df %>% 
+  gt()
+```
+
+## Semantic distance between topics
+
+Create a `dict` to create a documents to vectorize.
+```{python}
+topics_dict = {}
+for topics, words in topic_words:
+  topics_dict[topics] = [w[0] for w in words]
+```
+
+```{python}
+documents = [" ".join(words) for words in topics_dict.values()]
+
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform(documents)
+cosine_sim_matrix = cosine_similarity(tfidf_matrix, dense_output=True)
+topics = list(topics_dict.keys())
+cosine_sim_df = pd.DataFrame(cosine_sim_matrix, index=topics, columns=topics)
+```
+
+```{r}
+py$cosine_sim_df %>% 
+  gt()
+```
+
+## Organization of "HAM" mails
+
+### Create "HAM" df
+
+### Get ham lemmas which have ORG entity
+```{python}
+ham = df[df.label == "ham"]
+x = ham.entities
+```
+
+```{python}
+from collections import Counter
+
+# Flatten the list of lists and create a Counter object
+d = Counter([i for e in x for i in e])
+
+freq_df = pd.DataFrame(d.items(), columns=["word", "freq"])
+```
+
+```{r}
+library("wordcloud")
+set.seed(1234)
+word_freqs_df <- py$freq_df
+wordcloud(words = word_freqs_df$word, freq = word_freqs_df$freq, 
+          min.freq = 1, max.words = 100, random.order = FALSE, 
+          rot.per = 0.35, colors = brewer.pal(8, "Dark2"))
+```
+
+```{r}
+word_freqs_df %>% 
+  arrange(desc(freq)) %>% 
+  head(10) %>% 
+  gt()
+```
+
+# Conclusion

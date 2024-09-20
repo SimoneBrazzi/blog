@@ -32,6 +32,10 @@ editor_options:
 
 # Introduction
 
+-   Addestrare un classificatore per identificare SPAM
+-   Individuare i Topic principali tra le email SPAM presenti nel dataset
+-   Calcolare la distanza semantica tra i topics ottenuti, per dedurne l'eterogeneità.
+-   Estrarre dalle mail NON SPAM le Organizzazioni presenti.
 
 # Import
 
@@ -44,7 +48,7 @@ library(gt)
 library(reticulate)
 library(plotly)
 
-# renv::use_python("/Users/simonebrazzi/venv/nlp/bin/python3")
+# renv::use_python("/Users/simonebrazzi/venv/blog/bin/python3")
 ```
 
 ## Python packages
@@ -63,7 +67,11 @@ from nltk.corpus import stopwords
 from gensim.models import Word2Vec
 from scipy.spatial.distance import cosine
 from sklearn.metrics.pairwise import cosine_similarity
+
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 
 nltk.download('stopwords')
 glove_vector = gensim.downloader.load("glove-wiki-gigaword-300")
@@ -72,7 +80,7 @@ glove_vector = gensim.downloader.load("glove-wiki-gigaword-300")
 # Dataset
 
 ```{python}
-file = "~/R/blog/posts/toxic_comment_filter/spam_dataset.csv"
+file = "/Users/simonebrazzi/R/blog/posts/spam_detection/spam_dataset.csv"
 df = pd.read_csv(file, index_col=0)
 ```
 
@@ -155,12 +163,7 @@ nlp = spacy.load("en_core_web_lg")
 doc = list(nlp.pipe(df.text))
 ```
 
-Normalization:
-1. remove punctuation.
-2. remove stop words.
-3. remove spaces.
-4. remove "subject" token.
-5. lemmatization.
+Normalization: 1. remove punctuation. 2. remove stop words. 3. remove spaces. 4. remove "subject" token. 5. lemmatization.
 
 ```{python}
 punctuation = set(string.punctuation)
@@ -199,6 +202,106 @@ df["entities"] = entities
 # Tasks
 
 ## Classification
+
+The text is already preprocessed in the lemmas column. From a list of string, it has to be transformed to a string.
+
+```{python}
+df["feature"] = df.lemmas.apply(lambda x : " ".join(x))
+```
+
+### Features
+
+```{python}
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(df['feature'])
+y = df.label
+```
+
+## Split
+
+```{python}
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=.2, random_state=42)
+```
+
+### Model
+
+```{python}
+mlp = MLPClassifier(
+  activation="logistic",
+  solver="adam",
+  max_iter=100,
+  hidden_layer_sizes=(100,), # one layer with dimension 100
+  tol=.005,
+  verbose=True
+)
+```
+
+### Fit
+
+```{python}
+mlp.fit(xtrain, ytrain)
+```
+
+### Predict
+
+```{python}
+ypred = mlp.predict(xtest)
+```
+
+### Classification report
+
+```{python}
+cr = classification_report(
+  ytest,
+  ypred,
+  #target_names=config.labels,
+  digits=4,
+  output_dict=True
+  )
+df_cr = pd.DataFrame.from_dict(cr).reset_index()
+```
+
+```{r}
+library(reticulate)
+df_cr <- py$df_cr %>% dplyr::rename(names = index)
+cols <- df_cr %>% colnames()
+df_cr %>% 
+  pivot_longer(
+    cols = -names,
+    names_to = "metrics",
+    values_to = "values"
+  ) %>% 
+  pivot_wider(
+    names_from = names,
+    values_from = values
+  ) %>% 
+  gt() %>%
+  tab_header(
+    title = "Confusion Matrix",
+    subtitle = "Threshold optimization favoring recall"
+  ) %>% 
+  fmt_number(
+    columns = c("precision", "recall", "f1-score", "support"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = c("precision", "recall", "f1-score", "support")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = metrics
+  ) %>% 
+  cols_label(
+    metrics = "Metrics",
+    precision = "Precision",
+    recall = "Recall",
+    `f1-score` = "F1-Score",
+    support = "Support"
+  )
+```
 
 ## Topic Modeling for spam content
 
@@ -252,6 +355,7 @@ py$topics_df %>%
 ## Semantic distance between topics
 
 Create a `dict` to create a documents to vectorize.
+
 ```{python}
 topics_dict = {}
 for topics, words in topic_words:
@@ -278,6 +382,7 @@ py$cosine_sim_df %>%
 ### Create "HAM" df
 
 ### Get ham lemmas which have ORG entity
+
 ```{python}
 ham = df[df.label == "ham"]
 x = ham.entities

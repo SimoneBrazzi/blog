@@ -4,7 +4,7 @@ image: "spam_detection.jpg"
 description: "NLP"
 author: "Simone Brazzi"
 date: "2024-09-05"
-draft: true
+draft: false
 categories:
   - code
   - NLP
@@ -38,10 +38,10 @@ editor_options:
 
 Tasks:
 
-- Train a model to classify spam.
-- Find the main topic in the spam emails.
-- Calculate semantic distance of the spam topics.
-- Extract the ORG from ham emilas.
+-   Train a model to classify spam.
+-   Find the main topic in the spam emails.
+-   Calculate semantic distance of the spam topics.
+-   Extract the ORG from ham emilas.
 
 # Import
 
@@ -190,6 +190,7 @@ df = pd.read_csv(config.path, index_col=0)
 ```
 
 To further perform analysis also in R, here we assign the df to a variable using `reticulate` library.
+
 ```{r}
 library(reticulate)
 df <- py$df
@@ -237,6 +238,7 @@ df_g %>%
 ```
 
 It is useful also a visual cue.
+
 ```{r}
 #| label: fig-barchart
 #| fig-cap: "Absolute frequency barchart"
@@ -255,8 +257,7 @@ The dataset is not balanced, so it could be relevant when training the model for
 
 # Preprocessing
 
-In case of text, the preprocessing is fundamental: the computer does not understand the semantic or grammatical meaning of words.
-In case of text preprocessing, we follow the following steps:
+In case of text, the preprocessing is fundamental: the computer does not understand the semantic or grammatical meaning of words. In case of text preprocessing, we follow the following steps:
 
 1.  Lowercasing.
 2.  Punctuation removal.
@@ -264,14 +265,12 @@ In case of text preprocessing, we follow the following steps:
 4.  Tokenization.
 5.  Stopwords removal.
 
-Using `SpaCy`, we can applied these steps. The method `nlp.pipe` improves the performance and returns a generator. It yields a `Doc` objects, not a list. To use it as a list, it has to be defined as such.
-To speed up the process, is it possible to enable the multi process method in `nlp.pipe`.
-But, what does the variable `nlp` stand for? It load a spaCy model: we are going to use the `en_core_web_lg`.
+Using `SpaCy`, we can applied these steps. The method `nlp.pipe` improves the performance and returns a generator. It yields a `Doc` objects, not a list. To use it as a list, it has to be defined as such. To speed up the process, is it possible to enable the multi process method in `nlp.pipe`. But, what does the variable `nlp` stand for? It load a spaCy model: we are going to use the `en_core_web_lg`.
 
-- **Language**: EN; english.
-- **Type**: CORE; vocabulary, syntax, entities, vectors
-- **Genre**: WEB; written text (blogs, news, comments).
-- **Size**: LG; large (560 mB).
+-   **Language**: EN; english.
+-   **Type**: CORE; vocabulary, syntax, entities, vectors
+-   **Genre**: WEB; written text (blogs, news, comments).
+-   **Size**: LG; large (560 mB).
 
 Check this [link](https://spacy.io/models/en) for the documentation about this model.
 
@@ -285,17 +284,17 @@ doc = list(nlp.pipe(df.text, n_process=4))
 
 The specific preprocessing in this case should check these steps:
 
-1. Remove punctuation.
-2. Remove stop words.
-3. Remove spaces.
-4. Remove *"subject"* token.
-5. Lemmatization.
+1.  Remove punctuation.
+2.  Remove stop words.
+3.  Remove spaces.
+4.  Remove *"subject"* token.
+5.  Lemmatization.
 
 To improve code performance, these are the most noticible points:
 
-- When iterating over a collection of unique elements, **`set()`** performs better then `list()`. The underlying hash table structure allows for swift traversal. This is particularly noticible when the df dimension increase.
-- **List comprehension**, which performs better then for loops and are much more readable in some context.
-- The **walrus operator** `:=`. It is a syntax which lets assign variables in the middle of expressions. It avoids redundant calculations and improves readability.
+-   When iterating over a collection of unique elements, **`set()`** performs better then `list()`. The underlying hash table structure allows for swift traversal. This is particularly noticible when the df dimension increase.
+-   **List comprehension**, which performs better then for loops and are much more readable in some context.
+-   The **walrus operator** `:=`. It is a syntax which lets assign variables in the middle of expressions. It avoids redundant calculations and improves readability.
 
 ```{python}
 punctuation = set(string.punctuation)
@@ -321,20 +320,15 @@ df["feature"] = df.lemmas.apply(lambda x : " ".join(x))
 
 ### Features
 
-As said, the machine does not understand human readable text. It has to be transformed. The best approach is to **vectorize** it with `TfidfVectorizer()`. It is a tool for converting text into a matrix of TF-IDF features.
-The **T**erm**F**requency-**I**nverse**D**ocument**F**requency is a statistical method. It is a measure of importance of a word in a document, part of a corpus, adjusted for the frequency in the corpus.
-The model vectorize a word by multiplying the word **T**erm **F**requency
-
+As said, the machine does not understand human readable text. It has to be transformed. The best approach is to **vectorize** it with `TfidfVectorizer()`. It is a tool for converting text into a matrix of TF-IDF features. The **T**erm**F**requency-**I**nverse**D**ocument**F**requency is a statistical method. It is a measure of importance of a word in a document, part of a corpus, adjusted for the frequency in the corpus. The model vectorize a word by multiplying the word **T**erm **F**requency
 
 $$
 TF = \frac{word\ frequency\ in\ document}{total\ words\ in\ document}
-$$
-with the **I**nverse **D**ocument **F**requency
+$$ with the **I**nverse **D**ocument **F**requency
 
 $$
 IDF = log(\frac{total\ number\ documents}{documents\ containing\ the\ word})
-$$
-The final result is
+$$ The final result is
 
 $$
 TF-IDF = TF * IDF
@@ -342,9 +336,7 @@ $$
 
 The resulting **score** represents the importance of a word. It dependes on the word frequency both in a specific document and in the corpus.
 
-
-::: {.callout-note collapse:"true"}
-An example can be useful. If a word t appears 20 times in a document of 100 words, we have
+::: {.callout-note collapse:"true"} An example can be useful. If a word t appears 20 times in a document of 100 words, we have
 
 $$
 TF = \frac{20}{100}=0.2
@@ -356,13 +348,11 @@ $$
 IDF = log(\frac{10000}{100})=2
 $$
 
-This means the score is 
+This means the score is
 
 $$
 TF-IDF=0.2*2=0.4
-$$
-:::
-
+$$ :::
 
 ```{python}
 vectorizer = TfidfVectorizer()
@@ -384,8 +374,7 @@ The model is the `MLPClassifier()`. It is a Multi Perceptron Layer Classifier.
 
 ![MLPClassifier](mlpc.png)
 
-It is an Artificial Neural Network used for classification. It consists of **multiple layers of nodes**, called **perceptrons**.
-For further reading, see the [documentation](https://scikit-learn.org/stable/modules/neural_networks_supervised.html).
+It is an Artificial Neural Network used for classification. It consists of **multiple layers of nodes**, called **perceptrons**. For further reading, see the [documentation](https://scikit-learn.org/stable/modules/neural_networks_supervised.html).
 
 ```{python}
 mlp = config.get_sklearn_mlp(
@@ -410,6 +399,7 @@ ypred = mlp.predict(xtest)
 ```
 
 ### Classification report
+
 Considering we are doing a classificatoin, one method to evaluate the performance is the classification report. It summarize the performance of the model comparing **true** and **predicted** labels, showing not only the metrics (precision, recall and F1-score) but also the support.
 
 ```{python}
@@ -466,7 +456,7 @@ df_cr %>%
   )
 ```
 
-Even if the model is not fitted for an unbalanced dataset, it is not affecting the performance. Precision and Recall are high, so much that is could seems to be overfitted. 
+Even if the model is not fitted for an unbalanced dataset, it is not affecting the performance. Precision and Recall are high, so much that is could seems to be overfitted.
 
 ## Topic Modeling for spam content
 
@@ -474,12 +464,13 @@ Topic modeling in nlp can count on the **L**atent **D**irilicht **M**odel. It is
 
 The LDA model has:
 
-- Input: a **corpus** of text documents, preprocessed as tokenized and cleaned words. We have this in the *lemmas* column.
-- Output: a **distribution** of topics for each document and one of words for each topic.
+-   Input: a **corpus** of text documents, preprocessed as tokenized and cleaned words. We have this in the *lemmas* column.
+-   Output: a **distribution** of topics for each document and one of words for each topic.
 
 For further reading, you can find the paper in the Table of Contents or at this [link](https://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf).
 
 ### Dataset
+
 Filter data to have a spam dataframe and create a variable with the lemmas column to work with.
 
 ```{python}
@@ -488,6 +479,7 @@ x = spam.lemmas
 ```
 
 ### Create corpus
+
 LDA algortihm needs the corpus as a **bag of word**.
 
 ```{python}
@@ -496,6 +488,7 @@ corpus = [id2word.doc2bow(t) for t in x]
 ```
 
 ### Model
+
 The model will return a user defined number of topics. For each of it, it will return a user defined number of words ad the probability of each of them.
 
 ```{python}
@@ -668,5 +661,3 @@ word_freqs_df %>%
   )
 
 ```
-
-

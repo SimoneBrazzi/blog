@@ -1,7 +1,6 @@
 {
   "listing": "/projects.html",
   "items": [
-    "/posts/toxic_comment_filter/history/f1score/toxic-comment-filter-bilstm.html",
     "/posts/toxic_comment_filter/toxic_comment_filter.html",
     "/posts/eurostat_homicide_rate/eurostat_homicide_rate.html"
   ]

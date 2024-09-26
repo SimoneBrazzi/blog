@@ -81,6 +81,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
+from collections import Counter
 # glove vector
 glove_vector = gensim.downloader.load("glove-wiki-gigaword-300")
 # nltk stopwords

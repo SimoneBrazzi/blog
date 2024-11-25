@@ -19,12 +19,12 @@ toc-depth: 3
 number-sections: TRUE
 other-links:
   - text: Shiny App
-    href: https://d4jtd9-simonebrazzi.shinyapps.io/Homicide_Eurostat/
+    href: https://01936502-af11-a6d9-c28c-0487e8da41e0.share.connect.posit.cloud
 ---
 
 # Introduction
 
-:::{.callout-important}
+::: callout-important
 The post is not finished. Stay tuned for updates!
 :::
 
@@ -138,11 +138,11 @@ crim_hom_vrel_grouped <- crim_hom_vrel %>%
 
 Copying from the [dplyr website](https://dplyr.tidyverse.org/reference/dplyr_by.html) the differences between `.by` and `group_by()` are:
 
-| .by                                                                                                | group_by()                                                                                         |
+| .by | group_by() |
 |------------------------------------|------------------------------------|
-| Grouping only affects a single verb                                                                | Grouping is persistent across multiple verbs                                                       |
+| Grouping only affects a single verb | Grouping is persistent across multiple verbs |
 | Selects variables with [tidy-select](https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html) | Computes expressions with [data-masking](https://rlang.r-lib.org/reference/args_data_masking.html) |
-| Summaries use existing order of group keys                                                         | Summaries sort group keys in ascending order                                                       |
+| Summaries use existing order of group keys | Summaries sort group keys in ascending order |
 
 Last part is all about colors.
 

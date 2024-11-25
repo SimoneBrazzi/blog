@@ -29,6 +29,7 @@ code-link: true
 
 execute:
   warnings: false
+  freeze: auto
 
 editor_options: 
   chunk_output_type: console

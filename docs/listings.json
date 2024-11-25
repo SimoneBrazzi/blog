@@ -2,13 +2,9 @@
   {
     "listing": "/projects.html",
     "items": [
-      "/posts/toxic_comment_filter/history/f1score/toxic-comment-filter-bilstm.html",
-<<<<<<< HEAD
+      "/posts/spam_detection/spam_detection.html",
       "/posts/toxic_comment_filter/toxic_comment_filter.html",
-      "/posts/eurostat_homicide_rate/index.html"
-=======
-      "/posts/toxic_comment_filter/toxic_comment_filter.html"
->>>>>>> 3b10bbc8151b5cecde674b7ac0f95b00df939aad
+      "/posts/eurostat_homicide_rate/eurostat_homicide_rate.html"
     ]
   }
 ]

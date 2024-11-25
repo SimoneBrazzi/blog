@@ -1,0 +1,1102 @@
+---
+title: "Credit Score"
+image: "credit_score.jpeg"
+description: "ML explainability classification"
+author: "Simne Brazzi"
+date: "2024-10-26"
+draft: true
+categories:
+  - code
+  - ML
+  - Python, R
+toc: true
+toc-title: "Table of Contents"
+# other-links:
+#   - icon: file-pdf
+#     text: LDA Paper
+#     href: https://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf
+toc-depth: 3
+number-sections: true
+number-depth: 3
+embed-resources: true
+anchor-sections: true
+smooth-scroll: true
+highlight-style: monokai
+code-line-numbers: true
+code-copy: true
+code-link: true
+code-fold: true
+
+execute:
+  warnings: false
+  freeze: auto
+
+editor_options: 
+  chunk_output_type: console
+---
+
+# Introduction
+
+Create a model capable of estimating the creditworthiness of customers, in order to help the dedicated team understand whether or not to accept a credit card application.
+
+## Features
+
+-   ID: customer identification number
+-   CODE_GENDER: gender of the customer
+-   FLAGOWNCAR: indicator of car ownership
+-   FLAGOWNREALTY: indicator of house ownership
+-   CNT_CHILDREN: number of children
+-   AMTINCOMETOTAL: annual income
+-   NAMEINCOMETYPE: type of income
+-   NAMEEDUCATIONTYPE: level of education
+-   NAMEFAMILYSTATUS: marital status
+-   NAMEHOUSINGTYPE: type of dwelling
+-   DAYS_BIRTH: number of days since birth
+-   DAYS_EMPLOYED: number of days since employment (if positive, indicates the number of days since being unemployed)
+-   FLAG_MOBIL: indicator for the presence of a mobile phone number
+-   FLAGWORKPHONE: indicator of the presence of a work phone number
+-   FLAG_PHONE: indicator of the presence of a telephone number
+-   FLAG_EMAIL: indicator for the presence of an email address
+-   OCCUPATION_TYPE: type of occupation
+-   CNTFAMMEMBERS: number of family members
+-   TARGET: variable which is worth 1 if the customer has a high creditworthiness (constant payment of installments), 0 otherwise.
+
+If a customer is denied a credit card, the team must be able to give a reason. This means that your model must provide indications that are easy to interpret.
+
+It is a binary classification which needs a good explainability.
+
+# Import
+
+## R
+
+```{r}
+#| warning: FALSE
+
+library(tidyverse, verbose = FALSE)
+library(ggplot2)
+library(plotly)
+library(reticulate)
+library(gt)
+library(scales)
+library(shapr)
+```
+
+## Python
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import pickle
+import time
+
+from datetime import date
+from dateutil.relativedelta import relativedelta
+from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV, cross_val_score
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, LabelBinarizer
+from sklearn.pipeline import Pipeline
+from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, precision_recall_curve, roc_curve, roc_auc_score
+from scipy.stats import ttest_rel, wilcoxon
+```
+
+## Config class
+
+```{python}
+class Config():
+  
+  def __init__(self):
+    """
+    Initialization calss.
+    """
+    
+    self.path="/Users/simonebrazzi/R/blog/posts/credit_score/"
+    self.file="/Users/simonebrazzi/R/blog/posts/credit_score/credit_scoring.csv"
+    self.pkl_path="~/R/blog/posts/credit_score/pkl/"
+    self.random_state=42
+    self.random_state=42
+    self.col_binary = ['code_gender', 'flag_own_car', 'flag_own_realty']
+    self.col_ordinal = ["name_income_type", "name_education_type", "name_family_status", "name_housing_type", "occupation_type"]
+    self.col_numeric = ['cnt_children', 'amt_income_total', 'cnt_fam_members']
+    self.features = self.col_binary + self.col_ordinal + self.col_numeric
+  
+  def make_pipeline(self, name, clf):
+    """
+    Create the pipeline with preprocessor and classificator.\n
+    Preprocessor is set.
+    
+    name {str}: name of the classificator in the pipeline.\n
+    clf {model}: sklearn classificator model.\n
+    """
+    # initialize preprocessors
+    ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
+    oe = OrdinalEncoder().set_output(transform='pandas')
+    ss = StandardScaler()
+    # create preprocessor
+    preprocessor = ColumnTransformer(
+      transformers=[
+        ("binary_encoder", ohe, config.col_binary),
+        ("ordinal_encoder", oe, config.col_ordinal),
+        ("standard_scaler", ss, config.col_numeric)
+        ],
+        remainder='passthrough'
+        )
+    # pipeline
+    pipe = Pipeline(
+      steps=[
+        ("preprocessor", preprocessor),
+        (name, clf)
+        ]
+        )
+    return pipe
+  
+  def make_grid_search_dtc(self, pipe_dtc):
+    
+    """
+    Return the GridSearch for the DecisionTreeClassifier.\n
+    
+    pipe_dtc {sklearn.pipeline}: accept a pipeline with dtc model as classificator.\n
+    """
+    
+    param_grid_dtc = {
+      "dtc__criterion" : ["gini", "entropy", "log_loss"],
+      "dtc__splitter" : ["best", "random"],
+      "dtc__max_depth" : [1, 2, 5, 10, 15]
+      }
+    scoring = {
+      "accuracy": "accuracy",
+      "f1": "f1",
+      "roc_auc": "roc_auc"
+      }
+    
+    grid_search_dtc = GridSearchCV(
+      estimator=pipe_dtc,
+      param_grid=param_grid_dtc,
+      cv=7,
+      scoring=scoring,
+      refit="accuracy",  # This will refit the model using the accuracy metric
+      n_jobs=-1
+      )
+    
+    return grid_search_dtc
+  
+  def make_grid_search_rfc(self, pipe_rfc):
+    
+    # parameters
+    param_dist_rfc = {
+      'rfc__n_estimators': [50, 75, 100],
+      'rfc__max_depth': [5, 10, 15],
+      'rfc__min_samples_split': [5, 10]
+      }
+    scoring = {
+      "accuracy": "accuracy",
+      "f1": "f1",
+      "roc_auc": "roc_auc"
+      }
+    # grid search
+    random_search_rfc = GridSearchCV(
+      estimator=pipe_rfc,
+      param_grid=param_dist_rfc,
+      cv=7,
+      scoring=scoring,
+      refit="accuracy",
+      n_jobs=-1
+      )
+    
+    return random_search_rfc
+    
+  def make_grid_search_xgb(self, pipe_xgb):
+    # parameters
+    param_dist_xgb = {
+      "xgb__n_estimators" : [100, 150, 200, 300],
+      "xgb__max_depth" : [3, 5, 7, 10],
+      "xgb__learning_rate" : [0.1, 0.1, 0.01, 0.0001],
+      "xgb__subsample": [0.7, 0.8, 0.9],
+      "xgb__colsample_bytree": [0.7, 0.8, 0.9],
+      "xgb__gamma": [0, 0.1],
+      "xgb__alpha": [0, 0.1],  # Adding slight L1 regularization for simplicity
+      "xgb__lambda": [1, 2]    # Adding slight L2 regularization for stability
+      }
+    # scoring
+    scoring = {
+      "accuracy": "accuracy",
+      "f1": "f1",
+      "roc_auc": "roc_auc"
+      }
+    # random search cv
+    random_search_xgb = RandomizedSearchCV(
+      estimator=pipe_xgb,
+      param_distributions=param_dist_xgb,
+      n_iter=30,  # Set the number of parameter combinations to try
+      cv=7,
+      scoring=scoring,
+      refit="accuracy",
+      n_jobs=-1
+      )
+    
+    return random_search_xgb
+  
+  def plot_roc_curves(model_names, models):
+    
+    """
+    It returns the plot of the ROC AUC Curves.
+    
+    model_names {list}: list of string of name of the models.
+    models {list}: list of model names.
+    """
+    
+    plt.figure(figsize=(20, 15))
+    
+    for i, model in enumerate(models):
+      fpr, tpr, _ = roc_curve(ytest, model.predict_proba(xtest)[:, 1])
+      plt.plot(fpr, tpr, label=f'{model_names[i]} (AUC: {roc_auc_score(ytest,model.predict_proba(xtest)[:, 1]):.2f})')
+      plt.xlabel("False Positive Rate")
+      plt.ylabel("True Positive Rate")
+      plt.title("ROC Curves Comparison")
+      plt.legend()
+      plt.show()
+  
+  def calculate_shap_tree_explainer(self, model, preprocessor, clf, xtest, idx):
+    """
+    Calculate the shap.TreeExplainer for a specifc xtest observation.\n
+    It returns explainer, shap_value_obs, observation and observation_original.\n
+    preprocessor {sklearn.pipeline.named_steps["preprocessor]}.\n
+    clf {sklearn.pipeline.named_steps["classifier"]}.\n
+    xtest {array}.\n
+    idx {int}: index of the observation to analize in the xtest daaset.\n
+    """
+    
+    xtest_preprocessed = preprocessor.transform(xtest)
+    observation = xtest_preprocessed[idx].reshape(1, -1) # reshape to the requested array shape
+    observation_original = np.array(xtest.iloc[idx,:]).reshape(1, -1)
+    
+    explainer = shap.TreeExplainer(clf)
+    shap_value_obs = explainer.shap_values(observation)
+    
+    return (explainer, shap_value_obs, observation, observation_original)
+  
+  def make_force_plot(self, figsize, base_value, shap_values, features, feature_names):
+    
+    """
+    Plot the shap force plot.\n
+    \n
+    figsize {tuple}: (20, 10) for example.\n
+    base_value: explainer.expected_value. Valid also for the single observation.\n
+    shap_values: shap_value of the observation.\n
+    features: observation_original value before preprocesing.\n
+    feature_names: list of the feature names.\n
+    """
+    
+    plt.figure(figsize=figsize)
+    
+    shap.force_plot(
+      base_value=base_value,
+      shap_values=shap_values,
+      features=features,
+      feature_names=feature_names,
+      matplotlib=True
+      )
+  
+  def make_decision_plot(self, figsize, base_value, shap_values, features, feature_names, feature_order):
+    
+    """
+    Plot the shap decision plot.\n
+    \n
+    figsize {tuple}: (20, 10) for example.\n
+    base_value: explainer.expected_value. Valid also for the single observation.\n
+    shap_values: shap_value of the observation.\n
+    features: observation_original value before preprocesing.\n
+    feature_names: list of the feature names.\n
+    feature_order {str}: "importance", "hclust" or None.
+    """
+    
+    plt.figure(figsize=figsize)
+    
+    shap.plots.decision(
+      base_value=base_value,
+      shap_values=shap_values,
+      features=features,
+      feature_names=feature_names,
+      feature_order=feature_order,
+      show=True
+      )
+  
+  def make_waterfall(self, figsize, idx, max_display):
+    
+    """
+    Plot the shap decision plot.\n
+    \n
+    figsize {tuple}: (20, 10) for example.\n
+    shap_values
+    """
+    
+    plt.figure(figsize=figsize)
+    shap.plots.waterfall(
+      shap_values[23325],
+      max_display=len(config.features)
+      )
+    
+  
+config = Config()
+```
+
+# Dataset
+
+Now we can import the dataset. Having all columns UPPERCASE, I will set all of them as lowercase
+
+```{python}
+df = pd.read_csv(config.file)
+df.columns = df.columns.str.lower()
+```
+
+# EDA
+
+## Target
+
+It is always important to perform an EDA. In this case I am expecting to have less cases of high creditworthiness than low: for my personal knowledge and experience, high creditworth client are not the majority. Also, considering it is a **binary classification**, it is important to be sure if data are balanced to make a better model selection.
+
+```{python}
+#| echo: false
+
+value_count = np.unique(df.target, return_counts=True)
+
+var0 = value_count[0][0]
+var0_count = value_count[1][0]
+
+var1 = value_count[0][1]
+var1_count = value_count[1][1]
+```
+
+The variable:
+
+-   `{r} py$var0` has `{r} py$var0_count %>% format(scientific = FALSE, big.mark = ",")`.
+-   `{r} py$var1` has `{r} py$var1_count %>% format(scientific = FALSE, big.mark = ",")`.
+
+```{r}
+#| label: tbl-eda
+#| tbl-cap: Absolute and relative frequencies
+
+df <- py$df
+
+df_g <- df %>% 
+  rename(label = target) %>% 
+  mutate(label = as.factor(label)) %>% 
+  summarize(
+    freq_abs = n(),
+    freq_rel = n() / nrow(df),
+    .by = label
+  )
+df_g %>% 
+  gt() %>% 
+  fmt_auto() %>% 
+  cols_width(
+    label ~ pct(20),
+    freq_abs ~ pct(35),
+    freq_rel ~ pct(35)
+    ) %>% 
+  cols_align(
+    align = "center",
+    columns = c(freq_abs, freq_rel)
+  ) %>% 
+  tab_header(
+    title = "Label frequency",
+    subtitle = "Absolute and relative frequencies"
+  ) %>% 
+  cols_label(
+    label = "Label",
+    freq_abs = "Absolute frequency",
+    freq_rel = "Relative frequency"
+  ) %>% 
+  tab_options(
+    table.width = pct(100)
+    )
+```
+
+The dataset is unbalanced as expected: most of the target are low creditworthiness (0 label). This is important in the training, to avoid overfitting on the 0 class. If you say 10 times out of 10, 9 times out of 10 you are right: no model needed! Of course this is false and is prone to error when predicting on new data which are not distributed like the training ones.
+
+```{r}
+#| label: fig-barchart
+#| fig-cap: Absolute frequency barchart
+
+g <- ggplot(df_g) +
+  geom_bar(aes(x = label, y = freq_abs, fill = label), stat = "identity") +
+  ggtitle("Absolute frequency barchart") +
+  xlab("Label") +
+  ylab("Absolute frequency") +
+  labs(fill = "Label") +
+  scale_y_continuous(breaks = scales::breaks_pretty(n = 5)) +
+  theme_minimal()
+ggplotly(g)
+```
+
+Remember: **0**. stands for **low creditworthiness**, **1** for **high**. Our dataset is strongly unbalanced towards the 0 label. So, my first idea was right.
+
+## Features
+
+Lets check the **NA** values in each feature.
+
+```{r}
+#| label: tbl-na
+#| tbl-cap: Number of NA values for each feature
+
+df_na <- df %>%
+  summarize(across(everything(), ~ sum(is.na(.)))) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "columns",
+    values_to = "value"
+  )
+df_na %>% 
+  gt() %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    columns = "Columns",
+    value = "NA Value"
+  ) %>% 
+  tab_header(
+    title = "NA values",
+    subtitle = "Number of NA value for each feature"
+  ) %>% 
+  fmt_number(
+    columns = c("value"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    #drop_trailing_dec_mark = FALSE
+  ) 
+```
+
+There are 2 interesting things to notice:
+
+#### The column `occupation_type` has lots of NA value. How much in proportion to the total? Should we drop the NAs or keep them?
+
+```{r}
+#| label: tbl-occupation-type
+#| tbl-cap: NA frequency for occupation_type
+
+df %>%
+  summarize(
+    freq_abs = sum(is.na(occupation_type)),
+    freq_rel = sum(is.na(occupation_type)) / nrow(df)
+    ) %>% 
+  gt() %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    freq_abs = "Absolute Frequency",
+    freq_rel = "Relative Frequency"
+  ) %>% 
+  tab_header(
+    title = "Absolute and Relative Frequency",
+    subtitle = "NA frequency for occupation_type"
+  ) %>% 
+  fmt_number(
+    columns = c("freq_abs", "freq_rel"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE
+  ) 
+```
+
+`{r} df %>%summarize(freq_abs = sum(is.na(occupation_type)), freq_rel = sum(is.na(occupation_type)) / nrow(df)) %>% pull(freq_rel) %>% scales::percent(accuracy = 0.01)` of occupation_type are NA. This could be a big concern: how to handle it? Drop this much could mean losing lots of useful information, while keeping it could lead to impute wrong data, which could be worse.
+
+Lets check the occupation_type labels frequency.
+
+```{r}
+#| label: tbl-occupation-type-freq-tbl
+#| tbl-cap: Occupation type label frequency
+
+df %>% 
+  summarise(
+    n = n(),
+    .by = occupation_type
+  ) %>% 
+  arrange(desc(n)) %>% 
+  gt() %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    occupation_type = "Occupation Type",
+    n = "Frequency"
+  ) %>% 
+  tab_header(
+    title = "Occupation Type Label Frequency"
+  ) %>% 
+  fmt_number(
+    columns = c("n"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE
+  ) 
+```
+
+So here is the situation: we could impute the NA respecting the proportion of the other labels in the dataset or we can drop the NA values. I want to drop the NA. Even if we are losing a third of the data, we are not making assumption based on the mode. Occupation_type could be a very important feature and doing inference on it is worst then lose some data. Also, we still have `{r} df %>% filter(!is.na(occupation_type)) %>% nrow()`, which are plenty enough.
+
+```{r}
+#| label: fig-barplot-occ-type-freq
+#| fig-cap: Barplot Occupation Type Label frequency
+
+df_occ_type <- df %>% 
+  filter(!is.na(occupation_type)) %>% 
+  summarise(
+    n = n(),
+    .by = occupation_type
+  ) %>% 
+  arrange(desc(n))
+
+# to extend the palette to the number of labels
+extended_palette <- colorRampPalette(RColorBrewer::brewer.pal(9, "Purples"))(df_occ_type %>% nrow())
+
+g <- ggplot(df_occ_type) +
+  geom_col(aes(x = n, y = reorder(occupation_type, n), fill = reorder(occupation_type, n))) +
+  theme_minimal() +
+  labs(
+    x = "Count",
+    y = "Labels",
+    title = "Occupation Type Label Frequency"
+  ) +
+  scale_fill_manual(values = extended_palette)
+
+ggplotly(g)
+```
+
+#### There is a NA value in at least all the columns: is it possible it is the same observation?
+
+First of all, we can create a list of the columns name which have only 1 NA, using the `df_na` tibble.
+
+```{r}
+one_cols <- df_na %>% 
+  filter(value == 1) %>% 
+  pull(columns)
+one_cols
+```
+
+Then, to check multiple OR condition, we can use `if_any()`. In this case, we are checking if multiple columns are NA, with the previous filter on only one NA in each column.
+
+```{r}
+library(reticulate)
+
+df %>% 
+  filter(
+    if_any(all_of(one_cols), ~ . %>% is.na())
+  ) %>% 
+  gt()  %>% 
+  tab_options(
+    table.width = pct(100)
+    )
+  
+py$id_to_remove <- df %>% 
+  filter(
+    if_any(one_cols, ~ . %>% is.na())
+  ) %>% 
+  pull(id)
+```
+
+#### Interesting features
+
+Lets also look at some interesting variable: click on the different tabs to see the frequency table for each of them.
+
+```{r}
+# features to check
+cols <- py$config$features
+# 
+count_results <- map(cols, ~ df %>% filter(!is.na(occupation_type)) %>% count(.data[[.x]]))
+names(count_results) <- cols
+cols
+```
+
+::: panel-tabset
+## Count children
+
+```{r}
+#| label: tbl-cnt_children
+#| tbl-cap: Count of Number of Children
+
+count_results$cnt_children %>% 
+  arrange(desc(n)) %>% 
+  gt() %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    cnt_children = "# Children",
+    n = "Count"
+  ) %>% 
+  tab_header(
+    title = "Count of Number of Children",
+  ) %>% 
+  fmt_number(
+    columns = c("n"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    #drop_trailing_dec_mark = FALSE
+  ) 
+```
+
+## Education type
+
+```{r}
+#| label: tbl-name_education_type
+#| tbl-cap: Count by Education Type
+
+count_results$name_education_type %>% 
+  arrange(desc(n)) %>% 
+  gt()  %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    name_education_type = "Education Type",
+    n = "Count"
+  ) %>% 
+  tab_header(
+    title = "Count by Education Type",
+  ) %>% 
+  fmt_number(
+    columns = c("n"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    #drop_trailing_dec_mark = FALSE
+  ) 
+```
+
+## Family status
+
+```{r}
+#| label: tbl-name_family_status
+#| tbl-cap: Count by Family Status
+
+count_results$name_family_status %>% 
+  arrange(desc(n)) %>% 
+  gt()  %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    name_family_status = "Family Status",
+    n = "Count"
+  ) %>% 
+  tab_header(
+    title = "Count by Family Status",
+  ) %>% 
+  fmt_number(
+    columns = c("n"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    #drop_trailing_dec_mark = FALSE
+  ) 
+```
+
+## Housing type
+
+```{r}
+#| label: tbl-name_housing_type
+#| tbl-cap: Count by House Type
+
+count_results$name_housing_type %>% 
+  arrange(desc(n)) %>% 
+  gt()  %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    name_housing_type = "House Type",
+    n = "Count"
+  ) %>% 
+  tab_header(
+    title = "Count by House Type",
+  ) %>% 
+  fmt_number(
+    columns = c("n"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    #drop_trailing_dec_mark = FALSE
+  ) 
+```
+
+## Count family members
+
+```{r}
+#| label: tbl-cnt_fam_members
+#| tbl-cap: Count by Number of Family Members
+
+count_results$cnt_fam_members %>% 
+  arrange(desc(n)) %>% 
+  gt()  %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    cnt_fam_members = "Number of Family Members",
+    n = "Count"
+  ) %>% 
+  tab_header(
+    title = "Count by Number of Family Members",
+  ) %>% 
+  fmt_number(
+    columns = c("n"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    #drop_trailing_dec_mark = FALSE
+  ) 
+```
+
+## Gender
+
+```{r}
+#| label: tbl-code_gender
+#| tbl-cap: Count by Gender
+
+count_results$code_gender %>% 
+  arrange(desc(n)) %>% 
+  gt() %>% 
+  tab_options(
+    table.width = pct(100)
+    ) %>% 
+  cols_align(align = "center") %>% 
+  cols_label(
+    code_gender = "Gender",
+    n = "Count"
+  ) %>% 
+  tab_header(
+    title = "Count by Gender",
+  ) %>% 
+  fmt_number(
+    columns = c("n"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    #drop_trailing_dec_mark = FALSE
+  ) 
+```
+:::
+
+# Data preparation
+
+From the EDA, we know we can drop
+
+-   NA occupation_type.
+-   the id `{r} py$id_to_remove`.
+
+```{python}
+df = df[df.id != id_to_remove]
+df = df[~df.occupation_type.isna()]
+```
+
+Even if it is not useful for the model, I want to convert the date columns to birthday and date of employment.
+
+```{python}
+df["birthday"] = df.days_birth.map(lambda x : (date.today() + relativedelta(days=x)).strftime("%Y-%m-%d"))
+df["employed"] = df["days_employed"].apply(lambda x: (date.today() + relativedelta(days=x)).strftime("%Y-%m-%d") if x < 0 else "0")
+```
+
+# Split
+
+To take into consideration the unbalance and have it also in our split, we can use the `stratify` method.
+
+```{python}
+x = df[config.features]
+y = df.target
+
+xtrain, xtest, ytrain, ytest = train_test_split(
+  x, 
+  y, 
+  test_size = .2,
+  stratify = y,
+  random_state=config.random_state
+)
+```
+
+# Models
+
+To address the model **explainability**, we can choose a CART model. This selection has 2 interesting point for our task:
+
+1. **Explainability**, as already mentioned. This will help us explain the reason of rejection.
+2.  **Feature selection.** At this [link](https://www.researchgate.net/publication/369355042_A_Comprehensive_Review_of_Feature_Selection_and_Feature_Selection_Stability_in_Machine_Learning) you can find a paper which shows how **embedded method** as the tree models can have the same performance of traditional feature selection method.
+
+::: {callout-important}
+It could be also interesting to do a **R**ecursive **F**eature **E**limination. Right now the feature selection is made with personal knowledge to remove some columns before training. The models will use just 11 features.
+:::
+
+We are going to implement 3 models with an increasingly level of complexity:
+
+1. DecisionTreeClassifier.
+2. RandomForestClassifier.
+3. XGBoostClassifier.
+
+## DecisionTreeClassifier
+
+
+### GridSearchCV
+
+Even if the result of the model are relatively easy to understand, the **hyperparameter tuning** has far too many possibility. This is where `GridSearchCV()` comes handy.
+
+
+### Pipeline
+
+One of the many nice `sklearn` features is the [`Pipeline()`](https://scikit-learn.org/1.5/modules/generated/sklearn.pipeline.Pipeline.html). It has lots of important benefits:
+
+-   **Code redundancy and reproducibility** : it is like a recipe you can tune and run without worrying about to put togheter each step in the correct order.
+-   **Avoid data leakege**: the preprocessing steps applies only to the training dataset.
+-   **Hyperparameter tuning**: the `Pipeline()` integrates with `GridSearchCV()` and `RandomizedSearchCV()`.
+-   **Modularity**: it enables tuning the various steps, removing or adding new one.
+
+First, initialize the various preprocessor and the classification model.
+
+```{python}
+ohe = OneHotEncoder()
+ohe_bi = OneHotEncoder(drop="if_binary")
+ss = StandardScaler()
+mms = MinMaxScaler()
+dtc = DecisionTreeClassifier(class_weight="balanced")
+```
+
+Using the `ColumnTransformer()`, we can apply the different preprocessing to the specific columns. The preprocessing is divided between:
+
+-   Encoding the **binary labels** to 0-1 using `OneHotEncoding(drop="if_binary)"`.
+-   Encoding the remaining labels using `OneHotEncoding()`. I choose this over other categorical variables encoding because it avoid imputing a hierarchy.
+-   **Standardize** the numerical variables using `StandardScaler()`. I also have instantiated the `MinMaxScaler()`, but I am not using it.
+
+The classifier is a `DecisionTreeClassifier()`, which the `GridSearchCV()` will tune.
+
+All of these steps are putted togheter with the `Pipeline()`.
+
+
+::: {callout-important}
+For the binary labels I had to use the `OneHotEncoding(drop="if_binary")`, otherwise other preprocessor would not work with the `ColumnTransformer()`.
+:::
+
+### Fit
+
+```{python}
+# import dtc best model
+with open(config.path + "grid_search_dtc.pkl", "rb") as file:
+    dtc_model = pickle.load(file)
+
+cv_results = pd.DataFrame(dtc_model.cv_results_)
+model = dtc_model.best_estimator_
+```
+
+```{r}
+#| label: tbl-cv_results
+#| tbl-cap: Cross Validation Results
+
+py$cv_results %>% 
+  arrange(across(contains("rank"))) %>% 
+  select(params, mean_test_accuracy, rank_test_accuracy, mean_test_f1, rank_test_f1, mean_test_roc_auc, rank_test_roc_auc) %>% 
+  gt() %>%
+  tab_header(
+    title = "Cross Validation Results",
+    subtitle = "Main metrics"
+  ) %>% 
+  fmt_number(
+   columns = c("mean_test_accuracy", "mean_test_f1", "mean_test_roc_auc"),
+   decimals = 3,
+   drop_trailing_zeros = TRUE,
+   drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center"
+  ) %>% 
+  cols_label(
+    params = "criterion - max_depth - max_features - splitter",
+    mean_test_accuracy = "Mean Test Accuracy",
+    rank_test_accuracy = "Rank Test Accuracy",
+    mean_test_f1 = "Mean Test F1",
+    rank_test_f1 = "Rank Test F1",
+    mean_test_roc_auc = "Mean Test ROC AUC",
+    rank_test_roc_auc = "Rank Test ROC AUC",
+  ) %>% 
+  tab_options(
+    table.width = pct(100)
+    )
+```
+
+The grid search returns a CART with a best score of best_score with the following parameters:
+
+-   criterion:
+-   max_depth:
+-   splitter:
+
+Now, we can save and load the model. This is useful to avoid to run the grid_search.
+
+
+### Classification Report
+
+```{python}
+ypred_dtc = dtc_model.predict(xtest)
+cr = classification_report(
+  ytest,
+  ypred_dtc,
+  target_names=['0', '1'],
+  digits=4,
+  output_dict=True
+  )
+df_cr = pd.DataFrame.from_dict(cr).reset_index()
+df_cr
+```
+
+```{r}
+#| label: tbl-classification-report
+#| tbl-cap: Classification report
+
+library(reticulate)
+df_cr <- py$df_cr %>% dplyr::rename(names = index)
+cols <- df_cr %>% colnames()
+df_cr %>% 
+  pivot_longer(
+    cols = -names,
+    names_to = "metrics",
+    values_to = "values"
+  ) %>% 
+  pivot_wider(
+    names_from = names,
+    values_from = values
+  ) %>% 
+  gt() %>%
+  tab_header(
+    title = "Confusion Matrix",
+    subtitle = "Threshold optimization favoring recall"
+  ) %>% 
+  fmt_number(
+    columns = c("precision", "recall", "f1-score", "support"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = c("precision", "recall", "f1-score", "support")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = metrics
+  ) %>% 
+  cols_label(
+    metrics = "Metrics",
+    precision = "Precision",
+    recall = "Recall",
+    `f1-score` = "F1-Score",
+    support = "Support"
+  ) %>% 
+  tab_options(
+    table.width = pct(100)
+    )
+```
+
+## RandomForestClassifier
+
+### Pipeline
+```{python}
+# classifier
+rfc = RandomForestClassifier(class_weight="balanced")
+pipe_rfc= config.make_pipeline("rfc", rfc)
+
+with open(config.pkl_path + "credit_score_grid_search_rfc.pkl", "rb") as f:
+  gs_rfc = pickle.load(f)
+
+rfc_model = gs_rfc.best_estimator_
+```
+
+### Classification
+
+```{python}
+ypred_rfc = rfc_model.predict(xtest)
+cr_rfc = classification_report(
+  ytest,
+  ypred_rfc,
+  # target_names=config.labels,
+  digits=4,
+  output_dict=True
+  )
+df_cr_rfc = pd.DataFrame.from_dict(cr_rfc).reset_index()
+df_cr_rfc
+```
+
+## XGBoostClassifier
+
+### Pipeline
+
+```{python}
+# classifier
+xgb = XGBClassifier(n_jobs=-1, enable_categorical=True)
+# pipeline
+pipe_xgb = config.make_pipeline("xgb", xgb)
+```
+
+### Classification
+
+```{python}
+with open(config.pkl_path + "credit_score_random_search_xgb.pkl", "rb") as f:
+  rs_xgb = pickle.load(f)
+
+xgb_model = rs_xgb.best_estimator_
+
+ypred_xgb = xgb_model.predict(xtest)
+cr_xgb = classification_report(
+  ytest,
+  ypred_xgb,
+  # target_names=config.labels,
+  digits=4,
+  output_dict=True
+  )
+df_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()
+df_cr_xgb
+```
+
+# Models comparion
+
+```{python}
+config.plot_roc_curves(
+  model_names=["dtc", "rfc", "xgb"],
+  models=[dtc_model, rfc_model, xgb_model]
+)
+```
+
+# Explainability
+
+```{python}
+#| eval: false
+import shap
+```
+
+## Force plot
+
+```{python}
+config.make_force_plot()
+```
+
+## Decision plot
+```{python}
+
+```
+
+## Waterfall plot
+
+```{python}
+
+```
+
+## Bar plot
+
+```{python}
+shap.plots.bar(
+    shap_values[23325],
+    max_display=len(config.features)
+)
+```
+
+
+
+

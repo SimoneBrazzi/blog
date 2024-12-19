@@ -239,6 +239,18 @@ class Config():
     
     return random_search_xgb
   
+  def dump_pkl(path, model):
+    
+    with open(path, "wb") as f:
+    pickle.dump(model, f)
+  
+  def load_pkl(path, model):
+    
+    with open(path, "rb") as f:
+      model = pickle.load(model)
+    
+    return model
+
   def plot_roc_curves(model_names, models):
     
     """
@@ -880,6 +892,8 @@ For the binary labels I had to use the `OneHotEncoding(drop="if_binary")`, other
 ### Fit
 
 ```{python}
+#| eval: false
+
 # import dtc best model
 with open(config.path + "grid_search_dtc.pkl", "rb") as file:
     dtc_model = pickle.load(file)
@@ -889,6 +903,8 @@ model = dtc_model.best_estimator_
 ```
 
 ```{r}
+#| eval: false
+
 #| label: tbl-cv_results
 #| tbl-cap: Cross Validation Results
 
@@ -1061,39 +1077,6 @@ df_cr_xgb
 config.plot_roc_curves(
   model_names=["dtc", "rfc", "xgb"],
   models=[dtc_model, rfc_model, xgb_model]
-)
-```
-
-# Explainability
-
-```{python}
-#| eval: false
-import shap
-```
-
-## Force plot
-
-```{python}
-config.make_force_plot()
-```
-
-## Decision plot
-```{python}
-
-```
-
-## Waterfall plot
-
-```{python}
-
-```
-
-## Bar plot
-
-```{python}
-shap.plots.bar(
-    shap_values[23325],
-    max_display=len(config.features)
 )
 ```
 

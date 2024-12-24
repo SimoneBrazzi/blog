@@ -4,7 +4,7 @@ image: "credit_score.jpeg"
 description: "ML explainability classification"
 author: "Simne Brazzi"
 date: "2024-10-26"
-draft: true
+draft: false
 categories:
   - code
   - ML
@@ -26,6 +26,10 @@ code-line-numbers: true
 code-copy: true
 code-link: true
 code-fold: true
+other-links:
+  - icon: file-code
+    text: Kaggle
+    href: https://www.kaggle.com/code/simonebrazzi/credit-score
 
 execute:
   warnings: false
@@ -106,188 +110,247 @@ from sklearn.metrics import classification_report
 
 ## Config class
 
+::: {#config-class}
 ```{python, config}
-class Config():
-  
-  def __init__(self):
-    """
-    Initialization calss.
-    """
-    
-    self.path="/Users/simonebrazzi/R/blog/posts/credit_score/"
-    self.file="/Users/simonebrazzi/R/blog/posts/credit_score/credit_scoring.csv"
-    self.pkl_path="~/R/blog/posts/credit_score/pkl/"
-    self.random_state=42
-    self.col_binary = ['code_gender', 'flag_own_car', 'flag_own_realty']
-    self.col_ordinal = ["name_income_type", "name_education_type", "name_family_status", "name_housing_type", "occupation_type"]
-    self.col_numeric = ['cnt_children', 'amt_income_total', 'cnt_fam_members']
-    self.features = self.col_binary + self.col_ordinal + self.col_numeric
-  
-  def dump_pkl(self, path, model):
-    with open(path, "wb") as f:
-      pickle.dump(model, f)
-      
-  def load_pkl(self, path):
-    with open(path, "rb") as f:
-      model = pickle.load(f)
-    
-    return model
-  
-  def make_dtc(self):
-    
-    ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
-    oe = OrdinalEncoder().set_output(transform='pandas')
-    ss = StandardScaler()
-    dtc = DecisionTreeClassifier(class_weight="balanced", random_state=config.random_state)
-    preprocessor = ColumnTransformer(
-      transformers=[
-        ("binary_encoder", ohe, config.col_binary),
-        ("ordinal_encoder", oe, config.col_ordinal),
-        ("standard_scaler", ss, config.col_numeric)
-        ],
-        remainder='passthrough'
-        )
-    
-    pipe_dtc = Pipeline(
-      steps=[
-        ("preprocessor", preprocessor),
-        ("dtc", dtc)
-        ]
-        )
-    
-    param_grid_dtc = {
-      "dtc__criterion" : ["gini", "entropy", "log_loss"],
-      "dtc__splitter" : ["best", "random"],
-      "dtc__max_depth" : [1, 2, 5, 10, 15]
-      }
-    
-    scoring = {
-      "accuracy": "accuracy",
-      "f1": "f1",
-      "roc_auc": "roc_auc"
-      }
-    
-    grid_search_dtc = GridSearchCV(
-      estimator=pipe_dtc,
-      param_grid=param_grid_dtc,
-      cv=7,
-      scoring=scoring,
-      refit="f1",  # This will refit the model using the accuracy metric
-      n_jobs=-1
-      )
-    
-    return grid_search_dtc
-  
-  def make_rfc(self):
-    
-    ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
-    oe = OrdinalEncoder().set_output(transform='pandas')
-    ss = StandardScaler()
-    # classifier
-    rfc = RandomForestClassifier(class_weight="balanced", random_state=config.random_state)
-    # preprocessor
-    preprocessor = ColumnTransformer(
-      transformers=[
-        ("binary_encoder", ohe, config.col_binary),
-        ("ordinal_encoder", oe, config.col_ordinal),
-        ("standard_scaler", ss, config.col_numeric)
-        ],
-        remainder='passthrough'
-        )
-    # pipeline
-    pipe_rfc = Pipeline(
-      steps=[
-        ("preprocessor", preprocessor),
-        ("rfc", rfc)
-        ]
-        )
-    # parameters
-    param_dist_rfc = {
-      'rfc__n_estimators': [50, 75, 100],
-      'rfc__max_depth': [5, 10, 15],
-      'rfc__min_samples_split': [5, 10]
-      }
-    # scoring
-    scoring = {
-      "accuracy": "accuracy",
-      "f1": "f1",
-      "roc_auc": "roc_auc"
-      }
-    
-    # grid search
-    grid_search_rfc = GridSearchCV(
-      estimator=pipe_rfc,
-      param_grid=param_dist_rfc,
-      cv=7,
-      scoring=scoring,
-      refit="f1",
-      n_jobs=-1
-      )
-    
-    return grid_search_rfc
-  
-  def make_xgb(self):
-    
-    ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
-    oe = OrdinalEncoder().set_output(transform='pandas')
-    ss = StandardScaler()
-    # preprocessor
-    preprocessor = ColumnTransformer(
-      transformers=[
-        ("binary_encoder", ohe, config.col_binary),
-        ("ordinal_encoder", oe, config.col_ordinal),
-        ("standard_scaler", ss, config.col_numeric)
-        ],
-        remainder='passthrough'
-        )
-    # classifier
-    scale_pos_weight = len(y[y == 0]) / len(y[y == 1])
-    xgb = XGBClassifier(
-      n_jobs=-1,
-      enable_categorical=True,
-      scale_pos_weight=scale_pos_weight,
-      random_state=config.random_state
-      )
-    # pipeline
-    pipe_xgb = Pipeline(
-      steps=[
-        ("preprocessor", preprocessor),
-        ("xgb", xgb)
-        ]
-      )
-    # parameters
-    param_dist_xgb = {
-      "xgb__n_estimators" : [100, 150, 200, 300],
-      "xgb__max_depth" : [3, 5, 7, 10],
-      "xgb__learning_rate" : [0.1, 0.01, 0.001, 0.0001],
-      "xgb__subsample": [0.7, 0.8, 0.9],
-      "xgb__colsample_bytree": [0.7, 0.8, 0.9],
-      "xgb__gamma": [0, 0.1],
-      "xgb__alpha": [0, 0.1],  # Adding slight L1 regularization for simplicity
-      "xgb__lambda": [1, 2]    # Adding slight L2 regularization for stability
-      }
-    # scoring
-    scoring = {
-      "accuracy": "accuracy",
-      "f1": "f1",
-      "roc_auc": "roc_auc"
-      }
-    # random search cv
-    random_search_xgb = RandomizedSearchCV(
-      estimator=pipe_xgb,
-      param_distributions=param_dist_xgb,
-      n_iter=30,  # Set the number of parameter combinations to try
-      cv=7,
-      scoring=scoring,
-      refit="f1",
-      n_jobs=-1
-      )
-    
-    return random_search_xgb
+#| lst-label: lst-config
+#| lst-cap: Config class
 
-  
+
+class Config():
+    def __init__(self):
+        """
+        Initialize configuration settings for credit scoring model pipeline.
+        Sets up file paths, random state, and feature column classifications.
+        """
+        # Base directory and file paths
+        self.path="/Users/simonebrazzi/R/blog/posts/credit_score/"
+        self.file="/Users/simonebrazzi/R/blog/posts/credit_score/credit_scoring.csv"
+        self.pkl_path="~/R/blog/posts/credit_score/pkl/"
+        
+        # Set random state for reproducibility
+        self.random_state=42
+        
+        # Define feature columns by type
+        self.col_binary = ['code_gender', 'flag_own_car', 'flag_own_realty']
+        self.col_ordinal = ["name_income_type", "name_education_type", "name_family_status", "name_housing_type", "occupation_type"]
+        self.col_numeric = ['cnt_children', 'amt_income_total', 'cnt_fam_members']
+        self.features = self.col_binary + self.col_ordinal + self.col_numeric
+    
+    def dump_pkl(self, path, model):
+        """
+        Serialize model to pickle file.
+        Args:
+            path: Output file path
+            model: Model to serialize
+        """
+        with open(path, "wb") as f:
+            pickle.dump(model, f)
+    
+    def load_pkl(self, path):
+        """
+        Load model from pickle file.
+        Args:
+            path: Input pickle file path
+        Returns:
+            Deserialized model
+        """
+        with open(path, "rb") as f:
+            model = pickle.load(f)
+        return model
+    
+    def make_dtc(self):
+        """
+        Create Decision Tree Classifier pipeline with preprocessing and grid search.
+        Returns:
+            GridSearchCV object configured for DTC
+        """
+        # Initialize encoders and scaler
+        ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
+        oe = OrdinalEncoder().set_output(transform='pandas')
+        ss = StandardScaler()
+        
+        # Create balanced Decision Tree
+        dtc = DecisionTreeClassifier(class_weight="balanced", random_state=config.random_state)
+        
+        # Set up preprocessing pipeline
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ("binary_encoder", ohe, config.col_binary),
+                ("ordinal_encoder", oe, config.col_ordinal),
+                ("standard_scaler", ss, config.col_numeric)
+            ],
+            remainder='passthrough'
+        )
+        
+        # Create full pipeline
+        pipe_dtc = Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                ("dtc", dtc)
+            ]
+        )
+        
+        # Define hyperparameter search space
+        param_grid_dtc = {
+            "dtc__criterion": ["gini", "entropy", "log_loss"],
+            "dtc__splitter": ["best", "random"],
+            "dtc__max_depth": [1, 2, 5, 10, 15]
+        }
+        
+        # Set up multiple scoring metrics
+        scoring = {
+            "accuracy": "accuracy",
+            "f1": "f1",
+            "roc_auc": "roc_auc"
+        }
+        
+        # Configure grid search
+        grid_search_dtc = GridSearchCV(
+            estimator=pipe_dtc,
+            param_grid=param_grid_dtc,
+            cv=7,
+            scoring=scoring,
+            refit="f1",
+            n_jobs=-1
+        )
+        
+        return grid_search_dtc
+    
+    def make_rfc(self):
+        """
+        Create Random Forest Classifier pipeline with preprocessing and grid search.
+        Returns:
+            GridSearchCV object configured for RFC
+        """
+        # Initialize preprocessing components
+        ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
+        oe = OrdinalEncoder().set_output(transform='pandas')
+        ss = StandardScaler()
+        
+        # Create balanced Random Forest
+        rfc = RandomForestClassifier(class_weight="balanced", random_state=config.random_state)
+        
+        # Set up preprocessing pipeline
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ("binary_encoder", ohe, config.col_binary),
+                ("ordinal_encoder", oe, config.col_ordinal),
+                ("standard_scaler", ss, config.col_numeric)
+            ],
+            remainder='passthrough'
+        )
+        
+        # Create full pipeline
+        pipe_rfc = Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                ("rfc", rfc)
+            ]
+        )
+        
+        # Define parameter search space
+        param_dist_rfc = {
+            'rfc__n_estimators': [50, 75, 100],
+            'rfc__max_depth': [5, 10, 15],
+            'rfc__min_samples_split': [5, 10]
+        }
+        
+        # Set up scoring metrics
+        scoring = {
+            "accuracy": "accuracy",
+            "f1": "f1",
+            "roc_auc": "roc_auc"
+        }
+        
+        # Configure grid search
+        grid_search_rfc = GridSearchCV(
+            estimator=pipe_rfc,
+            param_grid=param_dist_rfc,
+            cv=7,
+            scoring=scoring,
+            refit="f1",
+            n_jobs=-1
+        )
+        
+        return grid_search_rfc
+    
+    def make_xgb(self):
+        """
+        Create XGBoost Classifier pipeline with preprocessing and randomized search.
+        Returns:
+            RandomizedSearchCV object configured for XGBoost
+        """
+        # Initialize preprocessing components
+        ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
+        oe = OrdinalEncoder().set_output(transform='pandas')
+        ss = StandardScaler()
+        
+        # Set up preprocessing pipeline
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ("binary_encoder", ohe, config.col_binary),
+                ("ordinal_encoder", oe, config.col_ordinal),
+                ("standard_scaler", ss, config.col_numeric)
+            ],
+            remainder='passthrough'
+        )
+        
+        # Calculate class weight
+        scale_pos_weight = len(y[y == 0]) / len(y[y == 1])
+        
+        # Create XGBoost classifier
+        xgb = XGBClassifier(
+            n_jobs=-1,
+            enable_categorical=True,
+            scale_pos_weight=scale_pos_weight,
+            random_state=config.random_state
+        )
+        
+        # Create full pipeline
+        pipe_xgb = Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                ("xgb", xgb)
+            ]
+        )
+        
+        # Define comprehensive parameter search space
+        param_dist_xgb = {
+            "xgb__n_estimators": [100, 150, 200, 300],
+            "xgb__max_depth": [3, 5, 7, 10],
+            "xgb__learning_rate": [0.1, 0.01, 0.001, 0.0001],
+            "xgb__subsample": [0.7, 0.8, 0.9],
+            "xgb__colsample_bytree": [0.7, 0.8, 0.9],
+            "xgb__gamma": [0, 0.1],
+            "xgb__alpha": [0, 0.1],
+            "xgb__lambda": [1, 2]
+        }
+        
+        # Set up scoring metrics
+        scoring = {
+            "accuracy": "accuracy",
+            "f1": "f1",
+            "roc_auc": "roc_auc"
+        }
+        
+        # Configure randomized search
+        random_search_xgb = RandomizedSearchCV(
+            estimator=pipe_xgb,
+            param_distributions=param_dist_xgb,
+            n_iter=30,
+            cv=7,
+            scoring=scoring,
+            refit="f1",
+            n_jobs=-1
+        )
+        
+        return random_search_xgb
+
+# Create global config instance
 config = Config()
 ```
+
+:::
 
 # Dataset
 
@@ -302,11 +365,9 @@ df.columns = df.columns.str.lower()
 
 ## Target
 
-It is always important to perform an EDA. In this case I am expecting to have less cases of high creditworthiness than low: for my personal knowledge and experience, high creditworth client are not the majority. Also, considering it is a **binary classification**, it is important to be sure if data are balanced to make a better model selection.
+It is always important to perform an EDA. In this case I am expecting to have less cases of high creditworthiness than low: for my personal knowledge and experience, high creditworthiness clients are not the majority. Also, considering it is a **binary classification**, it is important to be sure if data are balanced to make a better model selection.
 
 ```{python, value_count}
-#| echo: false
-
 value_count = np.unique(df.target, return_counts=True)
 
 var0 = value_count[0][0]
@@ -363,7 +424,7 @@ df_g %>%
     )
 ```
 
-The dataset is unbalanced as expected: most of the target are low creditworthiness (0 label). This is important in the training, to avoid overfitting on the 0 class. If you say 10 times out of 10, 9 times out of 10 you are right: no model needed! Of course this is false and is prone to error when predicting on new data which are not distributed like the training ones.
+The dataset is **unbalanced** as expected: most of the target are low creditworthiness (0 label). This is important in the training: unbalanced datasets have higher risk of overfitting. If 9 out of 10 observatinos are 0 and you predict 10 times 0, the model has an accuracy of 0.9!
 
 ```{r, barchart}
 #| label: fig-barchart
@@ -380,7 +441,11 @@ g <- ggplot(df_g) +
 ggplotly(g)
 ```
 
-Remember: **0**. stands for **low creditworthiness**, **1** for **high**. Our dataset is strongly unbalanced towards the 0 label. So, my first idea was right.
+::: callout-importand
+-   **0**. stands for **low creditworthiness**.
+-   **1** stands for **high**.
+-   Our dataset is strongly unbalanced towards the 0 label.
+:::
 
 ## Features
 
@@ -485,7 +550,12 @@ df %>%
   ) 
 ```
 
-So here is the situation: we could impute the NA respecting the proportion of the other labels in the dataset or we can drop the NA values. I want to drop the NA. Even if we are losing a third of the data, we are not making assumption based on the mode. Occupation_type could be a very important feature and doing inference on it is worst then lose some data. Also, we still have `{r} df %>% filter(!is.na(occupation_type)) %>% nrow()`, which are plenty enough.
+So here is the situation:
+
+1.  we could impute the NA respecting the proportion of the other labels in the dataset or
+2.  we can drop the NA values.
+
+I want to drop the NA. Even if we are losing a third of the data, we are not making assumption based on the mode. Occupation_type could be a very important feature and doing inference on it is worst then lose some data. Also, we still have `{r} df %>% filter(!is.na(occupation_type)) %>% nrow()`, which are plenty enough.
 
 ```{r}
 #| label: fig-barplot-occ-type-freq
@@ -526,7 +596,7 @@ one_cols <- df_na %>%
 one_cols
 ```
 
-Then, to check multiple OR condition, we can use `if_any()`. In this case, we are checking if multiple columns are NA, with the previous filter on only one NA in each column.
+Then, to check multiple OR condition, we can use `if_any()` in R. In this case, we are checking if multiple columns are NA, with the previous filter on only one NA in each column.
 
 ```{r}
 library(reticulate)
@@ -549,7 +619,11 @@ py$id_to_remove <- df %>%
 
 #### Interesting features
 
-Lets also look at some interesting variable: click on the different tabs to see the frequency table for each of them.
+Lets also look at some interesting variables: click on the different tabs to see the frequency table for each of them.
+
+::: callout-note
+Future upgrade will convert this tabset to a Shiny app. I am encountering some difficulties with shinylive, meaning it is not showing the plot.
+:::
 
 ```{r}
 # features to check
@@ -742,7 +816,7 @@ df = df[df.id != id_to_remove]
 df = df[~df.occupation_type.isna()]
 ```
 
-Even if it is not useful for the model, I want to convert the date columns to birthday and date of employment.
+Even if it is not useful for the model because these are not features, I want to convert the date columns to birthday and date of employment.
 
 ```{python}
 df["birthday"] = df.days_birth.map(lambda x : (date.today() + relativedelta(days=x)).strftime("%Y-%m-%d"))
@@ -768,13 +842,13 @@ xtrain, xtest, ytrain, ytest = train_test_split(
 
 # Models
 
-To address the model **explainability**, we can choose a CART model. This selection has 2 interesting point for our task:
+To address the model **explainability**, we can choose a CART model. They have 2 interesting point for our task:
 
 1.  **Explainability**, as already mentioned. This will help us explain the reason of rejection.
 2.  **Feature selection.** At this [link](https://www.researchgate.net/publication/369355042_A_Comprehensive_Review_of_Feature_Selection_and_Feature_Selection_Stability_in_Machine_Learning) you can find a paper which shows how **embedded method** as the tree models can have the same performance of traditional feature selection method.
 
 ::: {callout-important}
-It could be also interesting to do a **R**ecursive **F**eature **E**limination. Right now the feature selection is made with personal knowledge to remove some columns before training. The models will use just 11 features.
+It could be also interesting to do a **R**ecursive **F**eature **E**limination. Right now the feature selection is made with personal knowledge to remove some columns before training. The CART model will perform the feature selection, as the paper above explain.
 :::
 
 We are going to implement 3 models with an increasingly level of complexity:
@@ -785,15 +859,14 @@ We are going to implement 3 models with an increasingly level of complexity:
 
 ## DecisionTreeClassifier
 
-### GridSearchCV
+### Pipeline
 
-Even if the result of the model are relatively easy to understand, the **hyperparameter tuning** has far too many possibility. This is where `GridSearchCV()` comes handy.
+Even if the result of the model are relatively easy to understand, the **hyperparameter tuning** has far too many possibility. This is where `GridSearchCV()` comes handy. Check @lst-config for more details.
 
 ```{python, make_dtc}
+#| eval: false
 dtc = config.make_dtc()
 ```
-
-### Pipeline
 
 One of the many nice `sklearn` features is the [`Pipeline()`](https://scikit-learn.org/1.5/modules/generated/sklearn.pipeline.Pipeline.html). It has lots of important benefits:
 
@@ -821,12 +894,16 @@ For the binary labels I had to use the `OneHotEncoding(drop="if_binary")`, other
 ### Fit
 
 ```{python, dtc_fit}
+#| eval: false
 dtc_model = dtc.fit(xtrain, ytrain)
 ```
+
+Check @lst-config for more details.
 
 ### Pickle
 
 ```{python, dtc_pkl_dump}
+#| eval: false
 config.dump_pkl(
   path=os.path.expanduser(config.pkl_path) + "dtc_model.pkl",
   model=dtc_model
@@ -907,12 +984,16 @@ df_cr %>%
 ### Pipeline
 
 ```{python, make_rfc}
+#| eval: false
 rfc = config.make_rfc()
 ```
+
+Check @lst-config for more details.
 
 ### Fit
 
 ```{python, rfc_fit}
+#| eval: false
 tic = time.time()
 rfc_model = rfc.fit(xtrain, ytrain)
 toc = time.time()
@@ -924,6 +1005,7 @@ print(f"Elapsed time: {elapsed_time / 60} minutes")
 ### Pickle
 
 ```{python, rfc_pkl_dump}
+#| eval: false
 config.dump_pkl(
   path=os.path.expanduser(config.pkl_path) + "rfc_model.pkl",
   model=rfc_model
@@ -1004,12 +1086,16 @@ df_cr %>%
 ### Pipeline
 
 ```{python, make_xgb}
+#| eval: false
 xgb = config.make_xgb()
 ```
+
+Check @lst-config for more details.
 
 ### Fit
 
 ```{python, xgb_fit}
+#| eval: false
 tic = time.time()
 xgb_model = xgb.fit(xtrain, ytrain)
 toc = time.time()
@@ -1021,6 +1107,7 @@ print(f"Elapsed time: {elapsed_time / 60} minutes")
 ### Pickle
 
 ```{python, xgb_pkl_dump}
+#| eval: false
 config.dump_pkl(
   path=os.path.expanduser(config.pkl_path) + "xgb_model.pkl",
   model=xgb_model
@@ -1098,6 +1185,8 @@ df_cr %>%
 
 # Models comparison
 
+Lets check with a plot the performance of all the models. The AUC ROC makes it possible. It is a plot useful for classification tasks. It plots False vs True Positive Rate.
+
 ```{python, roc_data}
 from sklearn.metrics import roc_curve, roc_auc_score
 import matplotlib.pyplot as plt
@@ -1126,7 +1215,7 @@ From the ROC AUC, the best model is the xgboost, because the **A**rea **U**nder 
 
 # Explainability
 
-What if the model predict a low creditworthiness and the business wants to know why? Shapley values make this possible. Shapley values comes from cooperative game theory: for more details, check this [link](https://medium.com/the-modern-scientist/what-is-the-shapley-value-8ca624274d5a) and this [link](https://www.sciencedirect.com/science/article/abs/pii/S1574000502030163).
+What if the model predict a low creditworthiness and the business wants to know why? **Shapley values** make this possible. It comes from cooperative game theory: for more details, check this [link](https://medium.com/the-modern-scientist/what-is-the-shapley-value-8ca624274d5a) and this [link](https://www.sciencedirect.com/science/article/abs/pii/S1574000502030163).
 
 For our purpose, I have found 3 observations we can use. It is also useful to separate the preprocessor and classificator part of the pipeline.
 
@@ -1176,7 +1265,7 @@ The importance plot tells us the information gain each feature gives to the mode
 -   Number of childrens.
 -   Type of housing.
 
-Importance provides a score that indicates how useful useful each feature is in the construcition of the boosted decision trees. The more an attribute is used to make key decisions with decision trees, the higher its relative importance.
+Importance provides a **score** that indicates how useful useful each feature is in the construcition of the boosted decision trees. The more an attribute is used to make key decisions with decision trees, the higher its relative importance.
 
 ```{python}
 #| eval: false
@@ -1219,8 +1308,6 @@ The force plot explains the contribution of features to a specific model predict
 
 -   **Base value** is the model expected output or **mean prediction** over the dataset. It is the prediction the model would make without any specific input features. It is the starting point of the plot.
 
-<!-- -->
-
 -   **Feature Contributions**. The SHAP values represent how much each feature contributes to the difference between the vase value and the final prediction for a specific observation.
 
 -   **Positive contributions**. Features pushing the prediction higher. Shown in red.
@@ -1232,3 +1319,7 @@ The force plot explains the contribution of features to a specific model predict
 ![Waterfall plot](kaggle/waterfall_plot.png){fig-align="center"}
 
 Waterfall plots displays explanations for individual predictions. The bottom of a waterfall plot starts as the expected value of the model output, and then each row shows how the positive (red) or negative (blue) contribution of each feature moves the value from the expected model output over the background dataset to the model output for this prediction.
+
+::: {.callout-important}
+Due to venv incompatibilities between shap and other packages, the shap evaluation has been made on Kaggle. The plots are the results of the notebook.
+:::

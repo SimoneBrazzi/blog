@@ -4,6 +4,7 @@
     "items": [
       "/posts/credit_score/backup.html",
       "/posts/credit_score/credit-score.html",
+      "/posts/credit_score/credit_score.html",
       "/posts/spam_detection/spam_detection.html",
       "/posts/toxic_comment_filter/toxic_comment_filter.html",
       "/posts/eurostat_homicide_rate/eurostat_homicide_rate.html"

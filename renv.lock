@@ -14,6 +14,13 @@
     "Name": "/Users/simonebrazzi/.pyenv/versions/3.11.10/envs/blog"
   },
   "Packages": {
+    "BH": {
+      "Package": "BH",
+      "Version": "1.84.0-0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a8235afbcd6316e6e91433ea47661013"
+    },
     "DBI": {
       "Package": "DBI",
       "Version": "1.2.3",
@@ -147,6 +154,20 @@
         "utils"
       ],
       "Hash": "6b868847b365672d6c1677b1608da9ed"
+    },
+    "RcppArmadillo": {
+      "Package": "RcppArmadillo",
+      "Version": "14.0.2-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "edff747eebfb8f2e18eed194e000caa1"
     },
     "RcppTOML": {
       "Package": "RcppTOML",
@@ -481,6 +502,18 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "14eb0596f987c71535d07c3aff814742"
+    },
+    "condMVNorm": {
+      "Package": "condMVNorm",
+      "Version": "2020.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "mvtnorm",
+        "stats"
+      ],
+      "Hash": "c00fbe1636d56c59d91198cb202f4c11"
     },
     "conflicted": {
       "Package": "conflicted",
@@ -1569,6 +1602,29 @@
       ],
       "Hash": "4fd8900853b746af55b81fda99da7695"
     },
+    "mvnfast": {
+      "Package": "mvnfast",
+      "Version": "0.2.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "BH",
+        "Rcpp",
+        "RcppArmadillo"
+      ],
+      "Hash": "e65cac8e8501bdfbdca0412c37bb18c9"
+    },
+    "mvtnorm": {
+      "Package": "mvtnorm",
+      "Version": "1.3-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "stats"
+      ],
+      "Hash": "9e8405eacb262c0a939e121650247f4b"
+    },
     "nlme": {
       "Package": "nlme",
       "Version": "3.1-166",
@@ -2304,6 +2360,23 @@
         "stats"
       ],
       "Hash": "5c47e84dc0a3ca761ae1d307889e796d"
+    },
+    "shapr": {
+      "Package": "shapr",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "Rcpp",
+        "RcppArmadillo",
+        "condMVNorm",
+        "data.table",
+        "mvnfast",
+        "stats"
+      ],
+      "Hash": "2161d84052ee3d5733bb9b4c6b12a716"
     },
     "shiny": {
       "Package": "shiny",

@@ -69,8 +69,8 @@ It is a binary classification which needs a good explainability.
 
 ## R
 
-```{r}
-#| warning: FALSE
+```{r import_r}
+#| warning: false
 
 library(tidyverse, verbose = FALSE)
 library(ggplot2)
@@ -83,29 +83,30 @@ library(shapr)
 
 ## Python
 
-```{python}
+```{python, import_python}
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import time
+import os
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV, cross_val_score
+from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, LabelBinarizer
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
+from xgboost import DMatrix
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, precision_recall_curve, roc_curve, roc_auc_score
-from scipy.stats import ttest_rel, wilcoxon
+from sklearn.metrics import classification_report
 ```
 
 ## Config class
 
-```{python}
+```{python, config}
 class Config():
   
   def __init__(self):
@@ -117,25 +118,27 @@ class Config():
     self.file="/Users/simonebrazzi/R/blog/posts/credit_score/credit_scoring.csv"
     self.pkl_path="~/R/blog/posts/credit_score/pkl/"
     self.random_state=42
-    self.random_state=42
     self.col_binary = ['code_gender', 'flag_own_car', 'flag_own_realty']
     self.col_ordinal = ["name_income_type", "name_education_type", "name_family_status", "name_housing_type", "occupation_type"]
     self.col_numeric = ['cnt_children', 'amt_income_total', 'cnt_fam_members']
     self.features = self.col_binary + self.col_ordinal + self.col_numeric
   
-  def make_pipeline(self, name, clf):
-    """
-    Create the pipeline with preprocessor and classificator.\n
-    Preprocessor is set.
+  def dump_pkl(self, path, model):
+    with open(path, "wb") as f:
+      pickle.dump(model, f)
+      
+  def load_pkl(self, path):
+    with open(path, "rb") as f:
+      model = pickle.load(f)
     
-    name {str}: name of the classificator in the pipeline.\n
-    clf {model}: sklearn classificator model.\n
-    """
-    # initialize preprocessors
+    return model
+  
+  def make_dtc(self):
+    
     ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
     oe = OrdinalEncoder().set_output(transform='pandas')
     ss = StandardScaler()
-    # create preprocessor
+    dtc = DecisionTreeClassifier(class_weight="balanced", random_state=config.random_state)
     preprocessor = ColumnTransformer(
       transformers=[
         ("binary_encoder", ohe, config.col_binary),
@@ -144,28 +147,20 @@ class Config():
         ],
         remainder='passthrough'
         )
-    # pipeline
-    pipe = Pipeline(
+    
+    pipe_dtc = Pipeline(
       steps=[
         ("preprocessor", preprocessor),
-        (name, clf)
+        ("dtc", dtc)
         ]
         )
-    return pipe
-  
-  def make_grid_search_dtc(self, pipe_dtc):
-    
-    """
-    Return the GridSearch for the DecisionTreeClassifier.\n
-    
-    pipe_dtc {sklearn.pipeline}: accept a pipeline with dtc model as classificator.\n
-    """
     
     param_grid_dtc = {
       "dtc__criterion" : ["gini", "entropy", "log_loss"],
       "dtc__splitter" : ["best", "random"],
       "dtc__max_depth" : [1, 2, 5, 10, 15]
       }
+    
     scoring = {
       "accuracy": "accuracy",
       "f1": "f1",
@@ -177,43 +172,94 @@ class Config():
       param_grid=param_grid_dtc,
       cv=7,
       scoring=scoring,
-      refit="accuracy",  # This will refit the model using the accuracy metric
+      refit="f1",  # This will refit the model using the accuracy metric
       n_jobs=-1
       )
     
     return grid_search_dtc
   
-  def make_grid_search_rfc(self, pipe_rfc):
+  def make_rfc(self):
     
+    ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
+    oe = OrdinalEncoder().set_output(transform='pandas')
+    ss = StandardScaler()
+    # classifier
+    rfc = RandomForestClassifier(class_weight="balanced", random_state=config.random_state)
+    # preprocessor
+    preprocessor = ColumnTransformer(
+      transformers=[
+        ("binary_encoder", ohe, config.col_binary),
+        ("ordinal_encoder", oe, config.col_ordinal),
+        ("standard_scaler", ss, config.col_numeric)
+        ],
+        remainder='passthrough'
+        )
+    # pipeline
+    pipe_rfc = Pipeline(
+      steps=[
+        ("preprocessor", preprocessor),
+        ("rfc", rfc)
+        ]
+        )
     # parameters
     param_dist_rfc = {
       'rfc__n_estimators': [50, 75, 100],
       'rfc__max_depth': [5, 10, 15],
       'rfc__min_samples_split': [5, 10]
       }
+    # scoring
     scoring = {
       "accuracy": "accuracy",
       "f1": "f1",
       "roc_auc": "roc_auc"
       }
+    
     # grid search
-    random_search_rfc = GridSearchCV(
+    grid_search_rfc = GridSearchCV(
       estimator=pipe_rfc,
       param_grid=param_dist_rfc,
       cv=7,
       scoring=scoring,
-      refit="accuracy",
+      refit="f1",
       n_jobs=-1
       )
     
-    return random_search_rfc
+    return grid_search_rfc
+  
+  def make_xgb(self):
     
-  def make_grid_search_xgb(self, pipe_xgb):
+    ohe = OneHotEncoder(drop='if_binary', sparse_output=False)
+    oe = OrdinalEncoder().set_output(transform='pandas')
+    ss = StandardScaler()
+    # preprocessor
+    preprocessor = ColumnTransformer(
+      transformers=[
+        ("binary_encoder", ohe, config.col_binary),
+        ("ordinal_encoder", oe, config.col_ordinal),
+        ("standard_scaler", ss, config.col_numeric)
+        ],
+        remainder='passthrough'
+        )
+    # classifier
+    scale_pos_weight = len(y[y == 0]) / len(y[y == 1])
+    xgb = XGBClassifier(
+      n_jobs=-1,
+      enable_categorical=True,
+      scale_pos_weight=scale_pos_weight,
+      random_state=config.random_state
+      )
+    # pipeline
+    pipe_xgb = Pipeline(
+      steps=[
+        ("preprocessor", preprocessor),
+        ("xgb", xgb)
+        ]
+      )
     # parameters
     param_dist_xgb = {
       "xgb__n_estimators" : [100, 150, 200, 300],
       "xgb__max_depth" : [3, 5, 7, 10],
-      "xgb__learning_rate" : [0.1, 0.1, 0.01, 0.0001],
+      "xgb__learning_rate" : [0.1, 0.01, 0.001, 0.0001],
       "xgb__subsample": [0.7, 0.8, 0.9],
       "xgb__colsample_bytree": [0.7, 0.8, 0.9],
       "xgb__gamma": [0, 0.1],
@@ -233,124 +279,12 @@ class Config():
       n_iter=30,  # Set the number of parameter combinations to try
       cv=7,
       scoring=scoring,
-      refit="accuracy",
+      refit="f1",
       n_jobs=-1
       )
     
     return random_search_xgb
-  
-  def dump_pkl(path, model):
-    
-    with open(path, "wb") as f:
-    pickle.dump(model, f)
-  
-  def load_pkl(path, model):
-    
-    with open(path, "rb") as f:
-      model = pickle.load(model)
-    
-    return model
 
-  def plot_roc_curves(model_names, models):
-    
-    """
-    It returns the plot of the ROC AUC Curves.
-    
-    model_names {list}: list of string of name of the models.
-    models {list}: list of model names.
-    """
-    
-    plt.figure(figsize=(20, 15))
-    
-    for i, model in enumerate(models):
-      fpr, tpr, _ = roc_curve(ytest, model.predict_proba(xtest)[:, 1])
-      plt.plot(fpr, tpr, label=f'{model_names[i]} (AUC: {roc_auc_score(ytest,model.predict_proba(xtest)[:, 1]):.2f})')
-      plt.xlabel("False Positive Rate")
-      plt.ylabel("True Positive Rate")
-      plt.title("ROC Curves Comparison")
-      plt.legend()
-      plt.show()
-  
-  def calculate_shap_tree_explainer(self, model, preprocessor, clf, xtest, idx):
-    """
-    Calculate the shap.TreeExplainer for a specifc xtest observation.\n
-    It returns explainer, shap_value_obs, observation and observation_original.\n
-    preprocessor {sklearn.pipeline.named_steps["preprocessor]}.\n
-    clf {sklearn.pipeline.named_steps["classifier"]}.\n
-    xtest {array}.\n
-    idx {int}: index of the observation to analize in the xtest daaset.\n
-    """
-    
-    xtest_preprocessed = preprocessor.transform(xtest)
-    observation = xtest_preprocessed[idx].reshape(1, -1) # reshape to the requested array shape
-    observation_original = np.array(xtest.iloc[idx,:]).reshape(1, -1)
-    
-    explainer = shap.TreeExplainer(clf)
-    shap_value_obs = explainer.shap_values(observation)
-    
-    return (explainer, shap_value_obs, observation, observation_original)
-  
-  def make_force_plot(self, figsize, base_value, shap_values, features, feature_names):
-    
-    """
-    Plot the shap force plot.\n
-    \n
-    figsize {tuple}: (20, 10) for example.\n
-    base_value: explainer.expected_value. Valid also for the single observation.\n
-    shap_values: shap_value of the observation.\n
-    features: observation_original value before preprocesing.\n
-    feature_names: list of the feature names.\n
-    """
-    
-    plt.figure(figsize=figsize)
-    
-    shap.force_plot(
-      base_value=base_value,
-      shap_values=shap_values,
-      features=features,
-      feature_names=feature_names,
-      matplotlib=True
-      )
-  
-  def make_decision_plot(self, figsize, base_value, shap_values, features, feature_names, feature_order):
-    
-    """
-    Plot the shap decision plot.\n
-    \n
-    figsize {tuple}: (20, 10) for example.\n
-    base_value: explainer.expected_value. Valid also for the single observation.\n
-    shap_values: shap_value of the observation.\n
-    features: observation_original value before preprocesing.\n
-    feature_names: list of the feature names.\n
-    feature_order {str}: "importance", "hclust" or None.
-    """
-    
-    plt.figure(figsize=figsize)
-    
-    shap.plots.decision(
-      base_value=base_value,
-      shap_values=shap_values,
-      features=features,
-      feature_names=feature_names,
-      feature_order=feature_order,
-      show=True
-      )
-  
-  def make_waterfall(self, figsize, idx, max_display):
-    
-    """
-    Plot the shap decision plot.\n
-    \n
-    figsize {tuple}: (20, 10) for example.\n
-    shap_values
-    """
-    
-    plt.figure(figsize=figsize)
-    shap.plots.waterfall(
-      shap_values[23325],
-      max_display=len(config.features)
-      )
-    
   
 config = Config()
 ```
@@ -359,7 +293,7 @@ config = Config()
 
 Now we can import the dataset. Having all columns UPPERCASE, I will set all of them as lowercase
 
-```{python}
+```{python, import_data}
 df = pd.read_csv(config.file)
 df.columns = df.columns.str.lower()
 ```
@@ -370,7 +304,7 @@ df.columns = df.columns.str.lower()
 
 It is always important to perform an EDA. In this case I am expecting to have less cases of high creditworthiness than low: for my personal knowledge and experience, high creditworth client are not the majority. Also, considering it is a **binary classification**, it is important to be sure if data are balanced to make a better model selection.
 
-```{python}
+```{python, value_count}
 #| echo: false
 
 value_count = np.unique(df.target, return_counts=True)
@@ -387,9 +321,11 @@ The variable:
 -   `{r} py$var0` has `{r} py$var0_count %>% format(scientific = FALSE, big.mark = ",")`.
 -   `{r} py$var1` has `{r} py$var1_count %>% format(scientific = FALSE, big.mark = ",")`.
 
-```{r}
+```{r, tbl-eda}
 #| label: tbl-eda
 #| tbl-cap: Absolute and relative frequencies
+
+library(reticulate)
 
 df <- py$df
 
@@ -429,7 +365,7 @@ df_g %>%
 
 The dataset is unbalanced as expected: most of the target are low creditworthiness (0 label). This is important in the training, to avoid overfitting on the 0 class. If you say 10 times out of 10, 9 times out of 10 you are right: no model needed! Of course this is false and is prone to error when predicting on new data which are not distributed like the training ones.
 
-```{r}
+```{r, barchart}
 #| label: fig-barchart
 #| fig-cap: Absolute frequency barchart
 
@@ -801,7 +737,7 @@ From the EDA, we know we can drop
 -   NA occupation_type.
 -   the id `{r} py$id_to_remove`.
 
-```{python}
+```{python, remove_nas}
 df = df[df.id != id_to_remove]
 df = df[~df.occupation_type.isna()]
 ```
@@ -817,16 +753,16 @@ df["employed"] = df["days_employed"].apply(lambda x: (date.today() + relativedel
 
 To take into consideration the unbalance and have it also in our split, we can use the `stratify` method.
 
-```{python}
+```{python, train_test_split}
 x = df[config.features]
 y = df.target
 
 xtrain, xtest, ytrain, ytest = train_test_split(
-  x, 
-  y, 
-  test_size = .2,
-  stratify = y,
-  random_state=config.random_state
+    x,
+    y,
+    test_size = .2,
+    stratify = y,
+    random_state=config.random_state
 )
 ```
 
@@ -834,7 +770,7 @@ xtrain, xtest, ytrain, ytest = train_test_split(
 
 To address the model **explainability**, we can choose a CART model. This selection has 2 interesting point for our task:
 
-1. **Explainability**, as already mentioned. This will help us explain the reason of rejection.
+1.  **Explainability**, as already mentioned. This will help us explain the reason of rejection.
 2.  **Feature selection.** At this [link](https://www.researchgate.net/publication/369355042_A_Comprehensive_Review_of_Feature_Selection_and_Feature_Selection_Stability_in_Machine_Learning) you can find a paper which shows how **embedded method** as the tree models can have the same performance of traditional feature selection method.
 
 ::: {callout-important}
@@ -843,17 +779,19 @@ It could be also interesting to do a **R**ecursive **F**eature **E**limination. 
 
 We are going to implement 3 models with an increasingly level of complexity:
 
-1. DecisionTreeClassifier.
-2. RandomForestClassifier.
-3. XGBoostClassifier.
+1.  DecisionTreeClassifier.
+2.  RandomForestClassifier.
+3.  XGBoostClassifier.
 
 ## DecisionTreeClassifier
-
 
 ### GridSearchCV
 
 Even if the result of the model are relatively easy to understand, the **hyperparameter tuning** has far too many possibility. This is where `GridSearchCV()` comes handy.
 
+```{python, make_dtc}
+dtc = config.make_dtc()
+```
 
 ### Pipeline
 
@@ -866,14 +804,6 @@ One of the many nice `sklearn` features is the [`Pipeline()`](https://scikit-lea
 
 First, initialize the various preprocessor and the classification model.
 
-```{python}
-ohe = OneHotEncoder()
-ohe_bi = OneHotEncoder(drop="if_binary")
-ss = StandardScaler()
-mms = MinMaxScaler()
-dtc = DecisionTreeClassifier(class_weight="balanced")
-```
-
 Using the `ColumnTransformer()`, we can apply the different preprocessing to the specific columns. The preprocessing is divided between:
 
 -   Encoding the **binary labels** to 0-1 using `OneHotEncoding(drop="if_binary)"`.
@@ -884,73 +814,35 @@ The classifier is a `DecisionTreeClassifier()`, which the `GridSearchCV()` will 
 
 All of these steps are putted togheter with the `Pipeline()`.
 
-
 ::: {callout-important}
 For the binary labels I had to use the `OneHotEncoding(drop="if_binary")`, otherwise other preprocessor would not work with the `ColumnTransformer()`.
 :::
 
 ### Fit
 
-```{python}
-#| eval: false
-
-# import dtc best model
-with open(config.path + "grid_search_dtc.pkl", "rb") as file:
-    dtc_model = pickle.load(file)
-
-cv_results = pd.DataFrame(dtc_model.cv_results_)
-model = dtc_model.best_estimator_
+```{python, dtc_fit}
+dtc_model = dtc.fit(xtrain, ytrain)
 ```
 
-```{r}
-#| eval: false
+### Pickle
 
-#| label: tbl-cv_results
-#| tbl-cap: Cross Validation Results
-
-py$cv_results %>% 
-  arrange(across(contains("rank"))) %>% 
-  select(params, mean_test_accuracy, rank_test_accuracy, mean_test_f1, rank_test_f1, mean_test_roc_auc, rank_test_roc_auc) %>% 
-  gt() %>%
-  tab_header(
-    title = "Cross Validation Results",
-    subtitle = "Main metrics"
-  ) %>% 
-  fmt_number(
-   columns = c("mean_test_accuracy", "mean_test_f1", "mean_test_roc_auc"),
-   decimals = 3,
-   drop_trailing_zeros = TRUE,
-   drop_trailing_dec_mark = FALSE
-  ) %>% 
-  cols_align(
-    align = "center"
-  ) %>% 
-  cols_label(
-    params = "criterion - max_depth - max_features - splitter",
-    mean_test_accuracy = "Mean Test Accuracy",
-    rank_test_accuracy = "Rank Test Accuracy",
-    mean_test_f1 = "Mean Test F1",
-    rank_test_f1 = "Rank Test F1",
-    mean_test_roc_auc = "Mean Test ROC AUC",
-    rank_test_roc_auc = "Rank Test ROC AUC",
-  ) %>% 
-  tab_options(
-    table.width = pct(100)
-    )
+```{python, dtc_pkl_dump}
+config.dump_pkl(
+  path=os.path.expanduser(config.pkl_path) + "dtc_model.pkl",
+  model=dtc_model
+  )
 ```
 
-The grid search returns a CART with a best score of best_score with the following parameters:
-
--   criterion:
--   max_depth:
--   splitter:
-
-Now, we can save and load the model. This is useful to avoid to run the grid_search.
-
+```{python, dtc_pkl_load}
+dtc = config.load_pkl(
+  path=os.path.expanduser(config.pkl_path) + "dtc_model.pkl"
+  )
+dtc_model = dtc.best_estimator_
+```
 
 ### Classification Report
 
-```{python}
+```{python, dtc_cr}
 ypred_dtc = dtc_model.predict(xtest)
 cr = classification_report(
   ytest,
@@ -959,16 +851,15 @@ cr = classification_report(
   digits=4,
   output_dict=True
   )
-df_cr = pd.DataFrame.from_dict(cr).reset_index()
-df_cr
+df_cr_dtc= pd.DataFrame.from_dict(cr).reset_index()
 ```
 
-```{r}
-#| label: tbl-classification-report
-#| tbl-cap: Classification report
+```{r, dtc_cr}
+#| label: tbl-classification-report-dtc
+#| tbl-cap: Classification report DTC
 
 library(reticulate)
-df_cr <- py$df_cr %>% dplyr::rename(names = index)
+df_cr <- py$df_cr_dtc %>% dplyr::rename(names = index)
 cols <- df_cr %>% colnames()
 df_cr %>% 
   pivot_longer(
@@ -1014,20 +905,41 @@ df_cr %>%
 ## RandomForestClassifier
 
 ### Pipeline
-```{python}
-# classifier
-rfc = RandomForestClassifier(class_weight="balanced")
-pipe_rfc= config.make_pipeline("rfc", rfc)
 
-with open(config.pkl_path + "credit_score_grid_search_rfc.pkl", "rb") as f:
-  gs_rfc = pickle.load(f)
+```{python, make_rfc}
+rfc = config.make_rfc()
+```
 
-rfc_model = gs_rfc.best_estimator_
+### Fit
+
+```{python, rfc_fit}
+tic = time.time()
+rfc_model = rfc.fit(xtrain, ytrain)
+toc = time.time()
+elapsed_time= toc - tic
+print(f"Elapsed time: {elapsed_time} seconds")
+print(f"Elapsed time: {elapsed_time / 60} minutes")
+```
+
+### Pickle
+
+```{python, rfc_pkl_dump}
+config.dump_pkl(
+  path=os.path.expanduser(config.pkl_path) + "rfc_model.pkl",
+  model=rfc_model
+  )
+```
+
+```{python, rfc_pkl_load}
+rfc = config.load_pkl(
+  path=os.path.expanduser(config.pkl_path) + "rfc_model.pkl"
+  )
+rfc_model = rfc.best_estimator_
 ```
 
 ### Classification
 
-```{python}
+```{python, rfc_cr}
 ypred_rfc = rfc_model.predict(xtest)
 cr_rfc = classification_report(
   ytest,
@@ -1037,28 +949,94 @@ cr_rfc = classification_report(
   output_dict=True
   )
 df_cr_rfc = pd.DataFrame.from_dict(cr_rfc).reset_index()
-df_cr_rfc
+```
+
+```{r, rfc_cr}
+#| label: tbl-classification-report-rfc
+#| tbl-cap: Classification report RFC
+
+library(reticulate)
+df_cr <- py$df_cr_rfc %>% dplyr::rename(names = index)
+cols <- df_cr %>% colnames()
+df_cr %>% 
+  pivot_longer(
+    cols = -names,
+    names_to = "metrics",
+    values_to = "values"
+  ) %>% 
+  pivot_wider(
+    names_from = names,
+    values_from = values
+  ) %>% 
+  gt() %>%
+  tab_header(
+    title = "Confusion Matrix",
+    subtitle = "Threshold optimization favoring recall"
+  ) %>% 
+  fmt_number(
+    columns = c("precision", "recall", "f1-score", "support"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = c("precision", "recall", "f1-score", "support")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = metrics
+  ) %>% 
+  cols_label(
+    metrics = "Metrics",
+    precision = "Precision",
+    recall = "Recall",
+    `f1-score` = "F1-Score",
+    support = "Support"
+  ) %>% 
+  tab_options(
+    table.width = pct(100)
+    )
 ```
 
 ## XGBoostClassifier
 
 ### Pipeline
 
-```{python}
-# classifier
-xgb = XGBClassifier(n_jobs=-1, enable_categorical=True)
-# pipeline
-pipe_xgb = config.make_pipeline("xgb", xgb)
+```{python, make_xgb}
+xgb = config.make_xgb()
+```
+
+### Fit
+
+```{python, xgb_fit}
+tic = time.time()
+xgb_model = xgb.fit(xtrain, ytrain)
+toc = time.time()
+elapsed_time= toc - tic
+print(f"Elapsed time: {elapsed_time} seconds")
+print(f"Elapsed time: {elapsed_time / 60} minutes")
+```
+
+### Pickle
+
+```{python, xgb_pkl_dump}
+config.dump_pkl(
+  path=os.path.expanduser(config.pkl_path) + "xgb_model.pkl",
+  model=xgb_model
+  )
+```
+
+```{python, xgb_pkl_load}
+xgb = config.load_pkl(
+  path=os.path.expanduser(config.pkl_path) + "xgb_model.pkl"
+  )
+xgb_model = xgb.best_estimator_
 ```
 
 ### Classification
 
 ```{python}
-with open(config.pkl_path + "credit_score_random_search_xgb.pkl", "rb") as f:
-  rs_xgb = pickle.load(f)
-
-xgb_model = rs_xgb.best_estimator_
-
 ypred_xgb = xgb_model.predict(xtest)
 cr_xgb = classification_report(
   ytest,
@@ -1068,18 +1046,189 @@ cr_xgb = classification_report(
   output_dict=True
   )
 df_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()
-df_cr_xgb
 ```
 
-# Models comparion
+```{r, xgb_cr}
+#| label: tbl-classification-report-xgb
+#| tbl-cap: Classification report XGB
+
+library(reticulate)
+df_cr <- py$df_cr_xgb %>% dplyr::rename(names = index)
+cols <- df_cr %>% colnames()
+df_cr %>% 
+  pivot_longer(
+    cols = -names,
+    names_to = "metrics",
+    values_to = "values"
+  ) %>% 
+  pivot_wider(
+    names_from = names,
+    values_from = values
+  ) %>% 
+  gt() %>%
+  tab_header(
+    title = "Confusion Matrix",
+    subtitle = "Threshold optimization favoring recall"
+  ) %>% 
+  fmt_number(
+    columns = c("precision", "recall", "f1-score", "support"),
+    decimals = 2,
+    drop_trailing_zeros = TRUE,
+    drop_trailing_dec_mark = FALSE
+  ) %>% 
+  cols_align(
+    align = "center",
+    columns = c("precision", "recall", "f1-score", "support")
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = metrics
+  ) %>% 
+  cols_label(
+    metrics = "Metrics",
+    precision = "Precision",
+    recall = "Recall",
+    `f1-score` = "F1-Score",
+    support = "Support"
+  ) %>% 
+  tab_options(
+    table.width = pct(100)
+    )
+```
+
+# Models comparison
+
+```{python, roc_data}
+from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(20, 15))
+
+model_names = ["dtc", "rfc", "xgb"]
+models_ = [dtc_model, rfc_model, xgb_model]
+models = zip(model_names, models_)
+
+for name, model in models:
+    fpr, tpr, _ = roc_curve(ytest, model.predict_proba(xtest)[:, 1])
+    auc_score = roc_auc_score(ytest, model.predict_proba(xtest)[:, 1])
+    plt.plot(fpr, tpr, label=f'{name} (AUC: {auc_score:.2f})')
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curves Comparison")
+plt.tight_layout()
+plt.legend(loc="lower right", fontsize=12)
+plt.show()
+plt.close()
+```
+
+From the ROC AUC, the best model is the xgboost, because the **A**rea **U**nder the **C**urve is higher.
+
+# Explainability
+
+What if the model predict a low creditworthiness and the business wants to know why? Shapley values make this possible. Shapley values comes from cooperative game theory: for more details, check this [link](https://medium.com/the-modern-scientist/what-is-the-shapley-value-8ca624274d5a) and this [link](https://www.sciencedirect.com/science/article/abs/pii/S1574000502030163).
+
+For our purpose, I have found 3 observations we can use. It is also useful to separate the preprocessor and classificator part of the pipeline.
 
 ```{python}
-config.plot_roc_curves(
-  model_names=["dtc", "rfc", "xgb"],
-  models=[dtc_model, rfc_model, xgb_model]
-)
+model = xgb_model
+preprocessor = model.named_steps["preprocessor"]
+clf = model.named_steps["xgb"]
+idx = [15454, 1284, 30305]
 ```
 
+```{python, shapley_preparation}
+# retain features name
+xtrain_processed = preprocessor.transform(xtrain)
+xtrain_processed = pd.DataFrame(xtrain_processed, columns=config.features)
+# retain features name
+xtest_processed = preprocessor.transform(xtest)
+xtest_processed = pd.DataFrame(xtest_processed, columns=config.features)
+# retain features name
+clf.get_booster().feature_names = config.features
+# convert to DMatrix
+dtrain = DMatrix(xtrain_processed, label=ytrain)
+dtest = DMatrix(xtest_processed, label=ytest)
+# usefol idxs
+idx = [15454, 1284, 30305]
 
+x_processed = preprocessor.transform(x)
+```
 
+```{python}
+from xgboost import plot_importance
 
+# importance plot
+plot_importance(
+    booster=clf.get_booster(),
+    grid=False,
+    importance_type="gain",
+    title="Feature Importance by Gain",
+    values_format="{v:.2f}"
+)
+plt.tight_layout()
+plt.show()
+```
+
+The importance plot tells us the information gain each feature gives to the model prediction. The 3 most important features are also the most logical one:
+
+-   Total income amount.
+-   Number of childrens.
+-   Type of housing.
+
+Importance provides a score that indicates how useful useful each feature is in the construcition of the boosted decision trees. The more an attribute is used to make key decisions with decision trees, the higher its relative importance.
+
+```{python}
+#| eval: false
+# force plot
+plt.figure(figsize=(10, 8))
+plot_force = shap.plots.force(
+    base_value=explainer.expected_value,
+    shap_values=shap_values[idx[0], :],
+    # features=None,
+    feature_names=config.features,
+    # out_names=None,
+    # link='identity', # "logit"
+    plot_cmap='RdBu',
+    matplotlib=True,
+    show=True
+)
+plt.savefig("plot_force.jpeg", dpi=200)
+
+# calculate specific shap explainer for waterfall plot
+explainer_ = shap.Explainer(model=xgb_clf)
+shap_values_ = explainer(x_processed)
+shap_values_.feature_names = config.features
+# waterfall plot
+shap.plots.waterfall(
+    shap_values_[0],
+    max_display=len(config.features)
+)
+plt.savefig("plot_waterfall.jpeg", dpi=200)
+# bar plot
+shap.plots.bar(
+    shap_values_[0],
+    max_display=len(config.features)
+)
+plt.savefig("plot_bar.jpeg", dpi=200)
+```
+
+![Force plot](kaggle/force_plot.png){fig-align="center"}
+
+The force plot explains the contribution of features to a specific model prediction.
+
+-   **Base value** is the model expected output or **mean prediction** over the dataset. It is the prediction the model would make without any specific input features. It is the starting point of the plot.
+
+<!-- -->
+
+-   **Feature Contributions**. The SHAP values represent how much each feature contributes to the difference between the vase value and the final prediction for a specific observation.
+
+-   **Positive contributions**. Features pushing the prediction higher. Shown in red.
+
+-   **Negative contributions**. Features pulling the prediction lower. Shown in blue. The magnitude of each bar indicates the size of the feature's contribution.
+
+-   **Final Prediction**. Endpoint of the plot. It is the sum of the base value and all the SHAP values for that observation.
+
+![Waterfall plot](kaggle/waterfall_plot.png){fig-align="center"}
+
+Waterfall plots displays explanations for individual predictions. The bottom of a waterfall plot starts as the expected value of the model output, and then each row shows how the positive (red) or negative (blue) contribution of each feature moves the value from the expected model output over the background dataset to the model output for this prediction.

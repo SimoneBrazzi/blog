@@ -11,10 +11,12 @@ categories:
   - Python, R
 toc: true
 toc-title: "Table of Contents"
-# other-links:
-#   - icon: file-pdf
-#     text: LDA Paper
-#     href: https://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf
+
+other-links:
+  - icon: file-code
+    text: Kaggle
+    href: https://www.kaggle.com/code/simonebrazzi/credit-score
+
 toc-depth: 3
 number-sections: true
 number-depth: 3
@@ -26,10 +28,6 @@ code-line-numbers: true
 code-copy: true
 code-link: true
 code-fold: true
-other-links:
-  - icon: file-code
-    text: Kaggle
-    href: https://www.kaggle.com/code/simonebrazzi/credit-score
 
 execute:
   warnings: false
@@ -349,16 +347,18 @@ class Config():
 # Create global config instance
 config = Config()
 ```
-
 :::
 
 # Dataset
 
-Now we can import the dataset. Having all columns UPPERCASE, I will set all of them as lowercase
+Now we can import the dataset. Having all columns UPPERCASE, I will set all of them as lowercase.
 
 ```{python, import_data}
 df = pd.read_csv(config.file)
 df.columns = df.columns.str.lower()
+
+# df["birthday"] = df.days_birth.map(lambda x : (date.today() + relativedelta(days=x)).strftime("%Y-%m-%d"))
+# df["employed"] = df["days_employed"].apply(lambda x: (date.today() + relativedelta(days=x)).strftime("%Y-%m-%d") if x < 0 else "0")
 ```
 
 # EDA
@@ -426,13 +426,24 @@ df_g %>%
 
 The dataset is **unbalanced** as expected: most of the target are low creditworthiness (0 label). This is important in the training: unbalanced datasets have higher risk of overfitting. If 9 out of 10 observatinos are 0 and you predict 10 times 0, the model has an accuracy of 0.9!
 
+```{r}
+# check for unique values
+check_unique_values <- tibble(
+  names = names(df),
+  values = map(df, ~ .x %>% str_unique() %>% length())
+) %>% 
+  unnest(values)
+
+df %>% 
+  summary()
+```
+
 ```{r, barchart}
 #| label: fig-barchart
-#| fig-cap: Absolute frequency barchart
+#| fig-cap: Creditworthiness absolute frequency
 
 g <- ggplot(df_g) +
   geom_bar(aes(x = label, y = freq_abs, fill = label), stat = "identity") +
-  ggtitle("Absolute frequency barchart") +
   xlab("Label") +
   ylab("Absolute frequency") +
   labs(fill = "Label") +
@@ -441,7 +452,7 @@ g <- ggplot(df_g) +
 ggplotly(g)
 ```
 
-::: callout-importand
+::: {callout-important}
 -   **0**. stands for **low creditworthiness**.
 -   **1** stands for **high**.
 -   Our dataset is strongly unbalanced towards the 0 label.
@@ -814,13 +825,6 @@ From the EDA, we know we can drop
 ```{python, remove_nas}
 df = df[df.id != id_to_remove]
 df = df[~df.occupation_type.isna()]
-```
-
-Even if it is not useful for the model because these are not features, I want to convert the date columns to birthday and date of employment.
-
-```{python}
-df["birthday"] = df.days_birth.map(lambda x : (date.today() + relativedelta(days=x)).strftime("%Y-%m-%d"))
-df["employed"] = df["days_employed"].apply(lambda x: (date.today() + relativedelta(days=x)).strftime("%Y-%m-%d") if x < 0 else "0")
 ```
 
 # Split
@@ -1320,6 +1324,6 @@ The force plot explains the contribution of features to a specific model predict
 
 Waterfall plots displays explanations for individual predictions. The bottom of a waterfall plot starts as the expected value of the model output, and then each row shows how the positive (red) or negative (blue) contribution of each feature moves the value from the expected model output over the background dataset to the model output for this prediction.
 
-::: {.callout-important}
+::: callout-important
 Due to venv incompatibilities between shap and other packages, the shap evaluation has been made on Kaggle. The plots are the results of the notebook.
 :::

@@ -65,14 +65,14 @@
     },
     "KernSmooth": {
       "Package": "KernSmooth",
-      "Version": "2.23-24",
+      "Version": "2.23-26",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "stats"
       ],
-      "Hash": "9f33a1ee37bbe8919eb2ec4b9f2473a5"
+      "Hash": "2fb39782c07b5ad422b0448ae83f64c4"
     },
     "MASS": {
       "Package": "MASS",
@@ -91,7 +91,7 @@
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.7-1",
+      "Version": "1.7-2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -104,7 +104,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "5122bb14d8736372411f955e1b16bc8a"
+      "Hash": "f6a81550f166acbe2cd5229e9ca079b9"
     },
     "Metrics": {
       "Package": "Metrics",
@@ -408,7 +408,7 @@
     },
     "class": {
       "Package": "class",
-      "Version": "7.3-22",
+      "Version": "7.3-23",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -417,7 +417,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "f91f6b29f38b8c280f2b9477787d4bb2"
+      "Hash": "d0cb9cc838c3b43560bd958fc4317fdc"
     },
     "classInt": {
       "Package": "classInt",
@@ -1641,7 +1641,7 @@
     },
     "nnet": {
       "Package": "nnet",
-      "Version": "7.3-19",
+      "Version": "7.3-20",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1649,7 +1649,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "2c797b46eea7fb58ede195bc0b1f1138"
+      "Hash": "c955edf99ff24a32e96bd0a22645af60"
     },
     "numDeriv": {
       "Package": "numDeriv",
@@ -2193,7 +2193,7 @@
     },
     "rpart": {
       "Package": "rpart",
-      "Version": "4.1.23",
+      "Version": "4.1.24",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -2202,7 +2202,7 @@
         "graphics",
         "stats"
       ],
-      "Hash": "b3d390424f41d04174cccf84d49676c2"
+      "Hash": "ad31b457482eda7a12e51c5d8e7b0be4"
     },
     "rprojroot": {
       "Package": "rprojroot",

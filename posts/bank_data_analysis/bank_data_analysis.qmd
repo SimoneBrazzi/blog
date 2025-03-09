@@ -1,0 +1,340 @@
+---
+title: "Bank's Data Analysis"
+execute:
+  eval: false
+  enabled: true
+  freeze: false
+  cache: false
+  warning: false
+image: "db.png"
+description: "A SQL approach to data analysis"
+author: "Simone Brazzi"
+date: "2025-02-10"
+draft: true
+categories:
+  - code
+  - SQL
+  - database
+toc: TRUE
+toc-title: "Table of Contents"
+toc-depth: 3
+number-sections: TRUE
+other-links:
+  - text: Shiny Dashboard
+    href: "https://simonebrazzi-sql-query.share.connect.posit.cloud/"
+---
+
+# Introduction
+
+::: callout.important
+Please check this [Shiny Dashboard](https://simonebrazzi-sql-query.share.connect.posit.cloud/).
+:::
+
+## Project Description
+
+The company Banking Intelligence wants to develop a supervised machine learning model to predict the future behaviour of its customers, based on transactional data and product ownership characteristics. The aim of the project is to create a denormalised table with a series of indicators (features) derived from the tables available in the database, representing the customers' financial behaviours and activities.
+
+## Objective
+
+Our objective is to create a **feature table** for training machine learning models, enriching customer data with various **indicators** calculated from their transactions and accounts held. The final table will be related to the customer ID and will contain both quantitative and qualitative information.
+
+## Value Added
+
+The denormalised table will allow the extraction of advanced behavioural features for training supervised machine learning models, providing numerous benefits for the company:
+
+-   **Prediction of customer behaviour**: By analysing transactions and product ownership, useful behaviour patterns can be identified to predict future actions such as purchasing new products or closing accounts.
+
+-   **Reducing churn rates**: Using behavioural indicators, a model can be built to identify customers at risk of abandonment, allowing timely interventions by the marketing team.
+
+-   **Improved risk management**: Segmentation based on financial behaviour allows high-risk customers to be identified and credit and risk strategies to be optimised.
+
+-   **Customisation of offers**: Extracted features can be used to customise product and service offers according to the habits and preferences of individual customers, thereby increasing customer satisfaction.
+
+-   **Fraud prevention**: By analysing transactions by type and amount, the model can detect behavioural anomalies indicative of fraud, improving security and prevention strategies.
+
+These benefits will lead to an overall improvement in business operations, enabling more efficient customer management and sustainable business growth.
+
+## Behavioural Indicators to be Calculated
+
+Indicators will be calculated for each individual customer (referring to id_customer) and include:
+
+## Basic indicators
+
+-   Age of customer (from customer table)
+
+## Transaction indicators
+
+-   Number of outgoing transactions on all accounts.
+-   Number of incoming transactions on all accounts.
+-   Total amount transacted out on all accounts.
+-   Total amount transacted incoming on all accounts.
+
+## Account Indicators
+
+-   Total number of accounts held.
+-   Number of accounts held by type (one indicator for each type of account).
+
+## Transaction indicators by account type
+
+-   Number of outgoing transactions by account type (one indicator per account type).
+-   Number of incoming transactions by account type (one indicator per account type).
+-   Outgoing transacted amount by account type (one indicator per account type).
+-   Amount transacted inbound by account type (one indicator per account type).
+
+# Plan for Creating Denormalised Table
+
+## Table Join
+
+To construct the final table, it will be necessary to perform a series of joins between the tables available in the database.
+
+## Calculation of Indicators
+
+Behavioural indicators will be calculated using aggregation operations (SUM, COUNT) to obtain the required totals.
+
+# Import
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(duckdb)
+library(RMariaDB)
+```
+
+# Create db connection
+
+```{r}
+con <- dbConnect(RMariaDB::MariaDB(),
+                 user = "simonebrazzi",
+                 password = "MVAgustaF4",
+                 host = "localhost",
+                 dbname = "banca")
+dbListTables(con)
+
+# sql_script <- readLines("~/R/blog/posts/bank_data_analysis/banca.sql")
+# dbExecute(con, paste(sql_script, collapse = "\n"))
+
+dbExecute(
+  con,
+  "
+  CREATE TEMPORARY TABLE IF NOT EXISTS banca (
+  SELECT 
+    cliente.id_cliente, cliente.nome, cliente.cognome, cliente.data_nascita,
+    tipo_conto.id_tipo_conto, tipo_conto.desc_tipo_conto,
+    transazioni.data, transazioni.importo,
+    conto.id_conto,
+    tipo_transazione.id_tipo_transazione, tipo_transazione.desc_tipo_trans, tipo_transazione.segno
+  FROM cliente
+  LEFT JOIN conto ON cliente.id_cliente = conto.id_cliente
+  LEFT JOIN tipo_conto ON conto.id_tipo_conto = tipo_conto.id_tipo_conto
+  LEFT JOIN transazioni ON conto.id_conto = transazioni.id_conto
+  LEFT JOIN tipo_transazione ON transazioni.id_tipo_trans = tipo_transazione.id_tipo_transazione);
+  "
+)
+
+
+
+dbDisconnect(con)
+```
+
+```{r}
+con <- dbConnect(duckdb(), dbdir = "~/R/blog/posts/bank_data_analysis/bank.duckdb", read_only = TRUE)
+```
+
+## List tables
+
+```{r}
+dbListTables(con)
+```
+
+## Create join table
+
+```{r}
+#| eval: false
+
+dbExecute(
+  con,
+  "
+  CREATE TABLE IF NOT EXISTS bank AS
+    SELECT
+      a.id_account, a.id_customer, a.id_account_type,
+      at.desc_account_type,
+      c.first_name, c.last_name, c.birthday,
+      t.date AS date_transaction, t.id_transaction_type, t.amount AS amount_transaction,
+      tt.desc_transaction_type, tt.sign AS sign_transaction
+    FROM account AS a
+    LEFT JOIN account_type AS at
+    ON a.id_account_type = at.id_account_type
+    LEFT JOIN customers AS c
+    ON a.id_customer = c.id_customer
+    LEFT JOIN transactions AS t
+    ON a.id_account = t.id_account
+    LEFT JOIN transaction_type AS tt
+    ON t.id_transaction_type = tt.id_transaction_type
+    ORDER BY a.id_customer;
+  "
+)
+```
+
+## Basic indicators
+
+-   Age of customer (from customer table)
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT DISTINCT(id_customer), DATE_DIFF('year', birthday, CURRENT_DATE) AS age
+  FROM bank
+  ORDER BY id_customer
+  "
+)
+```
+
+## Transaction indicators
+
+-   Number of outgoing transactions on all accounts.
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT id_account, sign_transaction, COUNT(*) AS n_outgoing
+  FROM final
+  GROUP BY id_account, sign_transaction
+  HAVING sign_transaction = '-'
+  ORDER BY sign_transaction, id_account
+  "
+)
+```
+
+-   Number of incoming transactions on all accounts.
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT id_account, sign_transaction, COUNT(*) AS n_outgoing
+  FROM final
+  GROUP BY id_account, sign_transaction
+  HAVING sign_transaction = '+'
+  ORDER BY sign_transaction, id_account
+  "
+)
+```
+
+-   Total amount transacted out on all accounts.
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT sign_transaction, SUM(amount_transaction) AS total
+  FROM final
+  GROUP BY sign_transaction
+  HAVING sign_transaction = '-'
+  "
+)
+```
+
+-   Total amount transacted incoming on all accounts.
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT sign_transaction, SUM(amount_transaction) AS total
+  FROM final
+  GROUP BY sign_transaction
+  HAVING sign_transaction = '+'
+  "
+)
+```
+
+## Account Indicators
+
+-   Total number of accounts held.
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT id_customer, COUNT(id_account) AS n_account
+  FROM final
+  GROUP BY id_customer
+  "
+  )
+```
+
+-   Number of accounts held by type (one indicator for each type of account).
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT desc_account_type, COUNT(desc_account_type) AS n_desc_account_type
+  FROM final
+  GROUP BY desc_account_type
+  "
+)
+```
+
+## Transaction indicators by account type
+
+-   Number of outgoing transactions by account type (one indicator per account type).
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT desc_account_type, COUNT(*) AS n_outgoing
+  FROM final
+  WHERE sign_transaction == '-'
+  GROUP BY desc_account_type
+  "
+)
+```
+
+-   Number of incoming transactions by account type (one indicator per account type).
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT desc_account_type, COUNT(*) AS n_outgoing
+  FROM final
+  WHERE sign_transaction == '+'
+  GROUP BY desc_account_type
+  "
+)
+```
+
+-   Outgoing transacted amount by account type (one indicator per account type).
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT desc_account_type, sign_transaction, SUM(amount_transaction) AS total_outgoing
+  FROM final
+  GROUP BY desc_account_type, sign_transaction
+  HAVING sign_transaction = '-'
+  ORDER BY sign_transaction
+  "
+)
+```
+
+-   Amount transacted inbound by account type (one indicator per account type).
+
+```{r}
+dbGetQuery(
+  con,
+  "
+  SELECT desc_account_type, sign_transaction, SUM(amount_transaction) AS total_outgoing
+  FROM final
+  GROUP BY desc_account_type, sign_transaction
+  HAVING sign_transaction = '+'
+  ORDER BY sign_transaction
+  "
+)
+```

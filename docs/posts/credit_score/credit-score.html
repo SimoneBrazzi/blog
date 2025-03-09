@@ -173,14 +173,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p><a href="https://www.kaggle.com/code/simonebrazzi/credit-score?scriptVersionId=213847479" target="_blank"><img align="left" alt="Kaggle" title="Open in Kaggle" src="https://kaggle.com/static/images/open-in-kaggle.svg"></a></p>
-<div id="cell-1" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:04:51.844053Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:04:51.84444Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:04:51.851213Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:04:51.844411Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:04:51.850219Z&quot;}" data-execution_count="91">
+<p><a href="https://www.kaggle.com/code/simonebrazzi/credit-score?scriptVersionId=214630509" target="_blank"><img align="left" alt="Kaggle" title="Open in Kaggle" src="https://kaggle.com/static/images/open-in-kaggle.svg"></a></p>
+<div id="cell-1" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:58:17.724926Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:58:17.725268Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:58:17.732229Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:58:17.725228Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:58:17.731381Z&quot;}" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pdimport numpy <span class="im">as</span> npimport matplotlib.pyplot <span class="im">as</span> pltimport pickleimport shapimport timeimport shapfrom datetime <span class="im">import</span> datefrom dateutil.relativedelta <span class="im">import</span> relativedeltafrom sklearn.model_selection <span class="im">import</span> train_test_split, GridSearchCV, RandomizedSearchCVfrom sklearn.compose <span class="im">import</span> ColumnTransformerfrom sklearn.preprocessing <span class="im">import</span> OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, LabelBinarizerfrom sklearn.pipeline <span class="im">import</span> Pipelinefrom sklearn.tree <span class="im">import</span> DecisionTreeClassifierfrom xgboost <span class="im">import</span> XGBClassifierfrom xgboost <span class="im">import</span> DMatrixfrom sklearn.ensemble <span class="im">import</span> RandomForestClassifierfrom sklearn.metrics <span class="im">import</span> classification_report</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pdimport numpy <span class="im">as</span> npimport matplotlib.pyplot <span class="im">as</span> pltimport joblibimport shapimport timeimport shapfrom datetime <span class="im">import</span> datefrom dateutil.relativedelta <span class="im">import</span> relativedeltafrom sklearn.model_selection <span class="im">import</span> train_test_split, GridSearchCV, RandomizedSearchCVfrom sklearn.compose <span class="im">import</span> ColumnTransformerfrom sklearn.preprocessing <span class="im">import</span> OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, LabelBinarizerfrom sklearn.pipeline <span class="im">import</span> Pipelinefrom sklearn.tree <span class="im">import</span> DecisionTreeClassifierfrom xgboost <span class="im">import</span> XGBClassifierfrom xgboost <span class="im">import</span> DMatrixfrom sklearn.ensemble <span class="im">import</span> RandomForestClassifierfrom sklearn.metrics <span class="im">import</span> classification_report</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="cell-2" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:04:51.85309Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:04:51.85371Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:04:51.865859Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:04:51.853673Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:04:51.864933Z&quot;}" data-execution_count="92">
+<div id="cell-2" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:58:17.734022Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:58:17.734289Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:58:17.745481Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:58:17.734259Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:58:17.744571Z&quot;}" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">class</span> Config():  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):    <span class="st">"""    Initialization calss.    """</span>    <span class="va">self</span>.path<span class="op">=</span><span class="st">"/kaggle/working/"</span>    <span class="va">self</span>.<span class="bu">file</span><span class="op">=</span><span class="st">"/kaggle/input/credit-scoring/credit_scoring.csv"</span>    <span class="va">self</span>.model_result_path<span class="op">=</span><span class="st">"/kaggle/working/"</span>    <span class="va">self</span>.random_state<span class="op">=</span><span class="dv">42</span>    <span class="va">self</span>.col_binary <span class="op">=</span> [<span class="st">'code_gender'</span>, <span class="st">'flag_own_car'</span>, <span class="st">'flag_own_realty'</span>]    <span class="va">self</span>.col_ordinal <span class="op">=</span> [<span class="st">"name_income_type"</span>, <span class="st">"name_education_type"</span>, <span class="st">"name_family_status"</span>, <span class="st">"name_housing_type"</span>, <span class="st">"occupation_type"</span>]    <span class="va">self</span>.col_numeric <span class="op">=</span> [<span class="st">'cnt_children'</span>, <span class="st">'amt_income_total'</span>, <span class="st">'cnt_fam_members'</span>]    <span class="va">self</span>.features <span class="op">=</span> <span class="va">self</span>.col_binary <span class="op">+</span> <span class="va">self</span>.col_ordinal <span class="op">+</span> <span class="va">self</span>.col_numericconfig <span class="op">=</span> Config()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -188,13 +188,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="import" class="level1">
 <h1>Import</h1>
-<div id="cell-4" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:04:51.866903Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:04:51.867232Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:04:52.530021Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:04:51.867196Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:04:52.529305Z&quot;}" data-execution_count="93">
+<div id="cell-4" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:58:17.746661Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:58:17.746942Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:58:18.90962Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:58:17.746915Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:58:18.9086Z&quot;}" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>df <span class="op">=</span> pd.read_csv(config.<span class="bu">file</span>)df.columns <span class="op">=</span> df.columns.<span class="bu">str</span>.lower()df[<span class="st">"id"</span>] <span class="op">=</span> df.<span class="bu">id</span>.astype(<span class="bu">int</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="cell-5" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:04:52.531866Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:04:52.532144Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:04:52.607983Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:04:52.532119Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:04:52.607005Z&quot;}" data-execution_count="94">
+<div id="cell-5" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:58:18.910956Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:58:18.91134Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:58:19.0018Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:58:18.911299Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:58:19.000863Z&quot;}" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>df <span class="op">=</span> df[df.<span class="bu">id</span> <span class="op">!=</span> <span class="dv">6392180</span>]df <span class="op">=</span> df[<span class="op">~</span>df.occupation_type.isna()]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -203,7 +203,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="split" class="level1">
 <h1>Split</h1>
-<div id="cell-7" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:04:52.609359Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:04:52.609655Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:04:52.741979Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:04:52.609626Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:04:52.741294Z&quot;}" data-execution_count="95">
+<div id="cell-7" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:58:19.002954Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:58:19.003252Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:58:19.146206Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:58:19.003223Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:58:19.14544Z&quot;}" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>x <span class="op">=</span> df[config.features]y <span class="op">=</span> df.targetxtrain, xtest, ytrain, ytest <span class="op">=</span> train_test_split(    x,    y,    test_size <span class="op">=</span> <span class="fl">.2</span>,    stratify <span class="op">=</span> y,    random_state<span class="op">=</span>config.random_state)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="decision-tree-classifier" class="level1">
 <h1>Decision Tree Classifier</h1>
-<div id="cell-9" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:04:52.743168Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:04:52.743944Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:04:52.751856Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:04:52.743905Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:04:52.750899Z&quot;}" data-execution_count="96">
+<div id="cell-9" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:58:19.147269Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:58:19.147535Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:58:19.154781Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:58:19.147509Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:58:19.153804Z&quot;}" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>ohe <span class="op">=</span> OneHotEncoder(drop<span class="op">=</span><span class="st">'if_binary'</span>, sparse_output<span class="op">=</span><span class="va">False</span>)oe <span class="op">=</span> OrdinalEncoder().set_output(transform<span class="op">=</span><span class="st">'pandas'</span>)ss <span class="op">=</span> StandardScaler()dtc <span class="op">=</span> DecisionTreeClassifier(class_weight<span class="op">=</span><span class="st">"balanced"</span>, random_state<span class="op">=</span>config.random_state)preprocessor <span class="op">=</span> ColumnTransformer(  transformers<span class="op">=</span>[    (<span class="st">"binary_encoder"</span>, ohe, config.col_binary),    (<span class="st">"ordinal_encoder"</span>, oe, config.col_ordinal),    (<span class="st">"standard_scaler"</span>, ss, config.col_numeric)    ],    remainder<span class="op">=</span><span class="st">'passthrough'</span>    )pipe_dtc <span class="op">=</span> Pipeline(  steps<span class="op">=</span>[    (<span class="st">"preprocessor"</span>, preprocessor),    (<span class="st">"dtc"</span>, dtc)    ]    )param_grid_dtc <span class="op">=</span> {  <span class="st">"dtc__criterion"</span> : [<span class="st">"gini"</span>, <span class="st">"entropy"</span>, <span class="st">"log_loss"</span>],  <span class="st">"dtc__splitter"</span> : [<span class="st">"best"</span>, <span class="st">"random"</span>],  <span class="st">"dtc__max_depth"</span> : [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>]}scoring <span class="op">=</span> {    <span class="st">"accuracy"</span>: <span class="st">"accuracy"</span>,    <span class="st">"f1"</span>: <span class="st">"f1"</span>,    <span class="st">"roc_auc"</span>: <span class="st">"roc_auc"</span>}grid_search_dtc <span class="op">=</span> GridSearchCV(    estimator<span class="op">=</span>pipe_dtc,    param_grid<span class="op">=</span>param_grid_dtc,    cv<span class="op">=</span><span class="dv">7</span>,    scoring<span class="op">=</span>scoring,    refit<span class="op">=</span><span class="st">"f1"</span>,  <span class="co"># This will refit the model using the accuracy metric    n_jobs=-1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -220,7 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="fit" class="level2">
 <h2 class="anchored" data-anchor-id="fit">Fit</h2>
-<div id="cell-11" class="cell" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:04:52.752937Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:04:52.753191Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:05:55.209937Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:04:52.753166Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:05:55.209189Z&quot;}" data-trusted="true" data-execution_count="97">
+<div id="cell-11" class="cell" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:58:19.157525Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:58:19.157876Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:59:33.049051Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:58:19.157851Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:59:33.048057Z&quot;}" data-trusted="true" data-execution_count="7">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>gs_dtc <span class="op">=</span> grid_search_dtc.fit(xtrain, ytrain)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -229,27 +229,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pickle" class="level2">
 <h2 class="anchored" data-anchor-id="pickle">Pickle</h2>
-<div id="cell-13" class="cell" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:05:55.211158Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:05:55.211527Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:05:55.217505Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:05:55.211483Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:05:55.216921Z&quot;}" data-trusted="true" data-execution_count="98">
+<div id="cell-13" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:59:33.050337Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:59:33.05066Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:59:33.06948Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:59:33.050612Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:59:33.068595Z&quot;}" data-execution_count="8">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_grid_search_dtc_f1.pkl"</span>, <span class="st">"wb"</span>) <span class="im">as</span> f:    pickle.dump(gs_dtc, f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>joblib.dump(gs_dtc, config.model_result_path <span class="op">+</span> <span class="st">'credit_score_grid_search_dtc_f1.pkl'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>['/kaggle/working/credit_score_grid_search_dtc_f1.pkl']</code></pre>
 </div>
-<div id="cell-14" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:05:55.218487Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:05:55.218783Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:05:55.23276Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:05:55.218757Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:05:55.232105Z&quot;}" data-execution_count="99">
+</div>
+<div id="cell-14" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:59:33.070536Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:59:33.07084Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:59:33.081757Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:59:33.070812Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:59:33.080817Z&quot;}" data-execution_count="9">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_grid_search_dtc_f1.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  gs_dtc <span class="op">=</span> pickle.load(f)dtc_model <span class="op">=</span> gs_dtc.best_estimator_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a>gs_dtc <span class="op">=</span> joblib.load(config.model_result_path <span class="op">+</span> <span class="st">'credit_score_grid_search_dtc_f1.pkl'</span>)dtc_model <span class="op">=</span> gs_dtc.best_estimator_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 <section id="predict-classification-report" class="level2">
 <h2 class="anchored" data-anchor-id="predict-classification-report">Predict &amp; Classification Report</h2>
-<div id="cell-16" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:05:55.235821Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:05:55.236116Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:05:55.444769Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:05:55.236091Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:05:55.443933Z&quot;}" data-execution_count="100">
+<div id="cell-16" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:59:33.082967Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:59:33.083262Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:59:33.340491Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:59:33.083234Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:59:33.339536Z&quot;}" data-execution_count="10">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a>ypred_dtc <span class="op">=</span> dtc_model.predict(xtest)cr <span class="op">=</span> classification_report(  ytest,  ypred_dtc,  target_names<span class="op">=</span>[<span class="st">'0'</span>, <span class="st">'1'</span>],  digits<span class="op">=</span><span class="dv">4</span>,  output_dict<span class="op">=</span><span class="va">True</span>  )df_cr <span class="op">=</span> pd.DataFrame.from_dict(cr).reset_index()df_cr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>ypred_dtc <span class="op">=</span> dtc_model.predict(xtest)cr <span class="op">=</span> classification_report(  ytest,  ypred_dtc,  target_names<span class="op">=</span>[<span class="st">'0'</span>, <span class="st">'1'</span>],  digits<span class="op">=</span><span class="dv">4</span>,  output_dict<span class="op">=</span><span class="va">True</span>  )df_cr <span class="op">=</span> pd.DataFrame.from_dict(cr).reset_index()df_cr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="100">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div>
 
 
@@ -312,48 +315,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="random-forest-classifier" class="level1">
 <h1>Random Forest Classifier</h1>
-<div id="cell-18" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:05:55.445941Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:05:55.446288Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:05:55.451853Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:05:55.446251Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:05:55.451082Z&quot;}" data-execution_count="101">
+<div id="cell-18" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:59:33.341874Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:59:33.342313Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T16:59:33.348937Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:59:33.342267Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T16:59:33.347994Z&quot;}" data-execution_count="11">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># classifierrfc = RandomForestClassifier(class_weight="balanced", random_state=config.random_state)#&nbsp;pipelinepipe_rfc = Pipeline(  steps=[    ("preprocessor", preprocessor),    ("rfc", rfc)    ]    )#&nbsp;parametersparam_dist_rfc = {    'rfc__n_estimators': [50, 75, 100],    'rfc__max_depth': [5, 10, 15],    'rfc__min_samples_split': [5, 10]}#&nbsp;grid searchgrid_search_rfc = GridSearchCV(    estimator=pipe_rfc,    param_grid=param_dist_rfc,    cv=7,    scoring=scoring,    refit="f1",    n_jobs=-1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># classifierrfc = RandomForestClassifier(class_weight="balanced", random_state=config.random_state)#&nbsp;pipelinepipe_rfc = Pipeline(  steps=[    ("preprocessor", preprocessor),    ("rfc", rfc)    ]    )#&nbsp;parametersparam_dist_rfc = {    'rfc__n_estimators': [50, 75, 100],    'rfc__max_depth': [5, 10, 15],    'rfc__min_samples_split': [5, 10]}#&nbsp;grid searchgrid_search_rfc = GridSearchCV(    estimator=pipe_rfc,    param_grid=param_dist_rfc,    cv=7,    scoring=scoring,    refit="f1",    n_jobs=-1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="fit-1" class="level2">
 <h2 class="anchored" data-anchor-id="fit-1">Fit</h2>
-<div id="cell-20" class="cell" data-outputid="37ad9c13-f031-402c-dfa9-ff3908707ae0" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:05:55.453088Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:05:55.453549Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:10:34.945448Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:05:55.453505Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:10:34.944492Z&quot;}" data-trusted="true" data-execution_count="102">
+<div id="cell-20" class="cell" data-outputid="37ad9c13-f031-402c-dfa9-ff3908707ae0" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T16:59:33.350133Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T16:59:33.350458Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:05:09.82777Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T16:59:33.350425Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:05:09.826749Z&quot;}" data-trusted="true" data-execution_count="12">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>start_time <span class="op">=</span> time.time()rs_rfc <span class="op">=</span> grid_search_rfc.fit(xtrain, ytrain)end_time <span class="op">=</span> time.time()elapsed_time <span class="op">=</span> end_time <span class="op">-</span> start_timeprint(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time<span class="sc">}</span><span class="ss"> seconds"</span>)<span class="bu">print</span>(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time <span class="op">/</span> <span class="dv">60</span><span class="sc">}</span><span class="ss"> minutes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a>start_time <span class="op">=</span> time.time()rs_rfc <span class="op">=</span> grid_search_rfc.fit(xtrain, ytrain)end_time <span class="op">=</span> time.time()elapsed_time <span class="op">=</span> end_time <span class="op">-</span> start_timeprint(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time<span class="sc">}</span><span class="ss"> seconds"</span>)<span class="bu">print</span>(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time <span class="op">/</span> <span class="dv">60</span><span class="sc">}</span><span class="ss"> minutes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Elapsed time: 279.48332142829895 seconds
-Elapsed time: 4.658055357138315 minutes</code></pre>
+<pre><code>Elapsed time: 336.4672429561615 seconds
+Elapsed time: 5.607787382602692 minutes</code></pre>
 </div>
 </div>
 </section>
 <section id="pickle-1" class="level2">
 <h2 class="anchored" data-anchor-id="pickle-1">Pickle</h2>
-<div id="cell-22" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:10:34.946676Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:10:34.94705Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:10:34.995323Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:10:34.947011Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:10:34.994705Z&quot;}" data-execution_count="103">
+<div id="cell-22" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:05:09.828951Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:05:09.829265Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:05:09.881444Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:05:09.829236Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:05:09.880461Z&quot;}" data-execution_count="13">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_grid_search_rfc_f1.pkl"</span>, <span class="st">"wb"</span>) <span class="im">as</span> f:  pickle.dump(rs_rfc, f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">import</span> picklewith <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_grid_search_rfc_f1.pkl"</span>, <span class="st">"wb"</span>) <span class="im">as</span> f:  pickle.dump(rs_rfc, f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="cell-23" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:10:34.996381Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:10:34.996683Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:10:35.014551Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:10:34.996656Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:10:35.013704Z&quot;}" data-execution_count="104">
+<div id="cell-23" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:05:09.882696Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:05:09.882989Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:05:09.902658Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:05:09.882961Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:05:09.901865Z&quot;}" data-execution_count="14">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_grid_search_rfc_f1.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  gs_rfc <span class="op">=</span> pickle.load(f)rfc_model <span class="op">=</span> gs_rfc.best_estimator_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_grid_search_rfc_f1.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  gs_rfc <span class="op">=</span> pickle.load(f)rfc_model <span class="op">=</span> gs_rfc.best_estimator_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 <section id="predict" class="level2">
 <h2 class="anchored" data-anchor-id="predict">Predict</h2>
-<div id="cell-25" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:10:35.015752Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:10:35.016411Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:10:35.537146Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:10:35.016372Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:10:35.536269Z&quot;}" data-execution_count="105">
+<div id="cell-25" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:05:09.903712Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:05:09.903975Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:05:10.504605Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:05:09.90395Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:05:10.503708Z&quot;}" data-execution_count="15">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>ypred_rfc <span class="op">=</span> rfc_model.predict(xtest)cr_rfc <span class="op">=</span> classification_report(  ytest,  ypred_rfc,  <span class="co"># target_names=config.labels,  digits=4,  output_dict=True  )df_cr_rfc = pd.DataFrame.from_dict(cr_rfc).reset_index()df_cr_rfc</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a>ypred_rfc <span class="op">=</span> rfc_model.predict(xtest)cr_rfc <span class="op">=</span> classification_report(  ytest,  ypred_rfc,  <span class="co"># target_names=config.labels,  digits=4,  output_dict=True  )df_cr_rfc = pd.DataFrame.from_dict(cr_rfc).reset_index()df_cr_rfc</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="105">
+<div class="cell-output cell-output-display" data-execution_count="15">
 <div>
 
 
@@ -418,49 +421,49 @@ Elapsed time: 4.658055357138315 minutes</code></pre>
 <h1>XGBoost Classifier</h1>
 <section id="pipeline" class="level2">
 <h2 class="anchored" data-anchor-id="pipeline">Pipeline</h2>
-<div id="cell-28" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:10:35.538344Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:10:35.538641Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:10:35.550132Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:10:35.538614Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:10:35.549295Z&quot;}" data-execution_count="106">
+<div id="cell-28" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:05:10.505807Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:05:10.50607Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:05:10.517262Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:05:10.506043Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:05:10.516405Z&quot;}" data-execution_count="16">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="co">#&nbsp;classifierscale_pos_weight = len(y[y == 0]) / len(y[y == 1])xgb = XGBClassifier(    n_jobs=-1,    enable_categorical=True,    scale_pos_weight=scale_pos_weight,    random_state=config.random_state)# pipelinepipe_xgb = Pipeline(  steps=[    ("preprocessor", preprocessor),    ("xgb", xgb)    ]    )# parametersparam_dist_xgb = {  "xgb__n_estimators" : [100, 150, 200, 300],  "xgb__max_depth" : [3, 5, 7, 10],  "xgb__learning_rate" : [0.1, 0.01, 0.001, 0.0001],  "xgb__subsample": [0.7, 0.8, 0.9],  "xgb__colsample_bytree": [0.7, 0.8, 0.9],  "xgb__gamma": [0, 0.1],  "xgb__alpha": [0, 0.1],  # Adding slight L1 regularization for simplicity  "xgb__lambda": [1, 2]    # Adding slight L2 regularization for stability}#&nbsp;scoringscoring = {    "accuracy": "accuracy",    "f1": "f1",    "roc_auc": "roc_auc"}# random search cvrandom_search_xgb = RandomizedSearchCV(    estimator=pipe_xgb,    param_distributions=param_dist_xgb,    n_iter=30,  # Set the number of parameter combinations to try    cv=7,    scoring=scoring,    refit="f1",    n_jobs=-1    )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a><span class="co">#&nbsp;classifierscale_pos_weight = len(y[y == 0]) / len(y[y == 1])xgb = XGBClassifier(    n_jobs=-1,    enable_categorical=True,    scale_pos_weight=scale_pos_weight,    random_state=config.random_state)# pipelinepipe_xgb = Pipeline(  steps=[    ("preprocessor", preprocessor),    ("xgb", xgb)    ]    )# parametersparam_dist_xgb = {  "xgb__n_estimators" : [100, 150, 200, 300],  "xgb__max_depth" : [3, 5, 7, 10],  "xgb__learning_rate" : [0.1, 0.01, 0.001, 0.0001],  "xgb__subsample": [0.7, 0.8, 0.9],  "xgb__colsample_bytree": [0.7, 0.8, 0.9],  "xgb__gamma": [0, 0.1],  "xgb__alpha": [0, 0.1],  # Adding slight L1 regularization for simplicity  "xgb__lambda": [1, 2]    # Adding slight L2 regularization for stability}#&nbsp;scoringscoring = {    "accuracy": "accuracy",    "f1": "f1",    "roc_auc": "roc_auc"}# random search cvrandom_search_xgb = RandomizedSearchCV(    estimator=pipe_xgb,    param_distributions=param_dist_xgb,    n_iter=30,  # Set the number of parameter combinations to try    cv=7,    scoring=scoring,    refit="f1",    n_jobs=-1    )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 <section id="fit-2" class="level2">
 <h2 class="anchored" data-anchor-id="fit-2">Fit</h2>
-<div id="cell-30" class="cell" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:10:35.55121Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:10:35.551495Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:03.515148Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:10:35.551471Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:03.514187Z&quot;}" data-trusted="true" data-execution_count="107">
+<div id="cell-30" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:05:10.518407Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:05:10.518742Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:26.441254Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:05:10.518713Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:26.440241Z&quot;}" data-execution_count="17">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a>start_time <span class="op">=</span> time.time()rs_xgb <span class="op">=</span> random_search_xgb.fit(xtrain, ytrain)end_time <span class="op">=</span> time.time()elapsed_time <span class="op">=</span> end_time <span class="op">-</span> start_timeprint(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time<span class="sc">}</span><span class="ss"> seconds"</span>)<span class="bu">print</span>(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time <span class="op">/</span> <span class="dv">60</span><span class="sc">}</span><span class="ss"> minutes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>start_time <span class="op">=</span> time.time()rs_xgb <span class="op">=</span> random_search_xgb.fit(xtrain, ytrain)end_time <span class="op">=</span> time.time()elapsed_time <span class="op">=</span> end_time <span class="op">-</span> start_timeprint(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time<span class="sc">}</span><span class="ss"> seconds"</span>)<span class="bu">print</span>(<span class="ss">f"Elapsed time: </span><span class="sc">{</span>elapsed_time <span class="op">/</span> <span class="dv">60</span><span class="sc">}</span><span class="ss"> minutes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Elapsed time: 267.9529609680176 seconds
-Elapsed time: 4.465882682800293 minutes</code></pre>
+<pre><code>Elapsed time: 255.91241335868835 seconds
+Elapsed time: 4.2652068893114725 minutes</code></pre>
 </div>
 </div>
 </section>
 <section id="pickle-2" class="level2">
 <h2 class="anchored" data-anchor-id="pickle-2">Pickle</h2>
-<div id="cell-32" class="cell" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:03.516251Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:03.51654Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:03.546817Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:03.516508Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:03.545813Z&quot;}" data-trusted="true" data-execution_count="108">
+<div id="cell-32" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:26.442537Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:26.442923Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:26.460355Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:26.442891Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:26.459334Z&quot;}" data-execution_count="18">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_random_search_xgb_f1.pkl"</span>, <span class="st">"wb"</span>) <span class="im">as</span> f:  pickle.dump(rs_xgb, f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_random_search_xgb_f1.pkl"</span>, <span class="st">"wb"</span>) <span class="im">as</span> f:  pickle.dump(rs_xgb, f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="cell-33" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:03.547843Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:03.548368Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:03.571333Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:03.548338Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:03.570415Z&quot;}" data-execution_count="109">
+<div id="cell-33" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:26.461583Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:26.46199Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:26.478492Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:26.46194Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:26.477491Z&quot;}" data-execution_count="19">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_random_search_xgb_f1.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  rs_xgb <span class="op">=</span> pickle.load(f)xgb_model <span class="op">=</span> rs_xgb.best_estimator_xgb_params <span class="op">=</span> rs_xgb.best_params_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"credit_score_random_search_xgb_f1.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  rs_xgb <span class="op">=</span> pickle.load(f)xgb_model <span class="op">=</span> rs_xgb.best_estimator_xgb_params <span class="op">=</span> rs_xgb.best_params_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 <section id="predict-1" class="level2">
 <h2 class="anchored" data-anchor-id="predict-1">Predict</h2>
-<div id="cell-35" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:03.572394Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:03.572723Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:04.111051Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:03.572695Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:04.110149Z&quot;}" data-execution_count="110">
+<div id="cell-35" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:26.479801Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:26.480167Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:26.907654Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:26.480128Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:26.906616Z&quot;}" data-execution_count="20">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>ypred_xgb <span class="op">=</span> xgb_model.predict(xtest)cr_xgb <span class="op">=</span> classification_report(  ytest,  ypred_xgb,  <span class="co"># target_names=config.labels,  digits=4,  output_dict=True  )df_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()df_cr_xgb</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a>ypred_xgb <span class="op">=</span> xgb_model.predict(xtest)cr_xgb <span class="op">=</span> classification_report(  ytest,  ypred_xgb,  <span class="co"># target_names=config.labels,  digits=4,  output_dict=True  )df_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()df_cr_xgb</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="110">
+<div class="cell-output cell-output-display" data-execution_count="20">
 <div>
 
 
@@ -480,36 +483,36 @@ Elapsed time: 4.465882682800293 minutes</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>precision</td>
-<td>0.993012</td>
-<td>0.386646</td>
-<td>0.833273</td>
-<td>0.689829</td>
-<td>0.928129</td>
+<td>0.991184</td>
+<td>0.318273</td>
+<td>0.777676</td>
+<td>0.654728</td>
+<td>0.919180</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>recall</td>
-<td>0.819059</td>
-<td>0.951898</td>
-<td>0.833273</td>
-<td>0.885478</td>
-<td>0.833273</td>
+<td>0.757776</td>
+<td>0.943749</td>
+<td>0.777676</td>
+<td>0.850763</td>
+<td>0.777676</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>f1-score</td>
-<td>0.897686</td>
-<td>0.549922</td>
-<td>0.833273</td>
-<td>0.723804</td>
-<td>0.860474</td>
+<td>0.858905</td>
+<td>0.476014</td>
+<td>0.777676</td>
+<td>0.667460</td>
+<td>0.817934</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>support</td>
 <td>41986.000000</td>
 <td>5031.000000</td>
-<td>0.833273</td>
+<td>0.777676</td>
 <td>47017.000000</td>
 <td>47017.000000</td>
 </tr>
@@ -523,16 +526,16 @@ Elapsed time: 4.465882682800293 minutes</code></pre>
 </section>
 <section id="plot" class="level1">
 <h1>Plot</h1>
-<div id="cell-37" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:04.112131Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:04.112453Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:04.116786Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:04.112426Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:04.115829Z&quot;}" data-execution_count="111">
+<div id="cell-37" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:26.909064Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:26.90949Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:26.914029Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:26.909445Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:26.913002Z&quot;}" data-execution_count="21">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> precision_recall_curve, roc_curve, roc_auc_scorefrom sklearn.model_selection <span class="im">import</span> cross_val_scorefrom scipy.stats <span class="im">import</span> ttest_rel, wilcoxonimport matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> precision_recall_curve, roc_curve, roc_auc_scorefrom sklearn.model_selection <span class="im">import</span> cross_val_scorefrom scipy.stats <span class="im">import</span> ttest_rel, wilcoxonimport matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="cell-38" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:04.117918Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:04.118162Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:06.434274Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:04.118139Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:06.433079Z&quot;}" data-execution_count="112">
+<div id="cell-38" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:26.920257Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:26.920587Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:29.235371Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:26.920557Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:29.234443Z&quot;}" data-execution_count="22">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">15</span>))model_names <span class="op">=</span> [<span class="st">"dtc"</span>, <span class="st">"rfc"</span>, <span class="st">"xgb"</span>]models <span class="op">=</span> [dtc_model, rfc_model, xgb_model]<span class="cf">for</span> i, model <span class="kw">in</span> <span class="bu">enumerate</span>(models):    fpr, tpr, _ <span class="op">=</span> roc_curve(ytest, model.predict_proba(xtest)[:, <span class="dv">1</span>])    plt.plot(fpr, tpr, label<span class="op">=</span><span class="ss">f'</span><span class="sc">{</span>model_names[i]<span class="sc">}</span><span class="ss"> (AUC: </span><span class="sc">{</span>roc_auc_score(ytest, model.predict_proba(xtest)[:, <span class="dv">1</span>])<span class="sc">:.2f}</span><span class="ss">)'</span>)plt.xlabel(<span class="st">"False Positive Rate"</span>)plt.ylabel(<span class="st">"True Positive Rate"</span>)plt.title(<span class="st">"ROC Curves Comparison"</span>)plt.legend()plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">15</span>))model_names <span class="op">=</span> [<span class="st">"dtc"</span>, <span class="st">"rfc"</span>, <span class="st">"xgb"</span>]models <span class="op">=</span> [dtc_model, rfc_model, xgb_model]<span class="cf">for</span> i, model <span class="kw">in</span> <span class="bu">enumerate</span>(models):    fpr, tpr, _ <span class="op">=</span> roc_curve(ytest, model.predict_proba(xtest)[:, <span class="dv">1</span>])    plt.plot(fpr, tpr, label<span class="op">=</span><span class="ss">f'</span><span class="sc">{</span>model_names[i]<span class="sc">}</span><span class="ss"> (AUC: </span><span class="sc">{</span>roc_auc_score(ytest, model.predict_proba(xtest)[:, <span class="dv">1</span>])<span class="sc">:.2f}</span><span class="ss">)'</span>)plt.xlabel(<span class="st">"False Positive Rate"</span>)plt.ylabel(<span class="st">"True Positive Rate"</span>)plt.title(<span class="st">"ROC Curves Comparison"</span>)plt.legend()plt.show()plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -545,18 +548,18 @@ Elapsed time: 4.465882682800293 minutes</code></pre>
 </section>
 <section id="explainability" class="level1">
 <h1>Explainability</h1>
-<div id="cell-40" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:06.435797Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:06.436248Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:06.441367Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:06.436207Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:06.440348Z&quot;}" data-execution_count="113">
+<div id="cell-40" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:29.236528Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:29.236842Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:29.241507Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:29.236812Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:29.240458Z&quot;}" data-execution_count="23">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1"></a>preprocessor <span class="op">=</span> xgb_model.named_steps[<span class="st">"preprocessor"</span>]xgb_clf <span class="op">=</span> xgb_model.named_steps[<span class="st">"xgb"</span>]idx <span class="op">=</span> [<span class="dv">15454</span>, <span class="dv">1284</span>, <span class="dv">30305</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>preprocessor <span class="op">=</span> xgb_model.named_steps[<span class="st">"preprocessor"</span>]xgb_clf <span class="op">=</span> xgb_model.named_steps[<span class="st">"xgb"</span>]idx <span class="op">=</span> [<span class="dv">15454</span>, <span class="dv">1284</span>, <span class="dv">30305</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="cell-41" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:06.442609Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:06.442955Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:06.454927Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:06.44292Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:06.4533Z&quot;}" data-execution_count="114">
+<div id="cell-41" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:29.243039Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:29.24335Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:29.256712Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:29.243323Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:29.2557Z&quot;}" data-execution_count="24">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>xtest.iloc[idx[<span class="dv">0</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a>xtest.iloc[idx[<span class="dv">0</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="114">
+<div class="cell-output cell-output-display" data-execution_count="24">
 <pre><code>code_gender                                        M
 flag_own_car                                       Y
 flag_own_realty                                    Y
@@ -571,17 +574,17 @@ cnt_fam_members                                  3.0
 Name: 226874, dtype: object</code></pre>
 </div>
 </div>
-<div id="cell-42" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:06.456138Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:06.456429Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:07.24018Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:06.456396Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:07.239213Z&quot;}" data-execution_count="115">
+<div id="cell-42" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:29.258105Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:29.2584Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:30.131778Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:29.258373Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:30.13052Z&quot;}" data-execution_count="25">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a><span class="co"># retain features namextrain_processed = preprocessor.transform(xtrain)xtrain_processed = pd.DataFrame(xtrain_processed, columns=config.features)# retain features namextest_processed = preprocessor.transform(xtest)xtest_processed = pd.DataFrame(xtest_processed, columns=config.features)# retain features namexgb_clf.get_booster().feature_names = config.features# convert to DMatrixdtrain = DMatrix(xtrain_processed, label=ytrain)dtest = DMatrix(xtest_processed, label=ytest)# usefol idxsidx = [15454, 1284, 30305]x_processed = preprocessor.transform(x)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a><span class="co"># retain features namextrain_processed = preprocessor.transform(xtrain)xtrain_processed = pd.DataFrame(xtrain_processed, columns=config.features)# retain features namextest_processed = preprocessor.transform(xtest)xtest_processed = pd.DataFrame(xtest_processed, columns=config.features)# retain features namexgb_clf.get_booster().feature_names = config.features# convert to DMatrixdtrain = DMatrix(xtrain_processed, label=ytrain)dtest = DMatrix(xtest_processed, label=ytest)# usefol idxsidx = [15454, 1284, 30305]x_processed = preprocessor.transform(x)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>##&nbsp;Features importance</p>
-<div id="cell-44" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:07.241327Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:07.241623Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:07.672949Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:07.241591Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:07.672102Z&quot;}" data-execution_count="116">
+<div id="cell-44" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:30.13311Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:30.133439Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:30.623311Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:30.133408Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:30.622463Z&quot;}" data-execution_count="26">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a><span class="im">from</span> xgboost <span class="im">import</span> plot_importanceplot_importance(    booster<span class="op">=</span>xgb_clf.get_booster(),    grid<span class="op">=</span><span class="va">False</span>,    importance_type<span class="op">=</span><span class="st">"gain"</span>,    title<span class="op">=</span><span class="st">"Feature Importance by Gain"</span>,    values_format<span class="op">=</span><span class="st">"</span><span class="sc">{v:.2f}</span><span class="st">"</span>)plt.savefig(<span class="st">"plot_importance.jpeg"</span>, dpi<span class="op">=</span><span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a><span class="im">from</span> xgboost <span class="im">import</span> plot_importanceplot_importance(    booster<span class="op">=</span>xgb_clf.get_booster(),    grid<span class="op">=</span><span class="va">False</span>,    importance_type<span class="op">=</span><span class="st">"gain"</span>,    title<span class="op">=</span><span class="st">"Feature Importance by Gain"</span>,    values_format<span class="op">=</span><span class="st">"</span><span class="sc">{v:.2f}</span><span class="st">"</span>)plt.savefig(<span class="st">"plot_importance.jpeg"</span>, dpi<span class="op">=</span><span class="dv">200</span>)plt.show()plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -595,22 +598,19 @@ Name: 226874, dtype: object</code></pre>
 <h2 class="anchored" data-anchor-id="explain-predictions">Explain predictions</h2>
 <p>explainer = shap.TreeExplainer(xgb_clf)shap_values = explainer.shap_values(x_processed)</p>
 <p>with open(config.model_result_path + “explainer.pkl”, “wb”) as f: pickle.dump(explainer, f)with open(config.model_result_path + “shap_values.pkl”, “wb”) as f: pickle.dump(shap_values, f)</p>
-<div id="cell-48" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:07.67403Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:07.674293Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:07.713767Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:07.674268Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:07.712854Z&quot;}" data-execution_count="117">
+<div id="cell-48" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:30.624616Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:30.625032Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:30.673336Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:30.624991Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:30.672317Z&quot;}" data-execution_count="27">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"explainer.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  explainer <span class="op">=</span> pickle.load(f)<span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"shap_values.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  shap_values <span class="op">=</span> pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a><span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"explainer.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  explainer <span class="op">=</span> pickle.load(f)<span class="cf">with</span> <span class="bu">open</span>(config.model_result_path <span class="op">+</span> <span class="st">"shap_values.pkl"</span>, <span class="st">"rb"</span>) <span class="im">as</span> f:  shap_values <span class="op">=</span> pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="visualize-a-single-prediction" class="level2">
-<h2 class="anchored" data-anchor-id="visualize-a-single-prediction">Visualize a single prediction</h2>
-</section>
 <section id="force-plot" class="level2">
 <h2 class="anchored" data-anchor-id="force-plot">Force Plot</h2>
-<div id="cell-51" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:07.717266Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:07.717551Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:08.528784Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:07.717513Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:08.527629Z&quot;}" data-execution_count="118">
+<div id="cell-50" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:30.674495Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:30.674811Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:09:31.745837Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:30.674783Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:09:31.744869Z&quot;}" data-execution_count="28">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))plot_force <span class="op">=</span> shap.plots.force(    base_value<span class="op">=</span>explainer.expected_value,    shap_values<span class="op">=</span>shap_values[idx[<span class="dv">0</span>], :],    <span class="co"># features=None,    feature_names=config.features,    # out_names=None,    # link='identity', #&nbsp;"logit"    plot_cmap='RdBu',    matplotlib=True,    show=True)plt.savefig("plot_force.jpeg", dpi=200)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))plot_force <span class="op">=</span> shap.plots.force(    base_value<span class="op">=</span>explainer.expected_value,    shap_values<span class="op">=</span>shap_values[idx[<span class="dv">0</span>], :],    <span class="co"># features=None,    feature_names=config.features,    # out_names=None,    # link='identity', #&nbsp;"logit"    plot_cmap='RdBu',    matplotlib=True,    show=True)plt.savefig("plot_force.jpeg", dpi=200)plt.close()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <pre><code>&lt;Figure size 1000x800 with 0 Axes&gt;</code></pre>
@@ -622,20 +622,17 @@ Name: 226874, dtype: object</code></pre>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display">
-<pre><code>&lt;Figure size 640x480 with 0 Axes&gt;</code></pre>
 </div>
-</div>
-<div id="cell-52" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:08.529794Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:08.530058Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:32.536196Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:08.530032Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:32.535455Z&quot;}" data-execution_count="119">
+<div id="cell-51" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:09:31.746996Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:09:31.747262Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:10:00.871056Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:09:31.747235Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:10:00.870197Z&quot;}" data-execution_count="29">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>explainer_ <span class="op">=</span> shap.Explainer(model<span class="op">=</span>xgb_clf)shap_values_ <span class="op">=</span> explainer(x_processed)shap_values_.feature_names <span class="op">=</span> config.features</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="cell-53" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:32.537298Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:32.537673Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:33.346955Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:32.537633Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:33.346361Z&quot;}" data-execution_count="120">
+<div id="cell-52" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:10:00.872191Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:10:00.872499Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:10:01.783925Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:10:00.87247Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:10:01.783132Z&quot;}" data-execution_count="30">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>shap.plots.waterfall(    shap_values_[<span class="dv">0</span>],    max_display<span class="op">=</span><span class="bu">len</span>(config.features))plt.savefig(<span class="st">"plot_waterfall.jpeg"</span>, dpi<span class="op">=</span><span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>shap.plots.waterfall(    shap_values_[idx[<span class="dv">0</span>]],    max_display<span class="op">=</span><span class="bu">len</span>(config.features))plt.savefig(<span class="st">"plot_waterfall.jpeg"</span>, dpi<span class="op">=</span><span class="dv">200</span>)plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -644,14 +641,11 @@ Name: 226874, dtype: object</code></pre>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display">
-<pre><code>&lt;Figure size 640x480 with 0 Axes&gt;</code></pre>
 </div>
-</div>
-<div id="cell-54" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-19T11:15:33.347671Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-19T11:15:33.347928Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-19T11:15:33.694809Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-19T11:15:33.347904Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-19T11:15:33.694137Z&quot;}" data-execution_count="121">
+<div id="cell-53" class="cell" data-trusted="true" data-execution="{&quot;iopub.status.busy&quot;:&quot;2024-12-24T17:10:01.785077Z&quot;,&quot;iopub.execute_input&quot;:&quot;2024-12-24T17:10:01.785384Z&quot;,&quot;iopub.status.idle&quot;:&quot;2024-12-24T17:10:02.18745Z&quot;,&quot;shell.execute_reply.started&quot;:&quot;2024-12-24T17:10:01.785355Z&quot;,&quot;shell.execute_reply&quot;:&quot;2024-12-24T17:10:02.186696Z&quot;}" data-execution_count="31">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>shap.plots.bar(    shap_values_[<span class="dv">0</span>],    max_display<span class="op">=</span><span class="bu">len</span>(config.features))plt.savefig(<span class="st">"plot_bar.jpeg"</span>, dpi<span class="op">=</span><span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>shap.plots.bar(    shap_values_[idx[<span class="dv">0</span>]],    max_display<span class="op">=</span><span class="bu">len</span>(config.features))plt.savefig(<span class="st">"plot_bar.jpeg"</span>, dpi<span class="op">=</span><span class="dv">200</span>)plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -660,9 +654,12 @@ Name: 226874, dtype: object</code></pre>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-display">
-<pre><code>&lt;Figure size 640x480 with 0 Axes&gt;</code></pre>
 </div>
+<div id="cell-54" class="cell" data-trusted="true">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 
 

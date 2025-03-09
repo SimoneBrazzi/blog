@@ -28,11 +28,10 @@ code-copy: true
 code-link: true
 
 execute:
+  eval: false
   warnings: false
-  freeze: auto
-
-editor_options: 
-  chunk_output_type: console
+  freeze: true
+  cache: true
 ---
 
 # Introduction
@@ -354,7 +353,8 @@ This means the score is
 
 $$
 TF-IDF=0.2*2=0.4
-$$ :::
+$$
+:::
 
 ```{python}
 vectorizer = TfidfVectorizer()

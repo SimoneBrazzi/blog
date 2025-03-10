@@ -155,5 +155,3 @@ dbGetQuery(
 ## Consideration
 
 To better interact with the database, go to the [Shiny dashboard](https://simonebrazzi-sql-query.share.connect.posit.cloud/) or click on the link at the top of this page or in the table of content.
-
-

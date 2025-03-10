@@ -337,7 +337,8 @@ $$
 
 The resulting **score** represents the importance of a word. It dependes on the word frequency both in a specific document and in the corpus.
 
-::: {.callout-note collapse:"true"} An example can be useful. If a word t appears 20 times in a document of 100 words, we have
+::: {.callout-note}
+An example can be useful. If a word t appears 20 times in a document of 100 words, we have
 
 $$
 TF = \frac{20}{100}=0.2

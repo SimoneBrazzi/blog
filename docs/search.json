@@ -11,7 +11,161 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "backup\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImport\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCredit Score\n\n\n\n\n\n\ncode\n\n\nML\n\n\nPython, R\n\n\n\nML explainability classification\n\n\n\n\n\nOct 26, 2024\n\n\nSimne Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nSpam Detection\n\n\n\n\n\n\ncode\n\n\nNLP\n\n\nNatural Language, Processing\n\n\nPython, R\n\n\n\nNLP\n\n\n\n\n\nSep 5, 2024\n\n\nSimone Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nToxic Comment Filter\n\n\n\n\n\n\ncode\n\n\nDeep Learning\n\n\nPython\n\n\nR\n\n\n\nBiLSTM model for multi-label classification\n\n\n\n\n\nAug 12, 2024\n\n\nSimone Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nEurostat Homicide Data\n\n\n\n\n\n\ncode\n\n\nshiny\n\n\nR\n\n\n\nA primer on Shiny to analyze gender differences in homicide rates\n\n\n\n\n\nDec 29, 2023\n\n\nSimone Brazzi\n\n\n\n\n\n\nNo matching items"
+    "text": "backup\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImport\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBank’s Data Analysis\n\n\n\n\n\n\ncode\n\n\nSQL\n\n\ndatabase\n\n\n\nA SQL approach to data analysis\n\n\n\n\n\nFeb 10, 2025\n\n\nSimone Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nCredit Score\n\n\n\n\n\n\ncode\n\n\nML\n\n\nPython, R\n\n\n\nML explainability classification\n\n\n\n\n\nOct 26, 2024\n\n\nSimne Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nSpam Detection\n\n\n\n\n\n\ncode\n\n\nNLP\n\n\nNatural Language, Processing\n\n\nPython, R\n\n\n\nNLP\n\n\n\n\n\nSep 5, 2024\n\n\nSimone Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nToxic Comment Filter\n\n\n\n\n\n\ncode\n\n\nDeep Learning\n\n\nPython\n\n\nR\n\n\n\nBiLSTM model for multi-label classification\n\n\n\n\n\nAug 12, 2024\n\n\nSimone Brazzi\n\n\n\n\n\n\n\n\n\n\n\n\nEurostat Homicide Data\n\n\n\n\n\n\ncode\n\n\nshiny\n\n\nR\n\n\n\nA primer on Shiny to analyze gender differences in homicide rates\n\n\n\n\n\nDec 29, 2023\n\n\nSimone Brazzi\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html",
+    "href": "posts/credit_score/credit-score.html",
+    "title": "Import",
+    "section": "",
+    "text": "Code\nimport pandas as pdimport numpy as npimport matplotlib.pyplot as pltimport joblibimport shapimport timeimport shapfrom datetime import datefrom dateutil.relativedelta import relativedeltafrom sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCVfrom sklearn.compose import ColumnTransformerfrom sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, LabelBinarizerfrom sklearn.pipeline import Pipelinefrom sklearn.tree import DecisionTreeClassifierfrom xgboost import XGBClassifierfrom xgboost import DMatrixfrom sklearn.ensemble import RandomForestClassifierfrom sklearn.metrics import classification_report\nCode\nclass Config():  def __init__(self):    \"\"\"    Initialization calss.    \"\"\"    self.path=\"/kaggle/working/\"    self.file=\"/kaggle/input/credit-scoring/credit_scoring.csv\"    self.model_result_path=\"/kaggle/working/\"    self.random_state=42    self.col_binary = ['code_gender', 'flag_own_car', 'flag_own_realty']    self.col_ordinal = [\"name_income_type\", \"name_education_type\", \"name_family_status\", \"name_housing_type\", \"occupation_type\"]    self.col_numeric = ['cnt_children', 'amt_income_total', 'cnt_fam_members']    self.features = self.col_binary + self.col_ordinal + self.col_numericconfig = Config()"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#fit",
+    "href": "posts/credit_score/credit-score.html#fit",
+    "title": "Import",
+    "section": "Fit",
+    "text": "Fit\n\n\nCode\ngs_dtc = grid_search_dtc.fit(xtrain, ytrain)"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#pickle",
+    "href": "posts/credit_score/credit-score.html#pickle",
+    "title": "Import",
+    "section": "Pickle",
+    "text": "Pickle\n\n\nCode\njoblib.dump(gs_dtc, config.model_result_path + 'credit_score_grid_search_dtc_f1.pkl')\n\n\n['/kaggle/working/credit_score_grid_search_dtc_f1.pkl']\n\n\n\n\nCode\ngs_dtc = joblib.load(config.model_result_path + 'credit_score_grid_search_dtc_f1.pkl')dtc_model = gs_dtc.best_estimator_"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#predict-classification-report",
+    "href": "posts/credit_score/credit-score.html#predict-classification-report",
+    "title": "Import",
+    "section": "Predict & Classification Report",
+    "text": "Predict & Classification Report\n\n\nCode\nypred_dtc = dtc_model.predict(xtest)cr = classification_report(  ytest,  ypred_dtc,  target_names=['0', '1'],  digits=4,  output_dict=True  )df_cr = pd.DataFrame.from_dict(cr).reset_index()df_cr\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.989836\n0.303270\n0.763001\n0.646553\n0.916371\n\n\n1\nrecall\n0.742224\n0.936394\n0.763001\n0.839309\n0.763001\n\n\n2\nf1-score\n0.848331\n0.458157\n0.763001\n0.653244\n0.806581\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.763001\n47017.000000\n47017.000000"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#fit-1",
+    "href": "posts/credit_score/credit-score.html#fit-1",
+    "title": "Import",
+    "section": "Fit",
+    "text": "Fit\n\n\nCode\nstart_time = time.time()rs_rfc = grid_search_rfc.fit(xtrain, ytrain)end_time = time.time()elapsed_time = end_time - start_timeprint(f\"Elapsed time: {elapsed_time} seconds\")print(f\"Elapsed time: {elapsed_time / 60} minutes\")\n\n\nElapsed time: 336.4672429561615 seconds\nElapsed time: 5.607787382602692 minutes"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#pickle-1",
+    "href": "posts/credit_score/credit-score.html#pickle-1",
+    "title": "Import",
+    "section": "Pickle",
+    "text": "Pickle\n\n\nCode\nimport picklewith open(config.model_result_path + \"credit_score_grid_search_rfc_f1.pkl\", \"wb\") as f:  pickle.dump(rs_rfc, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_rfc_f1.pkl\", \"rb\") as f:  gs_rfc = pickle.load(f)rfc_model = gs_rfc.best_estimator_"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#predict",
+    "href": "posts/credit_score/credit-score.html#predict",
+    "title": "Import",
+    "section": "Predict",
+    "text": "Predict\n\n\nCode\nypred_rfc = rfc_model.predict(xtest)cr_rfc = classification_report(  ytest,  ypred_rfc,  # target_names=config.labels,  digits=4,  output_dict=True  )df_cr_rfc = pd.DataFrame.from_dict(cr_rfc).reset_index()df_cr_rfc\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.992212\n0.326011\n0.784503\n0.659112\n0.920926\n\n\n1\nrecall\n0.764683\n0.949911\n0.784503\n0.857297\n0.784503\n\n\n2\nf1-score\n0.863715\n0.485424\n0.784503\n0.674569\n0.823236\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.784503\n47017.000000\n47017.000000"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#pipeline",
+    "href": "posts/credit_score/credit-score.html#pipeline",
+    "title": "Import",
+    "section": "Pipeline",
+    "text": "Pipeline\n\n\nCode\n# classifierscale_pos_weight = len(y[y == 0]) / len(y[y == 1])xgb = XGBClassifier(    n_jobs=-1,    enable_categorical=True,    scale_pos_weight=scale_pos_weight,    random_state=config.random_state)# pipelinepipe_xgb = Pipeline(  steps=[    (\"preprocessor\", preprocessor),    (\"xgb\", xgb)    ]    )# parametersparam_dist_xgb = {  \"xgb__n_estimators\" : [100, 150, 200, 300],  \"xgb__max_depth\" : [3, 5, 7, 10],  \"xgb__learning_rate\" : [0.1, 0.01, 0.001, 0.0001],  \"xgb__subsample\": [0.7, 0.8, 0.9],  \"xgb__colsample_bytree\": [0.7, 0.8, 0.9],  \"xgb__gamma\": [0, 0.1],  \"xgb__alpha\": [0, 0.1],  # Adding slight L1 regularization for simplicity  \"xgb__lambda\": [1, 2]    # Adding slight L2 regularization for stability}# scoringscoring = {    \"accuracy\": \"accuracy\",    \"f1\": \"f1\",    \"roc_auc\": \"roc_auc\"}# random search cvrandom_search_xgb = RandomizedSearchCV(    estimator=pipe_xgb,    param_distributions=param_dist_xgb,    n_iter=30,  # Set the number of parameter combinations to try    cv=7,    scoring=scoring,    refit=\"f1\",    n_jobs=-1    )"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#fit-2",
+    "href": "posts/credit_score/credit-score.html#fit-2",
+    "title": "Import",
+    "section": "Fit",
+    "text": "Fit\n\n\nCode\nstart_time = time.time()rs_xgb = random_search_xgb.fit(xtrain, ytrain)end_time = time.time()elapsed_time = end_time - start_timeprint(f\"Elapsed time: {elapsed_time} seconds\")print(f\"Elapsed time: {elapsed_time / 60} minutes\")\n\n\nElapsed time: 255.91241335868835 seconds\nElapsed time: 4.2652068893114725 minutes"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#pickle-2",
+    "href": "posts/credit_score/credit-score.html#pickle-2",
+    "title": "Import",
+    "section": "Pickle",
+    "text": "Pickle\n\n\nCode\nwith open(config.model_result_path + \"credit_score_random_search_xgb_f1.pkl\", \"wb\") as f:  pickle.dump(rs_xgb, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_random_search_xgb_f1.pkl\", \"rb\") as f:  rs_xgb = pickle.load(f)xgb_model = rs_xgb.best_estimator_xgb_params = rs_xgb.best_params_"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#predict-1",
+    "href": "posts/credit_score/credit-score.html#predict-1",
+    "title": "Import",
+    "section": "Predict",
+    "text": "Predict\n\n\nCode\nypred_xgb = xgb_model.predict(xtest)cr_xgb = classification_report(  ytest,  ypred_xgb,  # target_names=config.labels,  digits=4,  output_dict=True  )df_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()df_cr_xgb\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.991184\n0.318273\n0.777676\n0.654728\n0.919180\n\n\n1\nrecall\n0.757776\n0.943749\n0.777676\n0.850763\n0.777676\n\n\n2\nf1-score\n0.858905\n0.476014\n0.777676\n0.667460\n0.817934\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.777676\n47017.000000\n47017.000000"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#explain-predictions",
+    "href": "posts/credit_score/credit-score.html#explain-predictions",
+    "title": "Import",
+    "section": "Explain predictions",
+    "text": "Explain predictions\nexplainer = shap.TreeExplainer(xgb_clf)shap_values = explainer.shap_values(x_processed)\nwith open(config.model_result_path + “explainer.pkl”, “wb”) as f: pickle.dump(explainer, f)with open(config.model_result_path + “shap_values.pkl”, “wb”) as f: pickle.dump(shap_values, f)\n\n\nCode\nwith open(config.model_result_path + \"explainer.pkl\", \"rb\") as f:  explainer = pickle.load(f)with open(config.model_result_path + \"shap_values.pkl\", \"rb\") as f:  shap_values = pickle.load(f)"
+  },
+  {
+    "objectID": "posts/credit_score/credit-score.html#force-plot",
+    "href": "posts/credit_score/credit-score.html#force-plot",
+    "title": "Import",
+    "section": "Force Plot",
+    "text": "Force Plot\n\n\nCode\nplt.figure(figsize=(10, 8))plot_force = shap.plots.force(    base_value=explainer.expected_value,    shap_values=shap_values[idx[0], :],    # features=None,    feature_names=config.features,    # out_names=None,    # link='identity', # \"logit\"    plot_cmap='RdBu',    matplotlib=True,    show=True)plt.savefig(\"plot_force.jpeg\", dpi=200)plt.close()\n\n\n&lt;Figure size 1000x800 with 0 Axes&gt;\n\n\n\n\n\n\n\n\n\n\n\nCode\nexplainer_ = shap.Explainer(model=xgb_clf)shap_values_ = explainer(x_processed)shap_values_.feature_names = config.features\n\n\n\n\nCode\nshap.plots.waterfall(    shap_values_[idx[0]],    max_display=len(config.features))plt.savefig(\"plot_waterfall.jpeg\", dpi=200)plt.close()\n\n\n\n\n\n\n\n\n\n\n\nCode\nshap.plots.bar(    shap_values_[idx[0]],    max_display=len(config.features))plt.savefig(\"plot_bar.jpeg\", dpi=200)plt.close()\n\n\n\n\n\n\n\n\n\n\n\nCode"
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "Please check this Shiny Dashboard.\n\n\nThe company Banking Intelligence wants to develop a supervised machine learning model to predict the future behaviour of its customers, based on transactional data and product ownership characteristics. The aim of the project is to create a denormalised table with a series of indicators (features) derived from the tables available in the database, representing the customers’ financial behaviours and activities.\n\nOur objective is to create a feature table for training machine learning models, enriching customer data with various indicators calculated from their transactions and accounts held. The final table will be related to the customer ID and will contain both quantitative and qualitative information.\n\nThe denormalised table will allow the extraction of advanced behavioural features for training supervised machine learning models, providing numerous benefits for the company:\n\nPrediction of customer behaviour: By analysing transactions and product ownership, useful behaviour patterns can be identified to predict future actions such as purchasing new products or closing accounts.\nReducing churn rates: Using behavioural indicators, a model can be built to identify customers at risk of abandonment, allowing timely interventions by the marketing team.\nImproved risk management: Segmentation based on financial behaviour allows high-risk customers to be identified and credit and risk strategies to be optimised.\nCustomisation of offers: Extracted features can be used to customise product and service offers according to the habits and preferences of individual customers, thereby increasing customer satisfaction.\nFraud prevention: By analysing transactions by type and amount, the model can detect behavioural anomalies indicative of fraud, improving security and prevention strategies.\n\nThese benefits will lead to an overall improvement in business operations, enabling more efficient customer management and sustainable business growth.\n\nIndicators will be calculated for each individual customer (referring to id_customer) and include:\n\n\nAge of customer (from customer table)\n\n\nNumber of outgoing transactions on all accounts.\nNumber of incoming transactions on all accounts.\nTotal amount transacted out on all accounts.\nTotal amount transacted incoming on all accounts.\n\n\nTotal number of accounts held.\nNumber of accounts held by type (one indicator for each type of account).\n\n\nNumber of outgoing transactions by account type (one indicator per account type).\nNumber of incoming transactions by account type (one indicator per account type).\nOutgoing transacted amount by account type (one indicator per account type).\nAmount transacted inbound by account type (one indicator per account type)."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#project-description",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#project-description",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "The company Banking Intelligence wants to develop a supervised machine learning model to predict the future behaviour of its customers, based on transactional data and product ownership characteristics. The aim of the project is to create a denormalised table with a series of indicators (features) derived from the tables available in the database, representing the customers’ financial behaviours and activities."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#objective",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#objective",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "Our objective is to create a feature table for training machine learning models, enriching customer data with various indicators calculated from their transactions and accounts held. The final table will be related to the customer ID and will contain both quantitative and qualitative information."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#value-added",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#value-added",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "The denormalised table will allow the extraction of advanced behavioural features for training supervised machine learning models, providing numerous benefits for the company:\n\nPrediction of customer behaviour: By analysing transactions and product ownership, useful behaviour patterns can be identified to predict future actions such as purchasing new products or closing accounts.\nReducing churn rates: Using behavioural indicators, a model can be built to identify customers at risk of abandonment, allowing timely interventions by the marketing team.\nImproved risk management: Segmentation based on financial behaviour allows high-risk customers to be identified and credit and risk strategies to be optimised.\nCustomisation of offers: Extracted features can be used to customise product and service offers according to the habits and preferences of individual customers, thereby increasing customer satisfaction.\nFraud prevention: By analysing transactions by type and amount, the model can detect behavioural anomalies indicative of fraud, improving security and prevention strategies.\n\nThese benefits will lead to an overall improvement in business operations, enabling more efficient customer management and sustainable business growth."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#behavioural-indicators-to-be-calculated",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#behavioural-indicators-to-be-calculated",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "Indicators will be calculated for each individual customer (referring to id_customer) and include:"
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#basic-indicators",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#basic-indicators",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "Age of customer (from customer table)"
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#transaction-indicators",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#transaction-indicators",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "Number of outgoing transactions on all accounts.\nNumber of incoming transactions on all accounts.\nTotal amount transacted out on all accounts.\nTotal amount transacted incoming on all accounts."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#account-indicators",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#account-indicators",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "Total number of accounts held.\nNumber of accounts held by type (one indicator for each type of account)."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#transaction-indicators-by-account-type",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#transaction-indicators-by-account-type",
+    "title": "Bank’s Data Analysis",
+    "section": "",
+    "text": "Number of outgoing transactions by account type (one indicator per account type).\nNumber of incoming transactions by account type (one indicator per account type).\nOutgoing transacted amount by account type (one indicator per account type).\nAmount transacted inbound by account type (one indicator per account type)."
   },
   {
     "objectID": "posts/toxic_comment_filter/toxic_comment_filter.html",
@@ -140,258 +294,6 @@
     "text": "3.2 ui.R"
   },
   {
-    "objectID": "posts/spam_detection/spam_detection.html",
-    "href": "posts/spam_detection/spam_detection.html",
-    "title": "Spam Detection",
-    "section": "",
-    "text": "Tasks:\n\nTrain a model to classify spam.\nFind the main topic in the spam emails.\nCalculate semantic distance of the spam topics.\nExtract the ORG from ham emilas."
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#r-libraries",
-    "href": "posts/spam_detection/spam_detection.html#r-libraries",
-    "title": "Spam Detection",
-    "section": "\n2.1 R libraries",
-    "text": "2.1 R libraries\n\nCodelibrary(tidyverse, verbose = FALSE)\nlibrary(ggplot2)\nlibrary(gt)\nlibrary(reticulate)\nlibrary(plotly)\n\n# renv::use_python(\"/Users/simonebrazzi/venv/blog/bin/python3\")"
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#python-packages",
-    "href": "posts/spam_detection/spam_detection.html#python-packages",
-    "title": "Spam Detection",
-    "section": "\n2.2 Python packages",
-    "text": "2.2 Python packages\n\nCodeimport pandas as pd\nimport numpy as np\nimport spacy\nimport nltk\nimport string\nimport gensim\nimport gensim.corpora as corpora\nimport gensim.downloader\n\nfrom nltk.corpus import stopwords\nfrom gensim.models import Word2Vec\nfrom scipy.spatial.distance import cosine\nfrom sklearn.metrics.pairwise import cosine_similarity\n\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.neural_network import MLPClassifier\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import classification_report\n\nfrom collections import Counter\n# glove vector\nglove_vector = gensim.downloader.load(\"glove-wiki-gigaword-300\")\n# nltk stopwords\nnltk.download('stopwords')\nstop_words = stopwords.words('english')"
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#config-class",
-    "href": "posts/spam_detection/spam_detection.html#config-class",
-    "title": "Spam Detection",
-    "section": "\n2.3 Config class",
-    "text": "2.3 Config class\n\nCodeclass Config():\n  def __init__(self):\n    \n    \"\"\"\n    CLass initialize function.\n    \"\"\"\n    \n    self.path=\"/Users/simonebrazzi/R/blog/posts/spam_detection/spam_dataset.csv\"\n    self.random_state=42\n  \n  def get_lemmas(self, doc):\n    \n    \"\"\"\n    List comprehension to get lemmas. It performs:\\n\n      1. Lowercase.\\n\n      2. Stop words removal\\n.\n      3. Whitespaces removal.\\n\n      4. Remove the word 'subject'.\\n\n      5. Digits removal.\\n\n      6. Get only words with length &gt;= 5.\\n\n    \"\"\"\n    \n    lemmas = [\n      [\n        t.lemma_ for t in d \n        if (text := t.text.lower()) not in punctuation \n        and text not in stop_words \n        and not t.is_space \n        and text != \"subject\" \n        and not t.is_digit\n        and len(text) &gt;=5\n        ]\n        for d in doc\n        ]\n    return lemmas\n  \n  def get_entities(self, doc):\n    \n    \"\"\"\n    List comprehension to get the lemmas which have entity type 'ORG'.\n    \"\"\"\n    \n    entities = [\n    [\n      t.lemma_ for t in d \n      if (text := t.text.lower()) not in punctuation \n      and text not in stop_words \n      and not t.is_space \n      and text != \"subject\" \n      and not t.is_digit\n      and len(text) &gt;=5\n      and t.ent_type_ == \"ORG\"\n      ]\n      for d in doc\n      ]\n    return entities\n  \n  def get_sklearn_mlp(self, activation, solver, max_iter, hidden_layer_sizes, tol):\n    \n    \"\"\"\n    It initialize the sklearn MLPClassifier.\n    \"\"\"\n    \n    mlp = mlp = MLPClassifier(\n      activation=activation,\n      solver=solver,\n      max_iter=max_iter,\n      hidden_layer_sizes=hidden_layer_sizes,\n      tol=tol,\n      verbose=True\n      )\n    return mlp\n  \n  def get_lda(self, corpus, id2word, num_topics, passes, workers, random_state):\n    \n    \"\"\"\n    Initialize LDA.\n    \"\"\"\n    \n    lda = gensim.models.LdaMulticore(\n      corpus=corpus,\n      id2word=id2word,\n      num_topics=num_topics,\n      passes=passes,\n      workers=workers,\n      random_state=self.random_state\n      )\n    return lda\n  \nconfig = Config()"
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#eda",
-    "href": "posts/spam_detection/spam_detection.html#eda",
-    "title": "Spam Detection",
-    "section": "\n3.1 EDA",
-    "text": "3.1 EDA\nFirst things first, Exploratory Data Analysis. Considering we are going to perform a classification, is interesting to check if our dataset is unbalanced.\n\n\nTable 1: Absolute and relative frequencies\n\nCodedf_g &lt;- df %&gt;% \n  summarise(\n    freq_abs = n(),\n    freq_rel = n() / nrow(df),\n    .by = label\n    )\n\ndf_g %&gt;% \n  gt() %&gt;% \n  fmt_auto() %&gt;% \n  cols_width(\n    label ~ pct(20),\n    freq_abs ~ pct(35),\n    freq_rel ~ pct(35)\n    ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(freq_abs, freq_rel)\n  ) %&gt;% \n  tab_header(\n    title = \"Label frequency\",\n    subtitle = \"Absolute and relative frequencies\"\n  ) %&gt;% \n  cols_label(\n    label = \"Label\",\n    freq_abs = \"Absolute frequency\",\n    freq_rel = \"Relative frequency\"\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n    )\n\n\n\n\nIt is useful also a visual cue.\n\nCodeg &lt;- ggplot(df_g) +\n  geom_col(aes(x = freq_abs, y = label, fill = label)) +\n  scale_fill_brewer(palette = \"Set1\", direction = -1) +\n  theme_minimal() +\n  ggtitle(\"Absolute frequency barchart\") +\n  xlab(\"Absolute frequency\") +\n  ylab(\"Label\") +\n  labs(fill = \"Label\")\nggplotly(g)\n\n\nThe dataset is not balanced, so it could be relevant when training the model for classification. Depending on the model performance, we know what we could investigate first."
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#classification",
-    "href": "posts/spam_detection/spam_detection.html#classification",
-    "title": "Spam Detection",
-    "section": "\n5.1 Classification",
-    "text": "5.1 Classification\nThe text is already preprocessed as list of lemmas. For the classification task, it is necessary to convert it as a string.\n\nCodedf[\"feature\"] = df.lemmas.apply(lambda x : \" \".join(x))\n\n\n\n5.1.1 Features\nAs said, the machine does not understand human readable text. It has to be transformed. The best approach is to vectorize it with TfidfVectorizer(). It is a tool for converting text into a matrix of TF-IDF features. The TermFrequency-InverseDocumentFrequency is a statistical method. It is a measure of importance of a word in a document, part of a corpus, adjusted for the frequency in the corpus. The model vectorize a word by multiplying the word Term Frequency\n\\[\nTF = \\frac{word\\ frequency\\ in\\ document}{total\\ words\\ in\\ document}\n\\] with the Inverse Document Frequency\n\\[\nIDF = log(\\frac{total\\ number\\ documents}{documents\\ containing\\ the\\ word})\n\\] The final result is\n\\[\nTF-IDF = TF * IDF\n\\]\nThe resulting score represents the importance of a word. It dependes on the word frequency both in a specific document and in the corpus.\n::: {.callout-note collapse:“true”} An example can be useful. If a word t appears 20 times in a document of 100 words, we have\n\\[\nTF = \\frac{20}{100}=0.2\n\\]\nIf there are 10.000 documents in the corpus and 100 documents contains the term t\n\\[\nIDF = log(\\frac{10000}{100})=2\n\\]\nThis means the score is\n\\[\nTF-IDF=0.2*2=0.4\n\\] :::\n\nCodevectorizer = TfidfVectorizer()\nX = vectorizer.fit_transform(df['feature'])\ny = df.label"
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#split",
-    "href": "posts/spam_detection/spam_detection.html#split",
-    "title": "Spam Detection",
-    "section": "\n5.2 Split",
-    "text": "5.2 Split\nNot much to say about this: a best practice which let evaluate the performance of our model on new data.\n\nCodextrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=.2, random_state=42)\n\n\n\n5.2.1 Model\nThe model is the MLPClassifier(). It is a Multi Perceptron Layer Classifier.\n\n\nMLPClassifier\n\nIt is an Artificial Neural Network used for classification. It consists of multiple layers of nodes, called perceptrons. For further reading, see the documentation.\n\nCodemlp = config.get_sklearn_mlp(\n  activation=\"logistic\",\n  solver=\"adam\",\n  max_iter=100,\n  hidden_layer_sizes=(100,),\n  tol=.005\n  )\n\n\n\n5.2.2 Fit\n\nCodemlp.fit(xtrain, ytrain)\n\n\n\n5.2.3 Predict\n\nCodeypred = mlp.predict(xtest)\n\n\n\n5.2.4 Classification report\nConsidering we are doing a classificatoin, one method to evaluate the performance is the classification report. It summarize the performance of the model comparing true and predicted labels, showing not only the metrics (precision, recall and F1-score) but also the support.\n\nCodecr = classification_report(\n  ytest,\n  ypred,\n  target_names=[\"spam\", \"ham\"],\n  digits=4,\n  output_dict=True\n  )\ndf_cr = pd.DataFrame.from_dict(cr).reset_index()\n\n\n\nCodelibrary(reticulate)\n\ndf_cr &lt;- py$df_cr %&gt;% dplyr::rename(names = index)\ncols &lt;- df_cr %&gt;% colnames()\ndf_cr %&gt;% \n  pivot_longer(\n    cols = -names,\n    names_to = \"metrics\",\n    values_to = \"values\"\n  ) %&gt;% \n  pivot_wider(\n    names_from = names,\n    values_from = values\n  ) %&gt;% \n  gt() %&gt;%\n  tab_header(\n    title = \"Confusion Matrix\",\n    subtitle = \"Sklearn MLPClassifier\"\n  ) %&gt;% \n  fmt_number(\n    columns = c(\"precision\", \"recall\", \"f1-score\", \"support\"),\n    decimals = 2,\n    drop_trailing_zeros = TRUE,\n    drop_trailing_dec_mark = FALSE\n  ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(\"precision\", \"recall\", \"f1-score\", \"support\")\n  ) %&gt;% \n  cols_align(\n    align = \"left\",\n    columns = metrics\n  ) %&gt;% \n  cols_label(\n    metrics = \"Metrics\",\n    precision = \"Precision\",\n    recall = \"Recall\",\n    `f1-score` = \"F1-Score\",\n    support = \"Support\"\n  )\n\n\nEven if the model is not fitted for an unbalanced dataset, it is not affecting the performance. Precision and Recall are high, so much that is could seems to be overfitted."
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#topic-modeling-for-spam-content",
-    "href": "posts/spam_detection/spam_detection.html#topic-modeling-for-spam-content",
-    "title": "Spam Detection",
-    "section": "\n5.3 Topic Modeling for spam content",
-    "text": "5.3 Topic Modeling for spam content\nTopic modeling in nlp can count on the Latent Dirilicht Model. It is a generative model used to get the topics which occur in a set of documents.\nThe LDA model has:\n\nInput: a corpus of text documents, preprocessed as tokenized and cleaned words. We have this in the lemmas column.\nOutput: a distribution of topics for each document and one of words for each topic.\n\nFor further reading, you can find the paper in the Table of Contents or at this link.\n\n5.3.1 Dataset\nFilter data to have a spam dataframe and create a variable with the lemmas column to work with.\n\nCodespam = df[df.label == \"spam\"]\nx = spam.lemmas\n\n\n\n5.3.2 Create corpus\nLDA algortihm needs the corpus as a bag of word.\n\nCodeid2word = corpora.Dictionary(x)\ncorpus = [id2word.doc2bow(t) for t in x]\n\n\n\n5.3.3 Model\nThe model will return a user defined number of topics. For each of it, it will return a user defined number of words ad the probability of each of them.\n\nCodelda = config.get_lda(\n  corpus=corpus,\n  id2word=id2word,\n  num_topics=10,\n  passes=10, # number of times the algorithm see the corpus\n  workers=4, # parellalize\n  random_state=42\n  )\ntopic_words = lda.show_topics(num_topics=10, num_words=5, formatted=False)\n\n# Iterate over topic_words to extract the data\ndata = []\ndata = [\n    (topic, w, p)\n    for topic, words in topic_words\n    for w, p in words\n    ]\ntopics_df = pd.DataFrame(data, columns=['topic', 'word', 'proba'])\n\n\n\n\nTable 2: Topics id, words and probabilities\n\nCodepy$topics_df %&gt;% \n  gt() %&gt;% \n  tab_header(\n    title = \"Words and probabilities by topics\"\n  ) %&gt;% \n  fmt_auto() %&gt;% \n  cols_width(\n    topic ~ pct(33),\n    word ~ pct(33),\n    proba ~ pct(33)\n    ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(topic, word, proba)\n  ) %&gt;% \n  cols_label(\n    topic = \"Topic\",\n    word = \"Word\",\n    proba = \"Probability\"\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n  )"
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#semantic-distance-between-topics",
-    "href": "posts/spam_detection/spam_detection.html#semantic-distance-between-topics",
-    "title": "Spam Detection",
-    "section": "\n5.4 Semantic distance between topics",
-    "text": "5.4 Semantic distance between topics\nThe semantic distance requires a documents made of strings. Using a dict, we can extract the topics and the words. The dict has the topics as keys and the words as a list of words. The documents can be created using the .join().\n\nCodetopics_dict = {}\nfor topics, words in topic_words:\n  topics_dict[topics] = [w[0] for w in words]\n\ndocuments = [\" \".join(words) for words in topics_dict.values()]\n\n\n\nCodevectorizer = TfidfVectorizer()\ntfidf_matrix = vectorizer.fit_transform(documents)\ncosine_sim_matrix = cosine_similarity(tfidf_matrix, dense_output=True)\ntopics = list(topics_dict.keys())\ncosine_sim_df = pd.DataFrame(cosine_sim_matrix, index=topics, columns=topics)\n\n\n\n\nTable 3: Cosine similarity matrix\n\nCodepy$cosine_sim_df %&gt;% \n  gt() %&gt;% \n  fmt_auto() %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(`0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`)\n  ) %&gt;% \n  cols_label(\n    `0` = \"Topic 0\",\n    `1` = \"Topic 1\",\n    `2` = \"Topic 2\",\n    `3` = \"Topic 3\",\n    `4` = \"Topic 4\",\n    `5` = \"Topic 5\",\n    `6` = \"Topic 6\",\n    `7` = \"Topic 7\",\n    `8` = \"Topic 8\",\n    `9` = \"Topic 9\",\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n    )"
-  },
-  {
-    "objectID": "posts/spam_detection/spam_detection.html#organization-of-ham-mails",
-    "href": "posts/spam_detection/spam_detection.html#organization-of-ham-mails",
-    "title": "Spam Detection",
-    "section": "\n5.5 Organization of “HAM” mails",
-    "text": "5.5 Organization of “HAM” mails\n\n5.5.1 Create “HAM” df\n\n5.5.2 Get ham lemmas which have ORG entity\n\nCodeham = df[df.label == \"ham\"]\nx = ham.entities\n\n\n\nCodefrom collections import Counter\n\n# Flatten the list of lists and create a Counter object\nd = Counter([i for e in x for i in e])\n\nfreq_df = pd.DataFrame(d.items(), columns=[\"word\", \"freq\"])\n\n\n\nCodelibrary(\"wordcloud\")\nlibrary(\"RColorBrewer\")\n\nset.seed(42)\nword_freqs_df &lt;- py$freq_df\n\nwordcloud(\n  words = word_freqs_df$word,\n  freq = word_freqs_df$freq,\n  min.freq = 1,\n  max.words = 100, # nrow(word_freqs_df),\n  random.order = FALSE,\n  rot.per = .3,\n  colors = brewer.pal(n = 8, name = \"Dark2\")\n  )\n\n\n\n\nTable 4: Top 10 words by frequency\n\nCodeword_freqs_df %&gt;% \n  arrange(desc(freq)) %&gt;% \n  head(10) %&gt;% \n  gt() %&gt;%                                        \n  tab_header(\n    title = \"Top 10 ham words \",\n    subtitle = \"by frequency\"\n  ) %&gt;% \n  fmt_auto() %&gt;% \n  cols_width(\n    word ~ pct(50),\n    freq ~ pct(50)\n    ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(word, freq)\n  ) %&gt;% \n  cols_label(\n    word = \"Word\",\n    freq = \"Frequency\"\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n  )"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Simone Brazzi",
-    "section": "",
-    "text": "I am a (data) nerd, with lot of passion and some mistake along the way. Data analyst by day, aspiring data wizard by night! I love using data to tell stories and drive business decisions. But I’m not content with stopping there. My passion for data and desire to expand my skill set has led me on a quest to become a data scientist. I’m a fearless problem solver with an insatiable curiosity, and I’m always seeking new challenges and opportunities to learn and grow. Let’s make some magic with data! When I don’t stare to lines of code or spreadsheet, I like to read and play video game or spend quality time with my dog."
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html",
-    "href": "posts/credit_score/credit_score_kaggle.html",
-    "title": "Import",
-    "section": "",
-    "text": "Code\nimport pandas as pdimport numpy as npimport matplotlib.pyplot as pltimport pickleimport shapimport timefrom datetime import datefrom dateutil.relativedelta import relativedeltafrom sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCVfrom sklearn.compose import ColumnTransformerfrom sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler, LabelBinarizerfrom sklearn.pipeline import Pipelinefrom sklearn.tree import DecisionTreeClassifierfrom xgboost import XGBClassifierfrom sklearn.ensemble import RandomForestClassifierfrom sklearn.metrics import classification_report\nCode\nclass Config():  def __init__(self):    \"\"\"    Initialization calss.    \"\"\"    self.path=\"/kaggle/working/\"    self.file=\"/kaggle/input/credit-scoring/credit_scoring.csv\"    self.model_result_path=\"/kaggle/working/\"    self.random_state=42    self.col_bi = ['code_gender', 'flag_own_car', 'flag_own_realty', 'flag_mobil', 'flag_work_phone', 'flag_phone', 'flag_email']    self.col_ohe = [\"name_income_type\", \"name_education_type\", \"name_family_status\", \"name_housing_type\", \"occupation_type\"]    self.col_ss = ['cnt_children', 'amt_income_total', 'cnt_fam_members']    self.features = self.col_bi + self.col_ohe + self.col_ssconfig = Config()\nCode\ndf = pd.read_csv(config.file)df.columns = df.columns.str.lower()df[\"id\"] = df.id.astype(int)\nCode\ndf = df[df.id != 6392180]df = df[~df.occupation_type.isna()]"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#fit",
-    "href": "posts/credit_score/credit_score_kaggle.html#fit",
-    "title": "Import",
-    "section": "Fit",
-    "text": "Fit\n\n\nCode\ngs_dtc = grid_search_dtc.fit(xtrain, ytrain)"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#pickle",
-    "href": "posts/credit_score/credit_score_kaggle.html#pickle",
-    "title": "Import",
-    "section": "Pickle",
-    "text": "Pickle\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_dtc.pkl\", \"wb\") as f:  pickle.dump(gs_dtc, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_dtc.pkl\", \"rb\") as f:  gs_dtc = pickle.load(f)dtc_model = gs_dtc.best_estimator_"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#predict-classification-report",
-    "href": "posts/credit_score/credit_score_kaggle.html#predict-classification-report",
-    "title": "Import",
-    "section": "Predict & Classification Report",
-    "text": "Predict & Classification Report\n\n\nCode\nypred_dtc = dtc_model.predict(xtest)cr = classification_report(  ytest,  ypred_dtc,  # target_names=config.labels,  digits=4,  output_dict=True  )df_cr = pd.DataFrame.from_dict(cr).reset_index()df_cr\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.971134\n0.123114\n0.268073\n0.547124\n0.880392\n\n\n1\nrecall\n0.185895\n0.953886\n0.268073\n0.569891\n0.268073\n\n\n2\nf1-score\n0.312056\n0.218082\n0.268073\n0.265069\n0.302001\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.268073\n47017.000000\n47017.000000"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#fit-1",
-    "href": "posts/credit_score/credit_score_kaggle.html#fit-1",
-    "title": "Import",
-    "section": "Fit",
-    "text": "Fit\n\n\nCode\nstart_time = time.time()rs_rfc = random_search_rfc.fit(xtrain, ytrain)end_time = time.time()elapsed_time = end_time - start_timeprint(f\"Elapsed time: {elapsed_time} seconds\")print(f\"Elapsed time: {elapsed_time / 60} minutes\")\n\n\nElapsed time: 1071.030502319336 seconds"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#pickle-1",
-    "href": "posts/credit_score/credit_score_kaggle.html#pickle-1",
-    "title": "Import",
-    "section": "Pickle",
-    "text": "Pickle\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_rfc.pkl\", \"wb\") as f:  pickle.dump(rs_rfc, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_rfc.pkl\", \"rb\") as f:  gs_rfc = pickle.load(f)rfc_model = gs_rfc.best_estimator_"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#predict",
-    "href": "posts/credit_score/credit_score_kaggle.html#predict",
-    "title": "Import",
-    "section": "Predict",
-    "text": "Predict\n\n\nCode\nypred_rfc = rfc_model.predict(xtest)cr_rfc = classification_report(  ytest,  ypred_rfc,  # target_names=config.labels,  digits=4,  output_dict=True  )df_cr_rfc = pd.DataFrame.from_dict(cr_rfc).reset_index()df_cr_rfc\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.992840\n0.316549\n0.774592\n0.654695\n0.920474\n\n\n1\nrecall\n0.753013\n0.954681\n0.774592\n0.853847\n0.774592\n\n\n2\nf1-score\n0.856454\n0.475450\n0.774592\n0.665952\n0.815685\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.774592\n47017.000000\n47017.000000"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#pipeline",
-    "href": "posts/credit_score/credit_score_kaggle.html#pipeline",
-    "title": "Import",
-    "section": "Pipeline",
-    "text": "Pipeline\n\n\nCode\n# classifierxgb = XGBClassifier(n_jobs=-1)# preprocessorpreprocessor = ColumnTransformer(  transformers=[    (\"binary_encoder\", ohe_bi, config.col_bi),    (\"categorical_encoder\", ohe, config.col_ohe),    (\"scaler\", ss, config.col_ss)    ],    remainder='passthrough'    )# pipelinepipe_xgb = Pipeline(  steps=[    (\"preprocessor\", preprocessor),    (\"xgb\", xgb)    ]    )# parametersparam_dist_xgb = {  \"xgb__n_estimators\" : [100, 150, 200, 300],  \"xgb__max_depth\" : [3, 5, 7, 10],  \"xgb__learning_rate\" : [0.1, 0.1, 0.01, 0.0002],  \"xgb__subsample\": [0.7, 0.8, 0.9],  \"xgb__colsample_bytree\": [0.7, 0.8, 0.9],  \"xgb__gamma\": [0, 0.1],  \"xgb__alpha\": [0, 0.1],  # Adding slight L1 regularization for simplicity  \"xgb__lambda\": [1, 2]    # Adding slight L2 regularization for stability}# scoringscoring = {    \"accuracy\": \"accuracy\",    \"f1\": \"f1\",    \"roc_auc\": \"roc_auc\"}# random search cvrandom_search_xgb = RandomizedSearchCV(    estimator=pipe_xgb,    param_distributions=param_dist_xgb,    n_iter=20,  # Set the number of parameter combinations to try    cv=7,    scoring=scoring,    refit=\"accuracy\",    n_jobs=-1,    random_state=42    )"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#fit-2",
-    "href": "posts/credit_score/credit_score_kaggle.html#fit-2",
-    "title": "Import",
-    "section": "Fit",
-    "text": "Fit\n\n\nCode\nstart_time = time.time()rs_xgb = random_search_xgb.fit(xtrain, ytrain)end_time = time.time()elapsed_time = end_time - start_timeprint(f\"Elapsed time: {elapsed_time} seconds\")print(f\"Elapsed time: {elapsed_time / 60} minutes\")\n\n\nElapsed time: 336.31454849243164 seconds\nElapsed time: 5.605242474873861 minutes"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#pickle-2",
-    "href": "posts/credit_score/credit_score_kaggle.html#pickle-2",
-    "title": "Import",
-    "section": "Pickle",
-    "text": "Pickle\n\n\nCode\nwith open(config.model_result_path + \"credit_score_random_search_xgb.pkl\", \"wb\") as f:  pickle.dump(rs_xgb, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_random_search_xgb.pkl\", \"rb\") as f:  rs_xgb = pickle.load(f)xgb_model = rs_xgb.best_estimator_"
-  },
-  {
-    "objectID": "posts/credit_score/credit_score_kaggle.html#predict-1",
-    "href": "posts/credit_score/credit_score_kaggle.html#predict-1",
-    "title": "Import",
-    "section": "Predict",
-    "text": "Predict\n\n\nCode\nypred_xgb = xgb_model.predict(xtest)cr_xgb = classification_report(  ytest,  ypred_xgb,  # target_names=config.labels,  digits=4,  output_dict=True  )df_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()df_cr_xgb\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.919670\n0.663104\n0.907927\n0.791387\n0.892217\n\n\n1\nrecall\n0.982732\n0.283641\n0.907927\n0.633187\n0.907927\n\n\n2\nf1-score\n0.950156\n0.397327\n0.907927\n0.673742\n0.891001\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.907927\n47017.000000\n47017.000000"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html",
-    "href": "posts/credit_score/credit-score.html",
-    "title": "Import",
-    "section": "",
-    "text": "Code\nimport pandas as pdimport numpy as npimport matplotlib.pyplot as pltimport pickleimport shapimport timeimport shapfrom datetime import datefrom dateutil.relativedelta import relativedeltafrom sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCVfrom sklearn.compose import ColumnTransformerfrom sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler, LabelBinarizerfrom sklearn.pipeline import Pipelinefrom sklearn.tree import DecisionTreeClassifierfrom xgboost import XGBClassifierfrom xgboost import DMatrixfrom sklearn.ensemble import RandomForestClassifierfrom sklearn.metrics import classification_report\nCode\nclass Config():  def __init__(self):    \"\"\"    Initialization calss.    \"\"\"    self.path=\"/kaggle/working/\"    self.file=\"/kaggle/input/credit-scoring/credit_scoring.csv\"    self.model_result_path=\"/kaggle/working/\"    self.random_state=42    self.col_binary = ['code_gender', 'flag_own_car', 'flag_own_realty']    self.col_ordinal = [\"name_income_type\", \"name_education_type\", \"name_family_status\", \"name_housing_type\", \"occupation_type\"]    self.col_numeric = ['cnt_children', 'amt_income_total', 'cnt_fam_members']    self.features = self.col_binary + self.col_ordinal + self.col_numericconfig = Config()"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#fit",
-    "href": "posts/credit_score/credit-score.html#fit",
-    "title": "Import",
-    "section": "Fit",
-    "text": "Fit\n\n\nCode\ngs_dtc = grid_search_dtc.fit(xtrain, ytrain)"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#pickle",
-    "href": "posts/credit_score/credit-score.html#pickle",
-    "title": "Import",
-    "section": "Pickle",
-    "text": "Pickle\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_dtc_f1.pkl\", \"wb\") as f:    pickle.dump(gs_dtc, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_dtc_f1.pkl\", \"rb\") as f:  gs_dtc = pickle.load(f)dtc_model = gs_dtc.best_estimator_"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#predict-classification-report",
-    "href": "posts/credit_score/credit-score.html#predict-classification-report",
-    "title": "Import",
-    "section": "Predict & Classification Report",
-    "text": "Predict & Classification Report\n\n\nCode\nypred_dtc = dtc_model.predict(xtest)cr = classification_report(  ytest,  ypred_dtc,  target_names=['0', '1'],  digits=4,  output_dict=True  )df_cr = pd.DataFrame.from_dict(cr).reset_index()df_cr\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.989836\n0.303270\n0.763001\n0.646553\n0.916371\n\n\n1\nrecall\n0.742224\n0.936394\n0.763001\n0.839309\n0.763001\n\n\n2\nf1-score\n0.848331\n0.458157\n0.763001\n0.653244\n0.806581\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.763001\n47017.000000\n47017.000000"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#fit-1",
-    "href": "posts/credit_score/credit-score.html#fit-1",
-    "title": "Import",
-    "section": "Fit",
-    "text": "Fit\n\n\nCode\nstart_time = time.time()rs_rfc = grid_search_rfc.fit(xtrain, ytrain)end_time = time.time()elapsed_time = end_time - start_timeprint(f\"Elapsed time: {elapsed_time} seconds\")print(f\"Elapsed time: {elapsed_time / 60} minutes\")\n\n\nElapsed time: 279.48332142829895 seconds\nElapsed time: 4.658055357138315 minutes"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#pickle-1",
-    "href": "posts/credit_score/credit-score.html#pickle-1",
-    "title": "Import",
-    "section": "Pickle",
-    "text": "Pickle\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_rfc_f1.pkl\", \"wb\") as f:  pickle.dump(rs_rfc, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_grid_search_rfc_f1.pkl\", \"rb\") as f:  gs_rfc = pickle.load(f)rfc_model = gs_rfc.best_estimator_"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#predict",
-    "href": "posts/credit_score/credit-score.html#predict",
-    "title": "Import",
-    "section": "Predict",
-    "text": "Predict\n\n\nCode\nypred_rfc = rfc_model.predict(xtest)cr_rfc = classification_report(  ytest,  ypred_rfc,  # target_names=config.labels,  digits=4,  output_dict=True  )df_cr_rfc = pd.DataFrame.from_dict(cr_rfc).reset_index()df_cr_rfc\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.992212\n0.326011\n0.784503\n0.659112\n0.920926\n\n\n1\nrecall\n0.764683\n0.949911\n0.784503\n0.857297\n0.784503\n\n\n2\nf1-score\n0.863715\n0.485424\n0.784503\n0.674569\n0.823236\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.784503\n47017.000000\n47017.000000"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#pipeline",
-    "href": "posts/credit_score/credit-score.html#pipeline",
-    "title": "Import",
-    "section": "Pipeline",
-    "text": "Pipeline\n\n\nCode\n# classifierscale_pos_weight = len(y[y == 0]) / len(y[y == 1])xgb = XGBClassifier(    n_jobs=-1,    enable_categorical=True,    scale_pos_weight=scale_pos_weight,    random_state=config.random_state)# pipelinepipe_xgb = Pipeline(  steps=[    (\"preprocessor\", preprocessor),    (\"xgb\", xgb)    ]    )# parametersparam_dist_xgb = {  \"xgb__n_estimators\" : [100, 150, 200, 300],  \"xgb__max_depth\" : [3, 5, 7, 10],  \"xgb__learning_rate\" : [0.1, 0.01, 0.001, 0.0001],  \"xgb__subsample\": [0.7, 0.8, 0.9],  \"xgb__colsample_bytree\": [0.7, 0.8, 0.9],  \"xgb__gamma\": [0, 0.1],  \"xgb__alpha\": [0, 0.1],  # Adding slight L1 regularization for simplicity  \"xgb__lambda\": [1, 2]    # Adding slight L2 regularization for stability}# scoringscoring = {    \"accuracy\": \"accuracy\",    \"f1\": \"f1\",    \"roc_auc\": \"roc_auc\"}# random search cvrandom_search_xgb = RandomizedSearchCV(    estimator=pipe_xgb,    param_distributions=param_dist_xgb,    n_iter=30,  # Set the number of parameter combinations to try    cv=7,    scoring=scoring,    refit=\"f1\",    n_jobs=-1    )"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#fit-2",
-    "href": "posts/credit_score/credit-score.html#fit-2",
-    "title": "Import",
-    "section": "Fit",
-    "text": "Fit\n\n\nCode\nstart_time = time.time()rs_xgb = random_search_xgb.fit(xtrain, ytrain)end_time = time.time()elapsed_time = end_time - start_timeprint(f\"Elapsed time: {elapsed_time} seconds\")print(f\"Elapsed time: {elapsed_time / 60} minutes\")\n\n\nElapsed time: 267.9529609680176 seconds\nElapsed time: 4.465882682800293 minutes"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#pickle-2",
-    "href": "posts/credit_score/credit-score.html#pickle-2",
-    "title": "Import",
-    "section": "Pickle",
-    "text": "Pickle\n\n\nCode\nwith open(config.model_result_path + \"credit_score_random_search_xgb_f1.pkl\", \"wb\") as f:  pickle.dump(rs_xgb, f)\n\n\n\n\nCode\nwith open(config.model_result_path + \"credit_score_random_search_xgb_f1.pkl\", \"rb\") as f:  rs_xgb = pickle.load(f)xgb_model = rs_xgb.best_estimator_xgb_params = rs_xgb.best_params_"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#predict-1",
-    "href": "posts/credit_score/credit-score.html#predict-1",
-    "title": "Import",
-    "section": "Predict",
-    "text": "Predict\n\n\nCode\nypred_xgb = xgb_model.predict(xtest)cr_xgb = classification_report(  ytest,  ypred_xgb,  # target_names=config.labels,  digits=4,  output_dict=True  )df_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()df_cr_xgb\n\n\n\n\n\n\n\n\n\nindex\n0\n1\naccuracy\nmacro avg\nweighted avg\n\n\n\n\n0\nprecision\n0.993012\n0.386646\n0.833273\n0.689829\n0.928129\n\n\n1\nrecall\n0.819059\n0.951898\n0.833273\n0.885478\n0.833273\n\n\n2\nf1-score\n0.897686\n0.549922\n0.833273\n0.723804\n0.860474\n\n\n3\nsupport\n41986.000000\n5031.000000\n0.833273\n47017.000000\n47017.000000"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#explain-predictions",
-    "href": "posts/credit_score/credit-score.html#explain-predictions",
-    "title": "Import",
-    "section": "Explain predictions",
-    "text": "Explain predictions\nexplainer = shap.TreeExplainer(xgb_clf)shap_values = explainer.shap_values(x_processed)\nwith open(config.model_result_path + “explainer.pkl”, “wb”) as f: pickle.dump(explainer, f)with open(config.model_result_path + “shap_values.pkl”, “wb”) as f: pickle.dump(shap_values, f)\n\n\nCode\nwith open(config.model_result_path + \"explainer.pkl\", \"rb\") as f:  explainer = pickle.load(f)with open(config.model_result_path + \"shap_values.pkl\", \"rb\") as f:  shap_values = pickle.load(f)"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#visualize-a-single-prediction",
-    "href": "posts/credit_score/credit-score.html#visualize-a-single-prediction",
-    "title": "Import",
-    "section": "Visualize a single prediction",
-    "text": "Visualize a single prediction"
-  },
-  {
-    "objectID": "posts/credit_score/credit-score.html#force-plot",
-    "href": "posts/credit_score/credit-score.html#force-plot",
-    "title": "Import",
-    "section": "Force Plot",
-    "text": "Force Plot\n\n\nCode\nplt.figure(figsize=(10, 8))plot_force = shap.plots.force(    base_value=explainer.expected_value,    shap_values=shap_values[idx[0], :],    # features=None,    feature_names=config.features,    # out_names=None,    # link='identity', # \"logit\"    plot_cmap='RdBu',    matplotlib=True,    show=True)plt.savefig(\"plot_force.jpeg\", dpi=200)\n\n\n&lt;Figure size 1000x800 with 0 Axes&gt;\n\n\n\n\n\n\n\n\n\n&lt;Figure size 640x480 with 0 Axes&gt;\n\n\n\n\nCode\nexplainer_ = shap.Explainer(model=xgb_clf)shap_values_ = explainer(x_processed)shap_values_.feature_names = config.features\n\n\n\n\nCode\nshap.plots.waterfall(    shap_values_[0],    max_display=len(config.features))plt.savefig(\"plot_waterfall.jpeg\", dpi=200)\n\n\n\n\n\n\n\n\n\n&lt;Figure size 640x480 with 0 Axes&gt;\n\n\n\n\nCode\nshap.plots.bar(    shap_values_[0],    max_display=len(config.features))plt.savefig(\"plot_bar.jpeg\", dpi=200)\n\n\n\n\n\n\n\n\n\n&lt;Figure size 640x480 with 0 Axes&gt;"
-  },
-  {
     "objectID": "posts/credit_score/credit_score.html",
     "href": "posts/credit_score/credit_score.html",
     "title": "Credit Score",
@@ -460,5 +362,96 @@
     "title": "Credit Score",
     "section": "\n7.3 XGBoostClassifier",
     "text": "7.3 XGBoostClassifier\n\n7.3.1 Pipeline\n\nCodexgb = config.make_xgb()\n\n\nCheck Listing 1 for more details.\n\n7.3.2 Fit\n\nCodetic = time.time()\nxgb_model = xgb.fit(xtrain, ytrain)\ntoc = time.time()\nelapsed_time= toc - tic\nprint(f\"Elapsed time: {elapsed_time} seconds\")\nprint(f\"Elapsed time: {elapsed_time / 60} minutes\")\n\n\n\n7.3.3 Pickle\n\nCodeconfig.dump_pkl(\n  path=os.path.expanduser(config.pkl_path) + \"xgb_model.pkl\",\n  model=xgb_model\n  )\n\n\n\nCodexgb = config.load_pkl(\n  path=os.path.expanduser(config.pkl_path) + \"xgb_model.pkl\"\n  )\nxgb_model = xgb.best_estimator_\n\n\n\n7.3.4 Classification\n\nCodeypred_xgb = xgb_model.predict(xtest)\ncr_xgb = classification_report(\n  ytest,\n  ypred_xgb,\n  # target_names=config.labels,\n  digits=4,\n  output_dict=True\n  )\ndf_cr_xgb = pd.DataFrame.from_dict(cr_xgb).reset_index()\n\n\n\nCodelibrary(reticulate)\ndf_cr &lt;- py$df_cr_xgb %&gt;% dplyr::rename(names = index)\ncols &lt;- df_cr %&gt;% colnames()\ndf_cr %&gt;% \n  pivot_longer(\n    cols = -names,\n    names_to = \"metrics\",\n    values_to = \"values\"\n  ) %&gt;% \n  pivot_wider(\n    names_from = names,\n    values_from = values\n  ) %&gt;% \n  gt() %&gt;%\n  tab_header(\n    title = \"Confusion Matrix\",\n    subtitle = \"Threshold optimization favoring recall\"\n  ) %&gt;% \n  fmt_number(\n    columns = c(\"precision\", \"recall\", \"f1-score\", \"support\"),\n    decimals = 2,\n    drop_trailing_zeros = TRUE,\n    drop_trailing_dec_mark = FALSE\n  ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(\"precision\", \"recall\", \"f1-score\", \"support\")\n  ) %&gt;% \n  cols_align(\n    align = \"left\",\n    columns = metrics\n  ) %&gt;% \n  cols_label(\n    metrics = \"Metrics\",\n    precision = \"Precision\",\n    recall = \"Recall\",\n    `f1-score` = \"F1-Score\",\n    support = \"Support\"\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n    )\n\n\nTable 13: Classification report XGB\n\n\n\n\n\n\n\nConfusion Matrix\n\n\nThreshold optimization favoring recall\n\n\nMetrics\nPrecision\nRecall\nF1-Score\nSupport\n\n\n\n\n0\n0.99\n0.82\n0.9\n41,986.\n\n\n1\n0.39\n0.95\n0.55\n5,031.\n\n\naccuracy\n0.83\n0.83\n0.83\n0.83\n\n\nmacro avg\n0.69\n0.89\n0.72\n47,017.\n\n\nweighted avg\n0.93\n0.83\n0.86\n47,017."
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html",
+    "href": "posts/spam_detection/spam_detection.html",
+    "title": "Spam Detection",
+    "section": "",
+    "text": "Tasks:\n\nTrain a model to classify spam.\nFind the main topic in the spam emails.\nCalculate semantic distance of the spam topics.\nExtract the ORG from ham emilas."
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#r-libraries",
+    "href": "posts/spam_detection/spam_detection.html#r-libraries",
+    "title": "Spam Detection",
+    "section": "\n2.1 R libraries",
+    "text": "2.1 R libraries\n\nCodelibrary(tidyverse, verbose = FALSE)\nlibrary(ggplot2)\nlibrary(gt)\nlibrary(reticulate)\nlibrary(plotly)\n\n# renv::use_python(\"/Users/simonebrazzi/venv/blog/bin/python3\")"
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#python-packages",
+    "href": "posts/spam_detection/spam_detection.html#python-packages",
+    "title": "Spam Detection",
+    "section": "\n2.2 Python packages",
+    "text": "2.2 Python packages\n\nCodeimport pandas as pd\nimport numpy as np\nimport spacy\nimport nltk\nimport string\nimport gensim\nimport gensim.corpora as corpora\nimport gensim.downloader\n\nfrom nltk.corpus import stopwords\nfrom gensim.models import Word2Vec\nfrom scipy.spatial.distance import cosine\nfrom sklearn.metrics.pairwise import cosine_similarity\n\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.neural_network import MLPClassifier\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import classification_report\n\nfrom collections import Counter\n# glove vector\nglove_vector = gensim.downloader.load(\"glove-wiki-gigaword-300\")\n# nltk stopwords\nnltk.download('stopwords')\nstop_words = stopwords.words('english')"
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#config-class",
+    "href": "posts/spam_detection/spam_detection.html#config-class",
+    "title": "Spam Detection",
+    "section": "\n2.3 Config class",
+    "text": "2.3 Config class\n\nCodeclass Config():\n  def __init__(self):\n    \n    \"\"\"\n    CLass initialize function.\n    \"\"\"\n    \n    self.path=\"/Users/simonebrazzi/R/blog/posts/spam_detection/spam_dataset.csv\"\n    self.random_state=42\n  \n  def get_lemmas(self, doc):\n    \n    \"\"\"\n    List comprehension to get lemmas. It performs:\\n\n      1. Lowercase.\\n\n      2. Stop words removal\\n.\n      3. Whitespaces removal.\\n\n      4. Remove the word 'subject'.\\n\n      5. Digits removal.\\n\n      6. Get only words with length &gt;= 5.\\n\n    \"\"\"\n    \n    lemmas = [\n      [\n        t.lemma_ for t in d \n        if (text := t.text.lower()) not in punctuation \n        and text not in stop_words \n        and not t.is_space \n        and text != \"subject\" \n        and not t.is_digit\n        and len(text) &gt;=5\n        ]\n        for d in doc\n        ]\n    return lemmas\n  \n  def get_entities(self, doc):\n    \n    \"\"\"\n    List comprehension to get the lemmas which have entity type 'ORG'.\n    \"\"\"\n    \n    entities = [\n    [\n      t.lemma_ for t in d \n      if (text := t.text.lower()) not in punctuation \n      and text not in stop_words \n      and not t.is_space \n      and text != \"subject\" \n      and not t.is_digit\n      and len(text) &gt;=5\n      and t.ent_type_ == \"ORG\"\n      ]\n      for d in doc\n      ]\n    return entities\n  \n  def get_sklearn_mlp(self, activation, solver, max_iter, hidden_layer_sizes, tol):\n    \n    \"\"\"\n    It initialize the sklearn MLPClassifier.\n    \"\"\"\n    \n    mlp = mlp = MLPClassifier(\n      activation=activation,\n      solver=solver,\n      max_iter=max_iter,\n      hidden_layer_sizes=hidden_layer_sizes,\n      tol=tol,\n      verbose=True\n      )\n    return mlp\n  \n  def get_lda(self, corpus, id2word, num_topics, passes, workers, random_state):\n    \n    \"\"\"\n    Initialize LDA.\n    \"\"\"\n    \n    lda = gensim.models.LdaMulticore(\n      corpus=corpus,\n      id2word=id2word,\n      num_topics=num_topics,\n      passes=passes,\n      workers=workers,\n      random_state=self.random_state\n      )\n    return lda\n  \nconfig = Config()"
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#eda",
+    "href": "posts/spam_detection/spam_detection.html#eda",
+    "title": "Spam Detection",
+    "section": "\n3.1 EDA",
+    "text": "3.1 EDA\nFirst things first, Exploratory Data Analysis. Considering we are going to perform a classification, is interesting to check if our dataset is unbalanced.\n\n\nTable 1: Absolute and relative frequencies\n\nCodedf_g &lt;- df %&gt;% \n  summarise(\n    freq_abs = n(),\n    freq_rel = n() / nrow(df),\n    .by = label\n    )\n\ndf_g %&gt;% \n  gt() %&gt;% \n  fmt_auto() %&gt;% \n  cols_width(\n    label ~ pct(20),\n    freq_abs ~ pct(35),\n    freq_rel ~ pct(35)\n    ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(freq_abs, freq_rel)\n  ) %&gt;% \n  tab_header(\n    title = \"Label frequency\",\n    subtitle = \"Absolute and relative frequencies\"\n  ) %&gt;% \n  cols_label(\n    label = \"Label\",\n    freq_abs = \"Absolute frequency\",\n    freq_rel = \"Relative frequency\"\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n    )\n\n\n\n\nIt is useful also a visual cue.\n\nCodeg &lt;- ggplot(df_g) +\n  geom_col(aes(x = freq_abs, y = label, fill = label)) +\n  scale_fill_brewer(palette = \"Set1\", direction = -1) +\n  theme_minimal() +\n  ggtitle(\"Absolute frequency barchart\") +\n  xlab(\"Absolute frequency\") +\n  ylab(\"Label\") +\n  labs(fill = \"Label\")\nggplotly(g)\n\n\nThe dataset is not balanced, so it could be relevant when training the model for classification. Depending on the model performance, we know what we could investigate first."
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#classification",
+    "href": "posts/spam_detection/spam_detection.html#classification",
+    "title": "Spam Detection",
+    "section": "\n5.1 Classification",
+    "text": "5.1 Classification\nThe text is already preprocessed as list of lemmas. For the classification task, it is necessary to convert it as a string.\n\nCodedf[\"feature\"] = df.lemmas.apply(lambda x : \" \".join(x))\n\n\n\n5.1.1 Features\nAs said, the machine does not understand human readable text. It has to be transformed. The best approach is to vectorize it with TfidfVectorizer(). It is a tool for converting text into a matrix of TF-IDF features. The TermFrequency-InverseDocumentFrequency is a statistical method. It is a measure of importance of a word in a document, part of a corpus, adjusted for the frequency in the corpus. The model vectorize a word by multiplying the word Term Frequency\n\\[\nTF = \\frac{word\\ frequency\\ in\\ document}{total\\ words\\ in\\ document}\n\\] with the Inverse Document Frequency\n\\[\nIDF = log(\\frac{total\\ number\\ documents}{documents\\ containing\\ the\\ word})\n\\] The final result is\n\\[\nTF-IDF = TF * IDF\n\\]\nThe resulting score represents the importance of a word. It dependes on the word frequency both in a specific document and in the corpus.\n\n\n\n\n\n\nNote\n\n\n\nAn example can be useful. If a word t appears 20 times in a document of 100 words, we have\n\\[\nTF = \\frac{20}{100}=0.2\n\\]\nIf there are 10.000 documents in the corpus and 100 documents contains the term t\n\\[\nIDF = log(\\frac{10000}{100})=2\n\\]\nThis means the score is\n\\[\nTF-IDF=0.2*2=0.4\n\\]\n\n\n\nCodevectorizer = TfidfVectorizer()\nX = vectorizer.fit_transform(df['feature'])\ny = df.label"
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#split",
+    "href": "posts/spam_detection/spam_detection.html#split",
+    "title": "Spam Detection",
+    "section": "\n5.2 Split",
+    "text": "5.2 Split\nNot much to say about this: a best practice which let evaluate the performance of our model on new data.\n\nCodextrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=.2, random_state=42)\n\n\n\n5.2.1 Model\nThe model is the MLPClassifier(). It is a Multi Perceptron Layer Classifier.\n\n\nMLPClassifier\n\nIt is an Artificial Neural Network used for classification. It consists of multiple layers of nodes, called perceptrons. For further reading, see the documentation.\n\nCodemlp = config.get_sklearn_mlp(\n  activation=\"logistic\",\n  solver=\"adam\",\n  max_iter=100,\n  hidden_layer_sizes=(100,),\n  tol=.005\n  )\n\n\n\n5.2.2 Fit\n\nCodemlp.fit(xtrain, ytrain)\n\n\n\n5.2.3 Predict\n\nCodeypred = mlp.predict(xtest)\n\n\n\n5.2.4 Classification report\nConsidering we are doing a classificatoin, one method to evaluate the performance is the classification report. It summarize the performance of the model comparing true and predicted labels, showing not only the metrics (precision, recall and F1-score) but also the support.\n\nCodecr = classification_report(\n  ytest,\n  ypred,\n  target_names=[\"spam\", \"ham\"],\n  digits=4,\n  output_dict=True\n  )\ndf_cr = pd.DataFrame.from_dict(cr).reset_index()\n\n\n\nCodelibrary(reticulate)\n\ndf_cr &lt;- py$df_cr %&gt;% dplyr::rename(names = index)\ncols &lt;- df_cr %&gt;% colnames()\ndf_cr %&gt;% \n  pivot_longer(\n    cols = -names,\n    names_to = \"metrics\",\n    values_to = \"values\"\n  ) %&gt;% \n  pivot_wider(\n    names_from = names,\n    values_from = values\n  ) %&gt;% \n  gt() %&gt;%\n  tab_header(\n    title = \"Confusion Matrix\",\n    subtitle = \"Sklearn MLPClassifier\"\n  ) %&gt;% \n  fmt_number(\n    columns = c(\"precision\", \"recall\", \"f1-score\", \"support\"),\n    decimals = 2,\n    drop_trailing_zeros = TRUE,\n    drop_trailing_dec_mark = FALSE\n  ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(\"precision\", \"recall\", \"f1-score\", \"support\")\n  ) %&gt;% \n  cols_align(\n    align = \"left\",\n    columns = metrics\n  ) %&gt;% \n  cols_label(\n    metrics = \"Metrics\",\n    precision = \"Precision\",\n    recall = \"Recall\",\n    `f1-score` = \"F1-Score\",\n    support = \"Support\"\n  )\n\n\nEven if the model is not fitted for an unbalanced dataset, it is not affecting the performance. Precision and Recall are high, so much that is could seems to be overfitted."
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#topic-modeling-for-spam-content",
+    "href": "posts/spam_detection/spam_detection.html#topic-modeling-for-spam-content",
+    "title": "Spam Detection",
+    "section": "\n5.3 Topic Modeling for spam content",
+    "text": "5.3 Topic Modeling for spam content\nTopic modeling in nlp can count on the Latent Dirilicht Model. It is a generative model used to get the topics which occur in a set of documents.\nThe LDA model has:\n\nInput: a corpus of text documents, preprocessed as tokenized and cleaned words. We have this in the lemmas column.\nOutput: a distribution of topics for each document and one of words for each topic.\n\nFor further reading, you can find the paper in the Table of Contents or at this link.\n\n5.3.1 Dataset\nFilter data to have a spam dataframe and create a variable with the lemmas column to work with.\n\nCodespam = df[df.label == \"spam\"]\nx = spam.lemmas\n\n\n\n5.3.2 Create corpus\nLDA algortihm needs the corpus as a bag of word.\n\nCodeid2word = corpora.Dictionary(x)\ncorpus = [id2word.doc2bow(t) for t in x]\n\n\n\n5.3.3 Model\nThe model will return a user defined number of topics. For each of it, it will return a user defined number of words ad the probability of each of them.\n\nCodelda = config.get_lda(\n  corpus=corpus,\n  id2word=id2word,\n  num_topics=10,\n  passes=10, # number of times the algorithm see the corpus\n  workers=4, # parellalize\n  random_state=42\n  )\ntopic_words = lda.show_topics(num_topics=10, num_words=5, formatted=False)\n\n# Iterate over topic_words to extract the data\ndata = []\ndata = [\n    (topic, w, p)\n    for topic, words in topic_words\n    for w, p in words\n    ]\ntopics_df = pd.DataFrame(data, columns=['topic', 'word', 'proba'])\n\n\n\n\nTable 2: Topics id, words and probabilities\n\nCodepy$topics_df %&gt;% \n  gt() %&gt;% \n  tab_header(\n    title = \"Words and probabilities by topics\"\n  ) %&gt;% \n  fmt_auto() %&gt;% \n  cols_width(\n    topic ~ pct(33),\n    word ~ pct(33),\n    proba ~ pct(33)\n    ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(topic, word, proba)\n  ) %&gt;% \n  cols_label(\n    topic = \"Topic\",\n    word = \"Word\",\n    proba = \"Probability\"\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n  )"
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#semantic-distance-between-topics",
+    "href": "posts/spam_detection/spam_detection.html#semantic-distance-between-topics",
+    "title": "Spam Detection",
+    "section": "\n5.4 Semantic distance between topics",
+    "text": "5.4 Semantic distance between topics\nThe semantic distance requires a documents made of strings. Using a dict, we can extract the topics and the words. The dict has the topics as keys and the words as a list of words. The documents can be created using the .join().\n\nCodetopics_dict = {}\nfor topics, words in topic_words:\n  topics_dict[topics] = [w[0] for w in words]\n\ndocuments = [\" \".join(words) for words in topics_dict.values()]\n\n\n\nCodevectorizer = TfidfVectorizer()\ntfidf_matrix = vectorizer.fit_transform(documents)\ncosine_sim_matrix = cosine_similarity(tfidf_matrix, dense_output=True)\ntopics = list(topics_dict.keys())\ncosine_sim_df = pd.DataFrame(cosine_sim_matrix, index=topics, columns=topics)\n\n\n\n\nTable 3: Cosine similarity matrix\n\nCodepy$cosine_sim_df %&gt;% \n  gt() %&gt;% \n  fmt_auto() %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(`0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`)\n  ) %&gt;% \n  cols_label(\n    `0` = \"Topic 0\",\n    `1` = \"Topic 1\",\n    `2` = \"Topic 2\",\n    `3` = \"Topic 3\",\n    `4` = \"Topic 4\",\n    `5` = \"Topic 5\",\n    `6` = \"Topic 6\",\n    `7` = \"Topic 7\",\n    `8` = \"Topic 8\",\n    `9` = \"Topic 9\",\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n    )"
+  },
+  {
+    "objectID": "posts/spam_detection/spam_detection.html#organization-of-ham-mails",
+    "href": "posts/spam_detection/spam_detection.html#organization-of-ham-mails",
+    "title": "Spam Detection",
+    "section": "\n5.5 Organization of “HAM” mails",
+    "text": "5.5 Organization of “HAM” mails\n\n5.5.1 Create “HAM” df\n\n5.5.2 Get ham lemmas which have ORG entity\n\nCodeham = df[df.label == \"ham\"]\nx = ham.entities\n\n\n\nCodefrom collections import Counter\n\n# Flatten the list of lists and create a Counter object\nd = Counter([i for e in x for i in e])\n\nfreq_df = pd.DataFrame(d.items(), columns=[\"word\", \"freq\"])\n\n\n\nCodelibrary(\"wordcloud\")\nlibrary(\"RColorBrewer\")\n\nset.seed(42)\nword_freqs_df &lt;- py$freq_df\n\nwordcloud(\n  words = word_freqs_df$word,\n  freq = word_freqs_df$freq,\n  min.freq = 1,\n  max.words = 100, # nrow(word_freqs_df),\n  random.order = FALSE,\n  rot.per = .3,\n  colors = brewer.pal(n = 8, name = \"Dark2\")\n  )\n\n\n\n\nTable 4: Top 10 words by frequency\n\nCodeword_freqs_df %&gt;% \n  arrange(desc(freq)) %&gt;% \n  head(10) %&gt;% \n  gt() %&gt;%                                        \n  tab_header(\n    title = \"Top 10 ham words \",\n    subtitle = \"by frequency\"\n  ) %&gt;% \n  fmt_auto() %&gt;% \n  cols_width(\n    word ~ pct(50),\n    freq ~ pct(50)\n    ) %&gt;% \n  cols_align(\n    align = \"center\",\n    columns = c(word, freq)\n  ) %&gt;% \n  cols_label(\n    word = \"Word\",\n    freq = \"Frequency\"\n  ) %&gt;% \n  tab_options(\n    table.width = pct(100)\n  )"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Simone Brazzi",
+    "section": "",
+    "text": "I am a (data) nerd, with lot of passion and some mistake along the way. Data analyst by day, aspiring data wizard by night! I love using data to tell stories and drive business decisions. But I’m not content with stopping there. My passion for data and desire to expand my skill set has led me on a quest to become a data scientist. I’m a fearless problem solver with an insatiable curiosity, and I’m always seeking new challenges and opportunities to learn and grow. Let’s make some magic with data! When I don’t stare to lines of code or spreadsheet, I like to read and play video game or spend quality time with my dog."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#table-join",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#table-join",
+    "title": "Bank’s Data Analysis",
+    "section": "\n2.1 Table Join",
+    "text": "2.1 Table Join\nTo construct the final table, it will be necessary to perform a series of joins between the tables available in the database."
+  },
+  {
+    "objectID": "posts/bank_data_analysis/bank_data_analysis.html#calculation-of-indicators",
+    "href": "posts/bank_data_analysis/bank_data_analysis.html#calculation-of-indicators",
+    "title": "Bank’s Data Analysis",
+    "section": "\n2.2 Calculation of Indicators",
+    "text": "2.2 Calculation of Indicators\nBehavioural indicators will be calculated using aggregation operations (SUM, COUNT) to obtain the required totals."
   }
 ]

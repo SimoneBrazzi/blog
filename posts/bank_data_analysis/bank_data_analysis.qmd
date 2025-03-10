@@ -3,14 +3,14 @@ title: "Bank's Data Analysis"
 execute:
   eval: false
   enabled: true
-  freeze: false
-  cache: false
+  freeze: true
+  cache: true
   warning: false
 image: "db.png"
 description: "A SQL approach to data analysis"
 author: "Simone Brazzi"
 date: "2025-02-10"
-draft: true
+draft: false
 categories:
   - code
   - SQL
@@ -91,7 +91,9 @@ To construct the final table, it will be necessary to perform a series of joins 
 
 Behavioural indicators will be calculated using aggregation operations (SUM, COUNT) to obtain the required totals.
 
-# Import
+# Code
+
+## Import
 
 ```{r}
 library(tidyverse)
@@ -101,240 +103,57 @@ library(duckdb)
 library(RMariaDB)
 ```
 
-# Create db connection
+## Create db connection
 
 ```{r}
 con <- dbConnect(RMariaDB::MariaDB(),
-                 user = "simonebrazzi",
-                 password = "MVAgustaF4",
+                 user = "username",
+                 password = "password",
                  host = "localhost",
-                 dbname = "banca")
+                 dbname = "dbname")
 dbListTables(con)
+```
 
-# sql_script <- readLines("~/R/blog/posts/bank_data_analysis/banca.sql")
-# dbExecute(con, paste(sql_script, collapse = "\n"))
+## Query
 
-dbExecute(
+```{r}
+dbGetQuery(
   con,
   "
-  CREATE TEMPORARY TABLE IF NOT EXISTS banca (
+  CREATE TEMPORARY TABLE IF NOT EXISTS features (
   SELECT 
-    cliente.id_cliente, cliente.nome, cliente.cognome, cliente.data_nascita,
-    tipo_conto.id_tipo_conto, tipo_conto.desc_tipo_conto,
-    transazioni.data, transazioni.importo,
-    conto.id_conto,
-    tipo_transazione.id_tipo_transazione, tipo_transazione.desc_tipo_trans, tipo_transazione.segno
+    cliente.id_cliente,
+    TIMESTAMPDIFF(YEAR, cliente.data_nascita, CURRENT_DATE()) AS eta,
+    COUNT(CASE WHEN tipo_transazione.segno = '-' THEN 1 ELSE 0 END) AS n_transazioni_uscita,
+    COUNT(CASE WHEN tipo_transazione.segno = '+' THEN 1 ELSE 0 END) AS n_transazioni_entrata,
+    SUM(CASE WHEN tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita,
+    SUM(CASE WHEN tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata,
+    COUNT(DISTINCT conto.id_conto) AS n_conti,
+    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' THEN 1 ELSE 0 END) AS n_conto_privati,
+    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' THEN 1 ELSE 0 END) AS n_conto_base,
+    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' THEN 1 ELSE 0 END) AS n_conto_business,
+    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' THEN 1 ELSE 0 END) AS n_conto_famiglie,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_privati,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_base,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_business,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_famiglie,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_privati,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_base,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_business,
+    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_famiglie
   FROM cliente
   LEFT JOIN conto ON cliente.id_cliente = conto.id_cliente
   LEFT JOIN tipo_conto ON conto.id_tipo_conto = tipo_conto.id_tipo_conto
   LEFT JOIN transazioni ON conto.id_conto = transazioni.id_conto
-  LEFT JOIN tipo_transazione ON transazioni.id_tipo_trans = tipo_transazione.id_tipo_transazione);
-  "
-)
-
-
-
-dbDisconnect(con)
-```
-
-```{r}
-con <- dbConnect(duckdb(), dbdir = "~/R/blog/posts/bank_data_analysis/bank.duckdb", read_only = TRUE)
-```
-
-## List tables
-
-```{r}
-dbListTables(con)
-```
-
-## Create join table
-
-```{r}
-#| eval: false
-
-dbExecute(
-  con,
-  "
-  CREATE TABLE IF NOT EXISTS bank AS
-    SELECT
-      a.id_account, a.id_customer, a.id_account_type,
-      at.desc_account_type,
-      c.first_name, c.last_name, c.birthday,
-      t.date AS date_transaction, t.id_transaction_type, t.amount AS amount_transaction,
-      tt.desc_transaction_type, tt.sign AS sign_transaction
-    FROM account AS a
-    LEFT JOIN account_type AS at
-    ON a.id_account_type = at.id_account_type
-    LEFT JOIN customers AS c
-    ON a.id_customer = c.id_customer
-    LEFT JOIN transactions AS t
-    ON a.id_account = t.id_account
-    LEFT JOIN transaction_type AS tt
-    ON t.id_transaction_type = tt.id_transaction_type
-    ORDER BY a.id_customer;
+  LEFT JOIN tipo_transazione ON transazioni.id_tipo_trans = tipo_transazione.id_tipo_transazione
+  GROUP BY cliente.id_cliente
+  ORDER BY cliente.id_cliente);
   "
 )
 ```
 
-## Basic indicators
+## Consideration
 
--   Age of customer (from customer table)
+To better interact with the database, go to the [Shiny dashboard](https://simonebrazzi-sql-query.share.connect.posit.cloud/) or click on the link at the top of this page or in the table of content.
 
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT DISTINCT(id_customer), DATE_DIFF('year', birthday, CURRENT_DATE) AS age
-  FROM bank
-  ORDER BY id_customer
-  "
-)
-```
 
-## Transaction indicators
-
--   Number of outgoing transactions on all accounts.
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT id_account, sign_transaction, COUNT(*) AS n_outgoing
-  FROM final
-  GROUP BY id_account, sign_transaction
-  HAVING sign_transaction = '-'
-  ORDER BY sign_transaction, id_account
-  "
-)
-```
-
--   Number of incoming transactions on all accounts.
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT id_account, sign_transaction, COUNT(*) AS n_outgoing
-  FROM final
-  GROUP BY id_account, sign_transaction
-  HAVING sign_transaction = '+'
-  ORDER BY sign_transaction, id_account
-  "
-)
-```
-
--   Total amount transacted out on all accounts.
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT sign_transaction, SUM(amount_transaction) AS total
-  FROM final
-  GROUP BY sign_transaction
-  HAVING sign_transaction = '-'
-  "
-)
-```
-
--   Total amount transacted incoming on all accounts.
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT sign_transaction, SUM(amount_transaction) AS total
-  FROM final
-  GROUP BY sign_transaction
-  HAVING sign_transaction = '+'
-  "
-)
-```
-
-## Account Indicators
-
--   Total number of accounts held.
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT id_customer, COUNT(id_account) AS n_account
-  FROM final
-  GROUP BY id_customer
-  "
-  )
-```
-
--   Number of accounts held by type (one indicator for each type of account).
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT desc_account_type, COUNT(desc_account_type) AS n_desc_account_type
-  FROM final
-  GROUP BY desc_account_type
-  "
-)
-```
-
-## Transaction indicators by account type
-
--   Number of outgoing transactions by account type (one indicator per account type).
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT desc_account_type, COUNT(*) AS n_outgoing
-  FROM final
-  WHERE sign_transaction == '-'
-  GROUP BY desc_account_type
-  "
-)
-```
-
--   Number of incoming transactions by account type (one indicator per account type).
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT desc_account_type, COUNT(*) AS n_outgoing
-  FROM final
-  WHERE sign_transaction == '+'
-  GROUP BY desc_account_type
-  "
-)
-```
-
--   Outgoing transacted amount by account type (one indicator per account type).
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT desc_account_type, sign_transaction, SUM(amount_transaction) AS total_outgoing
-  FROM final
-  GROUP BY desc_account_type, sign_transaction
-  HAVING sign_transaction = '-'
-  ORDER BY sign_transaction
-  "
-)
-```
-
--   Amount transacted inbound by account type (one indicator per account type).
-
-```{r}
-dbGetQuery(
-  con,
-  "
-  SELECT desc_account_type, sign_transaction, SUM(amount_transaction) AS total_outgoing
-  FROM final
-  GROUP BY desc_account_type, sign_transaction
-  HAVING sign_transaction = '+'
-  ORDER BY sign_transaction
-  "
-)
-```

@@ -214,8 +214,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#calculation-of-indicators" id="toc-calculation-of-indicators" class="nav-link" data-scroll-target="#calculation-of-indicators"><span class="header-section-number">2.2</span> Calculation of Indicators</a></li>
   </ul>
 </li>
-  <li><a href="#import" id="toc-import" class="nav-link" data-scroll-target="#import"><span class="header-section-number">3</span> Import</a></li>
-  <li><a href="#create-db-connection" id="toc-create-db-connection" class="nav-link" data-scroll-target="#create-db-connection"><span class="header-section-number">4</span> Create db connection</a></li>
+  <li>
+<a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code"><span class="header-section-number">3</span> Code</a>
+  <ul class="collapse">
+<li><a href="#import" id="toc-import" class="nav-link" data-scroll-target="#import"><span class="header-section-number">3.1</span> Import</a></li>
+  <li><a href="#create-db-connection" id="toc-create-db-connection" class="nav-link" data-scroll-target="#create-db-connection"><span class="header-section-number">3.2</span> Create db connection</a></li>
+  <li><a href="#query" id="toc-query" class="nav-link" data-scroll-target="#query"><span class="header-section-number">3.3</span> Query</a></li>
+  <li><a href="#consideration" id="toc-consideration" class="nav-link" data-scroll-target="#consideration"><span class="header-section-number">3.4</span> Consideration</a></li>
+  </ul>
+</li>
   </ul><div class="quarto-other-links"><h2>Other Links</h2><ul><li><a href="https://simonebrazzi-sql-query.share.connect.posit.cloud/"><i class="bi bi-link-45deg"></i>Shiny Dashboard</a></li></ul></div></nav>
     </div>
 <!-- main -->
@@ -275,8 +282,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section><section id="calculation-of-indicators" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="calculation-of-indicators">
 <span class="header-section-number">2.2</span> Calculation of Indicators</h2>
 <p>Behavioural indicators will be calculated using aggregation operations (SUM, COUNT) to obtain the required totals.</p>
-</section></section><section id="import" class="level1" data-number="3"><h1 data-number="3">
-<span class="header-section-number">3</span> Import</h1>
+</section></section><section id="code" class="level1" data-number="3"><h1 data-number="3">
+<span class="header-section-number">3</span> Code</h1>
+<section id="import" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="import">
+<span class="header-section-number">3.1</span> Import</h2>
 <div class="cell">
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(ggplot2)</span>
@@ -285,54 +294,61 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5"></a><span class="fu">library</span>(RMariaDB)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-</section><section id="create-db-connection" class="level1" data-number="4"><h1 data-number="4">
-<span class="header-section-number">4</span> Create db connection</h1>
+</section><section id="create-db-connection" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="create-db-connection">
+<span class="header-section-number">3.2</span> Create db connection</h2>
 <div class="cell">
 <details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RMariaDB<span class="sc">::</span><span class="fu">MariaDB</span>(),</span>
-<span id="cb2-2"><a href="#cb2-2"></a>                 <span class="at">user =</span> <span class="st">"simonebrazzi"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3"></a>                 <span class="at">password =</span> <span class="st">"MVAgustaF4"</span>,</span>
+<span id="cb2-2"><a href="#cb2-2"></a>                 <span class="at">user =</span> <span class="st">"username"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>                 <span class="at">password =</span> <span class="st">"password"</span>,</span>
 <span id="cb2-4"><a href="#cb2-4"></a>                 <span class="at">host =</span> <span class="st">"localhost"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5"></a>                 <span class="at">dbname =</span> <span class="st">"banca"</span>)</span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="fu">dbListTables</span>(con)</span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">dbGetQuery</span>(</span>
-<span id="cb2-9"><a href="#cb2-9"></a>  con,</span>
-<span id="cb2-10"><a href="#cb2-10"></a>  <span class="st">"</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="st">  CREATE TEMPORARY TABLE IF NOT EXISTS features (</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="st">  SELECT </span></span>
-<span id="cb2-13"><a href="#cb2-13"></a><span class="st">    cliente.id_cliente,</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="st">    TIMESTAMPDIFF(YEAR, cliente.data_nascita, CURRENT_DATE()) AS eta,</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="st">    COUNT(CASE WHEN tipo_transazione.segno = '-' THEN 1 ELSE 0 END) AS n_transazioni_uscita,</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="st">    COUNT(CASE WHEN tipo_transazione.segno = '+' THEN 1 ELSE 0 END) AS n_transazioni_entrata,</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="st">    SUM(CASE WHEN tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita,</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="st">    SUM(CASE WHEN tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata,</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="st">    COUNT(DISTINCT conto.id_conto) AS n_conti,</span></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' THEN 1 ELSE 0 END) AS n_conto_privati,</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' THEN 1 ELSE 0 END) AS n_conto_base,</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' THEN 1 ELSE 0 END) AS n_conto_business,</span></span>
-<span id="cb2-23"><a href="#cb2-23"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' THEN 1 ELSE 0 END) AS n_conto_famiglie,</span></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_privati,</span></span>
-<span id="cb2-25"><a href="#cb2-25"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_base,</span></span>
-<span id="cb2-26"><a href="#cb2-26"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_business,</span></span>
-<span id="cb2-27"><a href="#cb2-27"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_famiglie,</span></span>
-<span id="cb2-28"><a href="#cb2-28"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_privati,</span></span>
-<span id="cb2-29"><a href="#cb2-29"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_base,</span></span>
-<span id="cb2-30"><a href="#cb2-30"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_business,</span></span>
-<span id="cb2-31"><a href="#cb2-31"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_famiglie</span></span>
-<span id="cb2-32"><a href="#cb2-32"></a><span class="st">  FROM cliente</span></span>
-<span id="cb2-33"><a href="#cb2-33"></a><span class="st">  LEFT JOIN conto ON cliente.id_cliente = conto.id_cliente</span></span>
-<span id="cb2-34"><a href="#cb2-34"></a><span class="st">  LEFT JOIN tipo_conto ON conto.id_tipo_conto = tipo_conto.id_tipo_conto</span></span>
-<span id="cb2-35"><a href="#cb2-35"></a><span class="st">  LEFT JOIN transazioni ON conto.id_conto = transazioni.id_conto</span></span>
-<span id="cb2-36"><a href="#cb2-36"></a><span class="st">  LEFT JOIN tipo_transazione ON transazioni.id_tipo_trans = tipo_transazione.id_tipo_transazione</span></span>
-<span id="cb2-37"><a href="#cb2-37"></a><span class="st">  GROUP BY cliente.id_cliente</span></span>
-<span id="cb2-38"><a href="#cb2-38"></a><span class="st">  ORDER BY cliente.id_cliente);</span></span>
-<span id="cb2-39"><a href="#cb2-39"></a><span class="st">  "</span></span>
-<span id="cb2-40"><a href="#cb2-40"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5"></a>                 <span class="at">dbname =</span> <span class="st">"dbname"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="fu">dbListTables</span>(con)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section><section id="query" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="query">
+<span class="header-section-number">3.3</span> Query</h2>
+<div class="cell">
+<details open="" class="code-fold"><summary>Code</summary><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">dbGetQuery</span>(</span>
+<span id="cb3-2"><a href="#cb3-2"></a>  con,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="st">"</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="st">  CREATE TEMPORARY TABLE IF NOT EXISTS features (</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="st">  SELECT </span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="st">    cliente.id_cliente,</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="st">    TIMESTAMPDIFF(YEAR, cliente.data_nascita, CURRENT_DATE()) AS eta,</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">    COUNT(CASE WHEN tipo_transazione.segno = '-' THEN 1 ELSE 0 END) AS n_transazioni_uscita,</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="st">    COUNT(CASE WHEN tipo_transazione.segno = '+' THEN 1 ELSE 0 END) AS n_transazioni_entrata,</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="st">    SUM(CASE WHEN tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita,</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="st">    SUM(CASE WHEN tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata,</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="st">    COUNT(DISTINCT conto.id_conto) AS n_conti,</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' THEN 1 ELSE 0 END) AS n_conto_privati,</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' THEN 1 ELSE 0 END) AS n_conto_base,</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' THEN 1 ELSE 0 END) AS n_conto_business,</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="st">    COUNT(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' THEN 1 ELSE 0 END) AS n_conto_famiglie,</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_privati,</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_base,</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_business,</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' AND tipo_transazione.segno = '-' THEN transazioni.importo ELSE 0 END) AS tot_uscita_conto_famiglie,</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Privati' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_privati,</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Base' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_base,</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Business' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_business,</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="st">    SUM(CASE WHEN tipo_conto.desc_tipo_conto = 'Conto Famiglie' AND tipo_transazione.segno = '+' THEN transazioni.importo ELSE 0 END) AS tot_entrata_conto_famiglie</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="st">  FROM cliente</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="st">  LEFT JOIN conto ON cliente.id_cliente = conto.id_cliente</span></span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="st">  LEFT JOIN tipo_conto ON conto.id_tipo_conto = tipo_conto.id_tipo_conto</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="st">  LEFT JOIN transazioni ON conto.id_conto = transazioni.id_conto</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="st">  LEFT JOIN tipo_transazione ON transazioni.id_tipo_trans = tipo_transazione.id_tipo_transazione</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="st">  GROUP BY cliente.id_cliente</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="st">  ORDER BY cliente.id_cliente);</span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="st">  "</span></span>
+<span id="cb3-33"><a href="#cb3-33"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section><section id="consideration" class="level2" data-number="3.4"><h2 data-number="3.4" class="anchored" data-anchor-id="consideration">
+<span class="header-section-number">3.4</span> Consideration</h2>
+<p>To better interact with the database, go to the <a href="https://simonebrazzi-sql-query.share.connect.posit.cloud/">Shiny dashboard</a> or click on the link at the top of this page or in the table of content.</p>
 
 
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");

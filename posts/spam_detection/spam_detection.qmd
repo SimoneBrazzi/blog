@@ -47,7 +47,7 @@ Tasks:
 
 ## R libraries
 
-```{r}
+```{r, import_r}
 #| output: false
 
 library(tidyverse, verbose = FALSE)
@@ -56,12 +56,12 @@ library(gt)
 library(reticulate)
 library(plotly)
 
-# renv::use_python("/Users/simonebrazzi/venv/blog/bin/python3")
+Sys.setenv(RETICULATE_PYTHON = "~/R/blog/posts/spam_detection/.venv/bin/python")
 ```
 
 ## Python packages
 
-```{python}
+```{python, import_py}
 import pandas as pd
 import numpy as np
 import spacy
@@ -91,7 +91,7 @@ stop_words = stopwords.words('english')
 
 ## Config class
 
-```{python}
+```{python, config_py}
 class Config():
   def __init__(self):
     
@@ -186,13 +186,13 @@ config = Config()
 
 # Dataset
 
-```{python}
+```{python, read_data}
 df = pd.read_csv(config.path, index_col=0)
 ```
 
 To further perform analysis also in R, here we assign the df to a variable using `reticulate` library.
 
-```{r}
+```{r, py2r}
 library(reticulate)
 df <- py$df
 ```
@@ -201,7 +201,7 @@ df <- py$df
 
 First things first, Exploratory Data Analysis. Considering we are going to perform a classification, is interesting to check if our dataset is unbalanced.
 
-```{r}
+```{r, eda}
 #| label: tbl-eda
 #| tbl-cap: Absolute and relative frequencies
 df_g <- df %>% 
@@ -240,7 +240,7 @@ df_g %>%
 
 It is useful also a visual cue.
 
-```{r}
+```{r, barchart}
 #| label: fig-barchart
 #| fig-cap: "Absolute frequency barchart"
 g <- ggplot(df_g) +
@@ -277,7 +277,7 @@ Check this [link](https://spacy.io/models/en) for the documentation about this m
 
 I had chosen this model, even if it is the biggest, to get the full potential of it.
 
-```{python}
+```{python, en_core_web_lg}
 # load en_core_web_lg
 nlp = spacy.load("en_core_web_lg")
 doc = list(nlp.pipe(df.text, n_process=4))
@@ -297,7 +297,7 @@ To improve code performance, these are the most noticible points:
 -   **List comprehension**, which performs better then for loops and are much more readable in some context.
 -   The **walrus operator** `:=`. It is a syntax which lets assign variables in the middle of expressions. It avoids redundant calculations and improves readability.
 
-```{python}
+```{python, preprocessing}
 punctuation = set(string.punctuation)
 stop_words = set(stop_words)
 
@@ -315,7 +315,7 @@ df["entities"] = entities
 
 The text is already preprocessed as list of lemmas. For the classification task, it is necessary to convert it as a string.
 
-```{python}
+```{python, lemmas}
 df["feature"] = df.lemmas.apply(lambda x : " ".join(x))
 ```
 
@@ -337,7 +337,7 @@ $$
 
 The resulting **score** represents the importance of a word. It dependes on the word frequency both in a specific document and in the corpus.
 
-::: {.callout-note}
+::: callout-note
 An example can be useful. If a word t appears 20 times in a document of 100 words, we have
 
 $$
@@ -357,7 +357,7 @@ TF-IDF=0.2*2=0.4
 $$
 :::
 
-```{python}
+```{python, vecorizer}
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(df['feature'])
 y = df.label

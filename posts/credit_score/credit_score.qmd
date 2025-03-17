@@ -81,6 +81,8 @@ library(reticulate)
 library(gt)
 library(scales)
 library(shapr)
+
+Sys.setenv(RETICULATE_PYTHON = "~/R/blog/posts/credit_score/.venv/bin/python")
 ```
 
 ## Python

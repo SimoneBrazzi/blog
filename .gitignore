@@ -4,3 +4,6 @@
 .Ruserdata
 /.quarto/
 .Renviron
+./Users/simonebrazzi/R/blog/posts/toxic_comment_filter/.venv
+./Users/simonebrazzi/R/blog/posts/credit_score/.venv
+./Users/simonebrazzi/R/blog/posts/spam_detection/.venv

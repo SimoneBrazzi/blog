@@ -17,7 +17,6 @@ other-links:
 
 execute:
   freeze: true
-  cache: true
 
 engine: knitr
 

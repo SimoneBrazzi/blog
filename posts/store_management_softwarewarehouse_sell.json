@@ -1,0 +1,12 @@
+{
+    "Tofu": {
+        "quantity": 2,
+        "price_buy": 2.0,
+        "price_sell": 4.0
+    },
+    "Seitan": {
+        "quantity": 2,
+        "price_buy": 4.0,
+        "price_sell": 8.0
+    }
+}

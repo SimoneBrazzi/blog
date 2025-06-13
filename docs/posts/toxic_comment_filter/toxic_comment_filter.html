@@ -11384,886 +11384,885 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb48-17"><a href="#cb48-17"></a></span>
 <span id="cb48-18"><a href="#cb48-18"></a><span class="an">execute:</span></span>
 <span id="cb48-19"><a href="#cb48-19"></a><span class="co">  freeze: true</span></span>
-<span id="cb48-20"><a href="#cb48-20"></a><span class="co">  cache: true</span></span>
-<span id="cb48-21"><a href="#cb48-21"></a></span>
-<span id="cb48-22"><a href="#cb48-22"></a><span class="an">engine:</span><span class="co"> knitr</span></span>
-<span id="cb48-23"><a href="#cb48-23"></a></span>
-<span id="cb48-24"><a href="#cb48-24"></a><span class="an">toc:</span><span class="co"> true</span></span>
-<span id="cb48-25"><a href="#cb48-25"></a><span class="an">toc-title:</span><span class="co"> &quot;Table of Contents&quot;</span></span>
-<span id="cb48-26"><a href="#cb48-26"></a><span class="an">toc-depth:</span><span class="co"> 3</span></span>
-<span id="cb48-27"><a href="#cb48-27"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
-<span id="cb48-28"><a href="#cb48-28"></a><span class="an">number-depth:</span><span class="co"> 3</span></span>
-<span id="cb48-29"><a href="#cb48-29"></a><span class="an">embed-resources:</span><span class="co"> true</span></span>
-<span id="cb48-30"><a href="#cb48-30"></a><span class="an">anchor-sections:</span><span class="co"> true</span></span>
-<span id="cb48-31"><a href="#cb48-31"></a><span class="an">smooth-scroll:</span><span class="co"> true</span></span>
-<span id="cb48-32"><a href="#cb48-32"></a><span class="an">highlight-style:</span><span class="co"> monokai</span></span>
-<span id="cb48-33"><a href="#cb48-33"></a><span class="an">code-line-numbers:</span><span class="co"> true</span></span>
-<span id="cb48-34"><a href="#cb48-34"></a><span class="an">code-copy:</span><span class="co"> true</span></span>
-<span id="cb48-35"><a href="#cb48-35"></a><span class="an">code-tools:</span><span class="co"> true</span></span>
-<span id="cb48-36"><a href="#cb48-36"></a><span class="co">---</span></span>
-<span id="cb48-37"><a href="#cb48-37"></a></span>
-<span id="cb48-38"><a href="#cb48-38"></a><span class="fu"># Introduction</span></span>
-<span id="cb48-39"><a href="#cb48-39"></a></span>
-<span id="cb48-40"><a href="#cb48-40"></a>Build a model that can filter user comments based on the degree of language maliciousness:</span>
-<span id="cb48-41"><a href="#cb48-41"></a></span>
-<span id="cb48-42"><a href="#cb48-42"></a><span class="ss">-   </span>Preprocess the text by eliminating the set of tokens that do not make significant contribution at the semantic level.</span>
-<span id="cb48-43"><a href="#cb48-43"></a><span class="ss">-   </span>Transform the text corpus into sequences.</span>
-<span id="cb48-44"><a href="#cb48-44"></a><span class="ss">-   </span>Build a Deep Learning model including recurrent layers for a multilabel classification task.</span>
-<span id="cb48-45"><a href="#cb48-45"></a><span class="ss">-   </span>At prediction time, the model should return a vector containing a 1 or a 0 at each label in the dataset (toxic, severe_toxic, obscene, threat, insult, identity_hate). In this way, a non-harmful comment will be classified by a vector of only 0s <span class="sc">\[</span>0,0,0,0,0<span class="sc">\]</span>. In contrast, a dangerous comment will exhibit at least a 1 among the 6 labels.</span>
-<span id="cb48-46"><a href="#cb48-46"></a></span>
-<span id="cb48-47"><a href="#cb48-47"></a><span class="fu"># Setup</span></span>
-<span id="cb48-48"><a href="#cb48-48"></a></span>
-<span id="cb48-49"><a href="#cb48-49"></a>Leveraging Quarto and RStudio, I will setup an R and Python enviroment.</span>
-<span id="cb48-50"><a href="#cb48-50"></a></span>
-<span id="cb48-51"><a href="#cb48-51"></a><span class="fu">## Import R libraries</span></span>
-<span id="cb48-52"><a href="#cb48-52"></a></span>
-<span id="cb48-53"><a href="#cb48-53"></a>Import R libraries. These will be used for both the rendering of the document and data analysis. The reason is I prefer <span class="in">`ggplot2`</span> over <span class="in">`matplotlib`</span>. I will also use colorblind safe palettes.</span>
-<span id="cb48-54"><a href="#cb48-54"></a></span>
-<span id="cb48-55"><a href="#cb48-55"></a><span class="in">```{r, import_r}</span></span>
-<span id="cb48-56"><a href="#cb48-56"></a><span class="in">#| warning: FALSE</span></span>
+<span id="cb48-20"><a href="#cb48-20"></a></span>
+<span id="cb48-21"><a href="#cb48-21"></a><span class="an">engine:</span><span class="co"> knitr</span></span>
+<span id="cb48-22"><a href="#cb48-22"></a></span>
+<span id="cb48-23"><a href="#cb48-23"></a><span class="an">toc:</span><span class="co"> true</span></span>
+<span id="cb48-24"><a href="#cb48-24"></a><span class="an">toc-title:</span><span class="co"> &quot;Table of Contents&quot;</span></span>
+<span id="cb48-25"><a href="#cb48-25"></a><span class="an">toc-depth:</span><span class="co"> 3</span></span>
+<span id="cb48-26"><a href="#cb48-26"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
+<span id="cb48-27"><a href="#cb48-27"></a><span class="an">number-depth:</span><span class="co"> 3</span></span>
+<span id="cb48-28"><a href="#cb48-28"></a><span class="an">embed-resources:</span><span class="co"> true</span></span>
+<span id="cb48-29"><a href="#cb48-29"></a><span class="an">anchor-sections:</span><span class="co"> true</span></span>
+<span id="cb48-30"><a href="#cb48-30"></a><span class="an">smooth-scroll:</span><span class="co"> true</span></span>
+<span id="cb48-31"><a href="#cb48-31"></a><span class="an">highlight-style:</span><span class="co"> monokai</span></span>
+<span id="cb48-32"><a href="#cb48-32"></a><span class="an">code-line-numbers:</span><span class="co"> true</span></span>
+<span id="cb48-33"><a href="#cb48-33"></a><span class="an">code-copy:</span><span class="co"> true</span></span>
+<span id="cb48-34"><a href="#cb48-34"></a><span class="an">code-tools:</span><span class="co"> true</span></span>
+<span id="cb48-35"><a href="#cb48-35"></a><span class="co">---</span></span>
+<span id="cb48-36"><a href="#cb48-36"></a></span>
+<span id="cb48-37"><a href="#cb48-37"></a><span class="fu"># Introduction</span></span>
+<span id="cb48-38"><a href="#cb48-38"></a></span>
+<span id="cb48-39"><a href="#cb48-39"></a>Build a model that can filter user comments based on the degree of language maliciousness:</span>
+<span id="cb48-40"><a href="#cb48-40"></a></span>
+<span id="cb48-41"><a href="#cb48-41"></a><span class="ss">-   </span>Preprocess the text by eliminating the set of tokens that do not make significant contribution at the semantic level.</span>
+<span id="cb48-42"><a href="#cb48-42"></a><span class="ss">-   </span>Transform the text corpus into sequences.</span>
+<span id="cb48-43"><a href="#cb48-43"></a><span class="ss">-   </span>Build a Deep Learning model including recurrent layers for a multilabel classification task.</span>
+<span id="cb48-44"><a href="#cb48-44"></a><span class="ss">-   </span>At prediction time, the model should return a vector containing a 1 or a 0 at each label in the dataset (toxic, severe_toxic, obscene, threat, insult, identity_hate). In this way, a non-harmful comment will be classified by a vector of only 0s <span class="sc">\[</span>0,0,0,0,0<span class="sc">\]</span>. In contrast, a dangerous comment will exhibit at least a 1 among the 6 labels.</span>
+<span id="cb48-45"><a href="#cb48-45"></a></span>
+<span id="cb48-46"><a href="#cb48-46"></a><span class="fu"># Setup</span></span>
+<span id="cb48-47"><a href="#cb48-47"></a></span>
+<span id="cb48-48"><a href="#cb48-48"></a>Leveraging Quarto and RStudio, I will setup an R and Python enviroment.</span>
+<span id="cb48-49"><a href="#cb48-49"></a></span>
+<span id="cb48-50"><a href="#cb48-50"></a><span class="fu">## Import R libraries</span></span>
+<span id="cb48-51"><a href="#cb48-51"></a></span>
+<span id="cb48-52"><a href="#cb48-52"></a>Import R libraries. These will be used for both the rendering of the document and data analysis. The reason is I prefer <span class="in">`ggplot2`</span> over <span class="in">`matplotlib`</span>. I will also use colorblind safe palettes.</span>
+<span id="cb48-53"><a href="#cb48-53"></a></span>
+<span id="cb48-54"><a href="#cb48-54"></a><span class="in">```{r, import_r}</span></span>
+<span id="cb48-55"><a href="#cb48-55"></a><span class="in">#| warning: FALSE</span></span>
+<span id="cb48-56"><a href="#cb48-56"></a></span>
 <span id="cb48-57"><a href="#cb48-57"></a></span>
-<span id="cb48-58"><a href="#cb48-58"></a></span>
-<span id="cb48-59"><a href="#cb48-59"></a><span class="in">library(tidyverse, verbose = FALSE)</span></span>
-<span id="cb48-60"><a href="#cb48-60"></a><span class="in">library(tidymodels, verbose = FALSE)</span></span>
-<span id="cb48-61"><a href="#cb48-61"></a><span class="in">library(reticulate)</span></span>
-<span id="cb48-62"><a href="#cb48-62"></a><span class="in">library(ggplot2)</span></span>
-<span id="cb48-63"><a href="#cb48-63"></a><span class="in">library(plotly)</span></span>
-<span id="cb48-64"><a href="#cb48-64"></a><span class="in">library(RColorBrewer)</span></span>
-<span id="cb48-65"><a href="#cb48-65"></a><span class="in">library(bslib)</span></span>
-<span id="cb48-66"><a href="#cb48-66"></a><span class="in">library(Metrics)</span></span>
-<span id="cb48-67"><a href="#cb48-67"></a><span class="in">library(gt)</span></span>
+<span id="cb48-58"><a href="#cb48-58"></a><span class="in">library(tidyverse, verbose = FALSE)</span></span>
+<span id="cb48-59"><a href="#cb48-59"></a><span class="in">library(tidymodels, verbose = FALSE)</span></span>
+<span id="cb48-60"><a href="#cb48-60"></a><span class="in">library(reticulate)</span></span>
+<span id="cb48-61"><a href="#cb48-61"></a><span class="in">library(ggplot2)</span></span>
+<span id="cb48-62"><a href="#cb48-62"></a><span class="in">library(plotly)</span></span>
+<span id="cb48-63"><a href="#cb48-63"></a><span class="in">library(RColorBrewer)</span></span>
+<span id="cb48-64"><a href="#cb48-64"></a><span class="in">library(bslib)</span></span>
+<span id="cb48-65"><a href="#cb48-65"></a><span class="in">library(Metrics)</span></span>
+<span id="cb48-66"><a href="#cb48-66"></a><span class="in">library(gt)</span></span>
+<span id="cb48-67"><a href="#cb48-67"></a></span>
 <span id="cb48-68"><a href="#cb48-68"></a></span>
-<span id="cb48-69"><a href="#cb48-69"></a></span>
-<span id="cb48-70"><a href="#cb48-70"></a><span class="in">Sys.setenv(RETICULATE_PYTHON = &quot;~/R/blog/posts/toxic_comment_filter/.venv/bin/python&quot;)</span></span>
-<span id="cb48-71"><a href="#cb48-71"></a></span>
-<span id="cb48-72"><a href="#cb48-72"></a><span class="in">```</span></span>
-<span id="cb48-73"><a href="#cb48-73"></a></span>
-<span id="cb48-74"><a href="#cb48-74"></a><span class="fu">## Import Python packages</span></span>
-<span id="cb48-75"><a href="#cb48-75"></a></span>
-<span id="cb48-76"><a href="#cb48-76"></a><span class="in">```{python, import_py}</span></span>
-<span id="cb48-77"><a href="#cb48-77"></a><span class="in">import pandas as pd</span></span>
-<span id="cb48-78"><a href="#cb48-78"></a><span class="in">import numpy as np</span></span>
-<span id="cb48-79"><a href="#cb48-79"></a><span class="in">import matplotlib.pyplot as plt</span></span>
-<span id="cb48-80"><a href="#cb48-80"></a><span class="in">import tensorflow as tf</span></span>
-<span id="cb48-81"><a href="#cb48-81"></a><span class="in">import keras</span></span>
-<span id="cb48-82"><a href="#cb48-82"></a><span class="in">import keras_nlp</span></span>
-<span id="cb48-83"><a href="#cb48-83"></a></span>
-<span id="cb48-84"><a href="#cb48-84"></a><span class="in">from keras.backend import clear_session</span></span>
-<span id="cb48-85"><a href="#cb48-85"></a><span class="in">from keras.models import Model, load_model</span></span>
-<span id="cb48-86"><a href="#cb48-86"></a><span class="in">from keras.layers import TextVectorization, Input, Dense, Embedding, Dropout, GlobalAveragePooling1D, LSTM, Bidirectional, GlobalMaxPool1D, Flatten, Attention, LayerNormalization</span></span>
-<span id="cb48-87"><a href="#cb48-87"></a><span class="in">from keras.metrics import Precision, Recall, AUC, SensitivityAtSpecificity, SpecificityAtSensitivity, F1Score</span></span>
-<span id="cb48-88"><a href="#cb48-88"></a></span>
-<span id="cb48-89"><a href="#cb48-89"></a><span class="in">from sklearn.model_selection import train_test_split, KFold</span></span>
-<span id="cb48-90"><a href="#cb48-90"></a><span class="in">from sklearn.metrics import multilabel_confusion_matrix, classification_report, ConfusionMatrixDisplay, precision_recall_curve, f1_score, recall_score, roc_auc_score</span></span>
-<span id="cb48-91"><a href="#cb48-91"></a><span class="in">```</span></span>
-<span id="cb48-92"><a href="#cb48-92"></a></span>
-<span id="cb48-95"><a href="#cb48-95"></a><span class="in">```{python}</span></span>
-<span id="cb48-96"><a href="#cb48-96"></a><span class="bu">print</span>(<span class="st">&quot;Num GPUs Available: &quot;</span>, <span class="bu">len</span>(tf.config.list_physical_devices(<span class="st">&#39;GPU&#39;</span>)))</span>
-<span id="cb48-97"><a href="#cb48-97"></a><span class="in">```</span></span>
-<span id="cb48-98"><a href="#cb48-98"></a></span>
-<span id="cb48-99"><a href="#cb48-99"></a>Create a Config class to store all the useful parameters for the model and for the project.</span>
-<span id="cb48-100"><a href="#cb48-100"></a></span>
-<span id="cb48-101"><a href="#cb48-101"></a><span class="fu">## Class Config</span></span>
-<span id="cb48-102"><a href="#cb48-102"></a></span>
-<span id="cb48-103"><a href="#cb48-103"></a>I created a <span class="in">`class`</span> with all the basic configuration of the model, to improve the readability.</span>
-<span id="cb48-104"><a href="#cb48-104"></a></span>
-<span id="cb48-105"><a href="#cb48-105"></a><span class="in">```{python, config}</span></span>
-<span id="cb48-106"><a href="#cb48-106"></a><span class="in">class Config():</span></span>
-<span id="cb48-107"><a href="#cb48-107"></a><span class="in">    def __init__(self):</span></span>
-<span id="cb48-108"><a href="#cb48-108"></a><span class="in">        self.url = &quot;https://s3.eu-west-3.amazonaws.com/profession.ai/datasets/Filter_Toxic_Comments_dataset.csv&quot;</span></span>
-<span id="cb48-109"><a href="#cb48-109"></a><span class="in">        self.max_tokens = 20000</span></span>
-<span id="cb48-110"><a href="#cb48-110"></a><span class="in">        self.output_sequence_length = 911 # check the analysis done to establish this value</span></span>
-<span id="cb48-111"><a href="#cb48-111"></a><span class="in">        self.embedding_dim = 128</span></span>
-<span id="cb48-112"><a href="#cb48-112"></a><span class="in">        self.batch_size = 32</span></span>
-<span id="cb48-113"><a href="#cb48-113"></a><span class="in">        self.epochs = 100</span></span>
-<span id="cb48-114"><a href="#cb48-114"></a><span class="in">        self.temp_split = 0.3</span></span>
-<span id="cb48-115"><a href="#cb48-115"></a><span class="in">        self.test_split = 0.5</span></span>
-<span id="cb48-116"><a href="#cb48-116"></a><span class="in">        self.random_state = 42</span></span>
-<span id="cb48-117"><a href="#cb48-117"></a><span class="in">        self.total_samples = 159571 # total train samples</span></span>
-<span id="cb48-118"><a href="#cb48-118"></a><span class="in">        self.train_samples = 111699</span></span>
-<span id="cb48-119"><a href="#cb48-119"></a><span class="in">        self.val_samples = 23936</span></span>
-<span id="cb48-120"><a href="#cb48-120"></a><span class="in">        self.features = &#39;comment_text&#39;</span></span>
-<span id="cb48-121"><a href="#cb48-121"></a><span class="in">        self.labels = [&#39;toxic&#39;, &#39;severe_toxic&#39;, &#39;obscene&#39;, &#39;threat&#39;, &#39;insult&#39;, &#39;identity_hate&#39;]</span></span>
-<span id="cb48-122"><a href="#cb48-122"></a><span class="in">        self.new_labels = [&#39;toxic&#39;, &#39;severe_toxic&#39;, &#39;obscene&#39;, &#39;threat&#39;, &#39;insult&#39;, &#39;identity_hate&#39;, &quot;clean&quot;]</span></span>
-<span id="cb48-123"><a href="#cb48-123"></a><span class="in">        self.label_mapping = {label: i for i, label in enumerate(self.labels)}</span></span>
-<span id="cb48-124"><a href="#cb48-124"></a><span class="in">        self.new_label_mapping = {label: i for i, label in enumerate(self.labels)}</span></span>
-<span id="cb48-125"><a href="#cb48-125"></a><span class="in">        self.path = &quot;/Users/simonebrazzi/R/blog/posts/toxic_comment_filter/history/f1score/&quot;</span></span>
-<span id="cb48-126"><a href="#cb48-126"></a><span class="in">        self.model =  self.path + &quot;model_f1.keras&quot;</span></span>
-<span id="cb48-127"><a href="#cb48-127"></a><span class="in">        self.checkpoint = self.path + &quot;checkpoint.lstm_model_f1.keras&quot;</span></span>
-<span id="cb48-128"><a href="#cb48-128"></a><span class="in">        self.history = self.path + &quot;lstm_model_f1.xlsx&quot;</span></span>
-<span id="cb48-129"><a href="#cb48-129"></a><span class="in">        </span></span>
-<span id="cb48-130"><a href="#cb48-130"></a><span class="in">        self.metrics = [</span></span>
-<span id="cb48-131"><a href="#cb48-131"></a><span class="in">            Precision(name=&#39;precision&#39;),</span></span>
-<span id="cb48-132"><a href="#cb48-132"></a><span class="in">            Recall(name=&#39;recall&#39;),</span></span>
-<span id="cb48-133"><a href="#cb48-133"></a><span class="in">            AUC(name=&#39;auc&#39;, multi_label=True, num_labels=len(self.labels)),</span></span>
-<span id="cb48-134"><a href="#cb48-134"></a><span class="in">            F1Score(name=&quot;f1&quot;, average=&quot;macro&quot;)</span></span>
-<span id="cb48-135"><a href="#cb48-135"></a><span class="in">            </span></span>
-<span id="cb48-136"><a href="#cb48-136"></a><span class="in">        ]</span></span>
-<span id="cb48-137"><a href="#cb48-137"></a><span class="in">    def get_early_stopping(self):</span></span>
-<span id="cb48-138"><a href="#cb48-138"></a><span class="in">        early_stopping = keras.callbacks.EarlyStopping(</span></span>
-<span id="cb48-139"><a href="#cb48-139"></a><span class="in">            monitor=&quot;val_f1&quot;, # &quot;val_recall&quot;,</span></span>
-<span id="cb48-140"><a href="#cb48-140"></a><span class="in">            min_delta=0.2,</span></span>
-<span id="cb48-141"><a href="#cb48-141"></a><span class="in">            patience=10,</span></span>
-<span id="cb48-142"><a href="#cb48-142"></a><span class="in">            verbose=0,</span></span>
-<span id="cb48-143"><a href="#cb48-143"></a><span class="in">            mode=&quot;max&quot;,</span></span>
-<span id="cb48-144"><a href="#cb48-144"></a><span class="in">            restore_best_weights=True,</span></span>
-<span id="cb48-145"><a href="#cb48-145"></a><span class="in">            start_from_epoch=3</span></span>
-<span id="cb48-146"><a href="#cb48-146"></a><span class="in">        )</span></span>
-<span id="cb48-147"><a href="#cb48-147"></a><span class="in">        return early_stopping</span></span>
-<span id="cb48-148"><a href="#cb48-148"></a></span>
-<span id="cb48-149"><a href="#cb48-149"></a><span class="in">    def get_model_checkpoint(self, filepath):</span></span>
-<span id="cb48-150"><a href="#cb48-150"></a><span class="in">        model_checkpoint = keras.callbacks.ModelCheckpoint(</span></span>
-<span id="cb48-151"><a href="#cb48-151"></a><span class="in">            filepath=filepath,</span></span>
-<span id="cb48-152"><a href="#cb48-152"></a><span class="in">            monitor=&quot;val_f1&quot;, # &quot;val_recall&quot;,</span></span>
-<span id="cb48-153"><a href="#cb48-153"></a><span class="in">            verbose=0,</span></span>
-<span id="cb48-154"><a href="#cb48-154"></a><span class="in">            save_best_only=True,</span></span>
-<span id="cb48-155"><a href="#cb48-155"></a><span class="in">            save_weights_only=False,</span></span>
-<span id="cb48-156"><a href="#cb48-156"></a><span class="in">            mode=&quot;max&quot;,</span></span>
-<span id="cb48-157"><a href="#cb48-157"></a><span class="in">            save_freq=&quot;epoch&quot;</span></span>
-<span id="cb48-158"><a href="#cb48-158"></a><span class="in">        )</span></span>
-<span id="cb48-159"><a href="#cb48-159"></a><span class="in">        return model_checkpoint</span></span>
-<span id="cb48-160"><a href="#cb48-160"></a></span>
-<span id="cb48-161"><a href="#cb48-161"></a><span class="in">    def find_optimal_threshold_cv(self, ytrue, yproba, metric, thresholds=np.arange(.05, .35, .05), n_splits=7):</span></span>
-<span id="cb48-162"><a href="#cb48-162"></a></span>
-<span id="cb48-163"><a href="#cb48-163"></a><span class="in">      # instantiate KFold</span></span>
-<span id="cb48-164"><a href="#cb48-164"></a><span class="in">      kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)</span></span>
-<span id="cb48-165"><a href="#cb48-165"></a><span class="in">      threshold_scores = []</span></span>
-<span id="cb48-166"><a href="#cb48-166"></a></span>
-<span id="cb48-167"><a href="#cb48-167"></a><span class="in">      for threshold in thresholds:</span></span>
-<span id="cb48-168"><a href="#cb48-168"></a></span>
-<span id="cb48-169"><a href="#cb48-169"></a><span class="in">        cv_scores = []</span></span>
-<span id="cb48-170"><a href="#cb48-170"></a><span class="in">        for train_index, val_index in kf.split(ytrue):</span></span>
-<span id="cb48-171"><a href="#cb48-171"></a></span>
-<span id="cb48-172"><a href="#cb48-172"></a><span class="in">          ytrue_val = ytrue[val_index]</span></span>
-<span id="cb48-173"><a href="#cb48-173"></a><span class="in">          yproba_val = yproba[val_index]</span></span>
-<span id="cb48-174"><a href="#cb48-174"></a></span>
-<span id="cb48-175"><a href="#cb48-175"></a><span class="in">          ypred_val = (yproba_val &gt;= threshold).astype(int)</span></span>
-<span id="cb48-176"><a href="#cb48-176"></a><span class="in">          score = metric(ytrue_val, ypred_val, average=&quot;macro&quot;)</span></span>
-<span id="cb48-177"><a href="#cb48-177"></a><span class="in">          cv_scores.append(score)</span></span>
-<span id="cb48-178"><a href="#cb48-178"></a></span>
-<span id="cb48-179"><a href="#cb48-179"></a><span class="in">        mean_score = np.mean(cv_scores)</span></span>
-<span id="cb48-180"><a href="#cb48-180"></a><span class="in">        threshold_scores.append((threshold, mean_score))</span></span>
-<span id="cb48-181"><a href="#cb48-181"></a></span>
-<span id="cb48-182"><a href="#cb48-182"></a><span class="in">        # Find the threshold with the highest mean score</span></span>
-<span id="cb48-183"><a href="#cb48-183"></a><span class="in">        best_threshold, best_score = max(threshold_scores, key=lambda x: x[1])</span></span>
-<span id="cb48-184"><a href="#cb48-184"></a><span class="in">      return best_threshold, best_score</span></span>
-<span id="cb48-185"><a href="#cb48-185"></a></span>
-<span id="cb48-186"><a href="#cb48-186"></a><span class="in">config = Config()</span></span>
-<span id="cb48-187"><a href="#cb48-187"></a><span class="in">```</span></span>
-<span id="cb48-188"><a href="#cb48-188"></a></span>
-<span id="cb48-189"><a href="#cb48-189"></a><span class="fu"># Data</span></span>
-<span id="cb48-190"><a href="#cb48-190"></a></span>
-<span id="cb48-191"><a href="#cb48-191"></a>The dataset is accessible using <span class="in">`tf.keras.utils.get_file`</span> to get the file from the url. *N.B.* For reproducibility purpose, I also downloaded the dataset. There was time in which the link was not available.</span>
-<span id="cb48-192"><a href="#cb48-192"></a></span>
-<span id="cb48-193"><a href="#cb48-193"></a><span class="in">```{python, read_data}</span></span>
-<span id="cb48-194"><a href="#cb48-194"></a><span class="in"># df = pd.read_csv(config.path)</span></span>
-<span id="cb48-195"><a href="#cb48-195"></a><span class="in">file = tf.keras.utils.get_file(&quot;Filter_Toxic_Comments_dataset.csv&quot;, config.url)</span></span>
-<span id="cb48-196"><a href="#cb48-196"></a><span class="in">df = pd.read_csv(file)</span></span>
-<span id="cb48-197"><a href="#cb48-197"></a><span class="in">```</span></span>
-<span id="cb48-198"><a href="#cb48-198"></a></span>
-<span id="cb48-199"><a href="#cb48-199"></a><span class="in">```{r, tbl_head}</span></span>
-<span id="cb48-200"><a href="#cb48-200"></a><span class="in">#| label: tbl-head</span></span>
-<span id="cb48-201"><a href="#cb48-201"></a><span class="in">#| tbl-cap: First 5 elemtns</span></span>
-<span id="cb48-202"><a href="#cb48-202"></a></span>
-<span id="cb48-203"><a href="#cb48-203"></a><span class="in">library(reticulate)</span></span>
-<span id="cb48-204"><a href="#cb48-204"></a></span>
-<span id="cb48-205"><a href="#cb48-205"></a><span class="in">py$df %&gt;%</span></span>
-<span id="cb48-206"><a href="#cb48-206"></a><span class="in">  tibble() %&gt;% </span></span>
-<span id="cb48-207"><a href="#cb48-207"></a><span class="in">  head(5) %&gt;% </span></span>
-<span id="cb48-208"><a href="#cb48-208"></a><span class="in">  gt() %&gt;% </span></span>
-<span id="cb48-209"><a href="#cb48-209"></a><span class="in">  tab_header(</span></span>
-<span id="cb48-210"><a href="#cb48-210"></a><span class="in">    title = &quot;First five observations&quot;</span></span>
-<span id="cb48-211"><a href="#cb48-211"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-212"><a href="#cb48-212"></a><span class="in">   cols_align(</span></span>
-<span id="cb48-213"><a href="#cb48-213"></a><span class="in">    align = &quot;center&quot;,</span></span>
-<span id="cb48-214"><a href="#cb48-214"></a><span class="in">    columns = c(&quot;toxic&quot;, &quot;severe_toxic&quot;, &quot;obscene&quot;, &quot;threat&quot;, &quot;insult&quot;, &quot;identity_hate&quot;, &quot;sum_injurious&quot;)</span></span>
-<span id="cb48-215"><a href="#cb48-215"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-216"><a href="#cb48-216"></a><span class="in">  cols_align(</span></span>
-<span id="cb48-217"><a href="#cb48-217"></a><span class="in">    align = &quot;left&quot;,</span></span>
-<span id="cb48-218"><a href="#cb48-218"></a><span class="in">    columns = comment_text</span></span>
-<span id="cb48-219"><a href="#cb48-219"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-220"><a href="#cb48-220"></a><span class="in">  cols_label(</span></span>
-<span id="cb48-221"><a href="#cb48-221"></a><span class="in">    comment_text = &quot;Comments&quot;,</span></span>
-<span id="cb48-222"><a href="#cb48-222"></a><span class="in">    toxic = &quot;Toxic&quot;,</span></span>
-<span id="cb48-223"><a href="#cb48-223"></a><span class="in">    severe_toxic = &quot;Severe Toxic&quot;,</span></span>
-<span id="cb48-224"><a href="#cb48-224"></a><span class="in">    obscene = &quot;Obscene&quot;,</span></span>
-<span id="cb48-225"><a href="#cb48-225"></a><span class="in">    threat = &quot;Threat&quot;,</span></span>
-<span id="cb48-226"><a href="#cb48-226"></a><span class="in">    insult = &quot;Insult&quot;,</span></span>
-<span id="cb48-227"><a href="#cb48-227"></a><span class="in">    identity_hate = &quot;Identity Hate&quot;,</span></span>
-<span id="cb48-228"><a href="#cb48-228"></a><span class="in">    sum_injurious = &quot;Sum Injurious&quot;</span></span>
-<span id="cb48-229"><a href="#cb48-229"></a><span class="in">    )</span></span>
-<span id="cb48-230"><a href="#cb48-230"></a><span class="in">```</span></span>
-<span id="cb48-231"><a href="#cb48-231"></a></span>
-<span id="cb48-232"><a href="#cb48-232"></a>Lets create a *clean* variable for EDA purpose: I want to visually see how many observation are clean vs the others labels.</span>
-<span id="cb48-233"><a href="#cb48-233"></a></span>
-<span id="cb48-234"><a href="#cb48-234"></a><span class="in">```{python, clean}</span></span>
-<span id="cb48-235"><a href="#cb48-235"></a><span class="in">df.loc[df.sum_injurious == 0, &quot;clean&quot;] = 1</span></span>
-<span id="cb48-236"><a href="#cb48-236"></a><span class="in">df.loc[df.sum_injurious != 0, &quot;clean&quot;] = 0</span></span>
-<span id="cb48-237"><a href="#cb48-237"></a><span class="in">```</span></span>
-<span id="cb48-238"><a href="#cb48-238"></a></span>
-<span id="cb48-239"><a href="#cb48-239"></a><span class="fu">## EDA</span></span>
-<span id="cb48-240"><a href="#cb48-240"></a></span>
-<span id="cb48-241"><a href="#cb48-241"></a>First a check on the dataset to find possible missing values and imbalances.</span>
-<span id="cb48-242"><a href="#cb48-242"></a></span>
-<span id="cb48-243"><a href="#cb48-243"></a><span class="fu">### Frequency</span></span>
-<span id="cb48-244"><a href="#cb48-244"></a></span>
-<span id="cb48-245"><a href="#cb48-245"></a><span class="in">```{r, tbl_freq}</span></span>
-<span id="cb48-246"><a href="#cb48-246"></a><span class="in">#| label: tbl-frequency</span></span>
-<span id="cb48-247"><a href="#cb48-247"></a><span class="in">#| tbl-cap: Absolute and relative labels frequency</span></span>
-<span id="cb48-248"><a href="#cb48-248"></a></span>
-<span id="cb48-249"><a href="#cb48-249"></a><span class="in">library(reticulate)</span></span>
-<span id="cb48-250"><a href="#cb48-250"></a><span class="in">df_r &lt;- py$df</span></span>
-<span id="cb48-251"><a href="#cb48-251"></a><span class="in">new_labels_r &lt;- py$config$new_labels</span></span>
-<span id="cb48-252"><a href="#cb48-252"></a></span>
-<span id="cb48-253"><a href="#cb48-253"></a><span class="in">df_r_grouped &lt;- df_r %&gt;% </span></span>
-<span id="cb48-254"><a href="#cb48-254"></a><span class="in">  select(all_of(new_labels_r)) %&gt;%</span></span>
-<span id="cb48-255"><a href="#cb48-255"></a><span class="in">  pivot_longer(</span></span>
-<span id="cb48-256"><a href="#cb48-256"></a><span class="in">    cols = all_of(new_labels_r),</span></span>
-<span id="cb48-257"><a href="#cb48-257"></a><span class="in">    names_to = &quot;label&quot;,</span></span>
-<span id="cb48-258"><a href="#cb48-258"></a><span class="in">    values_to = &quot;value&quot;</span></span>
-<span id="cb48-259"><a href="#cb48-259"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-260"><a href="#cb48-260"></a><span class="in">  group_by(label) %&gt;%</span></span>
-<span id="cb48-261"><a href="#cb48-261"></a><span class="in">  summarise(count = sum(value)) %&gt;% </span></span>
-<span id="cb48-262"><a href="#cb48-262"></a><span class="in">  mutate(freq = round(count / sum(count), 4))</span></span>
-<span id="cb48-263"><a href="#cb48-263"></a></span>
-<span id="cb48-264"><a href="#cb48-264"></a><span class="in">df_r_grouped %&gt;% </span></span>
-<span id="cb48-265"><a href="#cb48-265"></a><span class="in">  gt() %&gt;% </span></span>
-<span id="cb48-266"><a href="#cb48-266"></a><span class="in">  tab_header(</span></span>
-<span id="cb48-267"><a href="#cb48-267"></a><span class="in">    title = &quot;Labels frequency&quot;,</span></span>
-<span id="cb48-268"><a href="#cb48-268"></a><span class="in">    subtitle = &quot;Absolute and relative frequency&quot;</span></span>
-<span id="cb48-269"><a href="#cb48-269"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-270"><a href="#cb48-270"></a><span class="in">  fmt_number(</span></span>
-<span id="cb48-271"><a href="#cb48-271"></a><span class="in">    columns = &quot;count&quot;,</span></span>
-<span id="cb48-272"><a href="#cb48-272"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
-<span id="cb48-273"><a href="#cb48-273"></a><span class="in">    drop_trailing_dec_mark = TRUE,</span></span>
-<span id="cb48-274"><a href="#cb48-274"></a><span class="in">    use_seps = TRUE</span></span>
-<span id="cb48-275"><a href="#cb48-275"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-276"><a href="#cb48-276"></a><span class="in">  fmt_percent(</span></span>
-<span id="cb48-277"><a href="#cb48-277"></a><span class="in">    columns = &quot;freq&quot;,</span></span>
-<span id="cb48-278"><a href="#cb48-278"></a><span class="in">    decimals = 2,</span></span>
-<span id="cb48-279"><a href="#cb48-279"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
-<span id="cb48-280"><a href="#cb48-280"></a><span class="in">    drop_trailing_dec_mark = FALSE</span></span>
-<span id="cb48-281"><a href="#cb48-281"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-282"><a href="#cb48-282"></a><span class="in">  cols_align(</span></span>
-<span id="cb48-283"><a href="#cb48-283"></a><span class="in">    align = &quot;center&quot;,</span></span>
-<span id="cb48-284"><a href="#cb48-284"></a><span class="in">    columns = c(&quot;count&quot;, &quot;freq&quot;)</span></span>
-<span id="cb48-285"><a href="#cb48-285"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-286"><a href="#cb48-286"></a><span class="in">  cols_align(</span></span>
-<span id="cb48-287"><a href="#cb48-287"></a><span class="in">    align = &quot;left&quot;,</span></span>
-<span id="cb48-288"><a href="#cb48-288"></a><span class="in">    columns = label</span></span>
-<span id="cb48-289"><a href="#cb48-289"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-290"><a href="#cb48-290"></a><span class="in">  cols_label(</span></span>
-<span id="cb48-291"><a href="#cb48-291"></a><span class="in">    label = &quot;Label&quot;,</span></span>
-<span id="cb48-292"><a href="#cb48-292"></a><span class="in">    count = &quot;Absolute Frequency&quot;,</span></span>
-<span id="cb48-293"><a href="#cb48-293"></a><span class="in">    freq = &quot;Relative frequency&quot;</span></span>
-<span id="cb48-294"><a href="#cb48-294"></a><span class="in">  )</span></span>
-<span id="cb48-295"><a href="#cb48-295"></a><span class="in">```</span></span>
-<span id="cb48-296"><a href="#cb48-296"></a></span>
-<span id="cb48-297"><a href="#cb48-297"></a><span class="fu">### Barchart</span></span>
-<span id="cb48-298"><a href="#cb48-298"></a></span>
-<span id="cb48-299"><a href="#cb48-299"></a><span class="in">```{r, barchart}</span></span>
-<span id="cb48-300"><a href="#cb48-300"></a><span class="in">#| label: fig-barchart</span></span>
-<span id="cb48-301"><a href="#cb48-301"></a><span class="in">#| fig.cap: &quot;Imbalance in the dataset with clean variable&quot;</span></span>
-<span id="cb48-302"><a href="#cb48-302"></a><span class="in">#| fig.width: 10</span></span>
-<span id="cb48-303"><a href="#cb48-303"></a><span class="in">#| fig.height: 6</span></span>
-<span id="cb48-304"><a href="#cb48-304"></a><span class="in">#| fig-responsive: true</span></span>
-<span id="cb48-305"><a href="#cb48-305"></a></span>
-<span id="cb48-306"><a href="#cb48-306"></a><span class="in">library(reticulate)</span></span>
-<span id="cb48-307"><a href="#cb48-307"></a><span class="in">barchart &lt;- df_r_grouped %&gt;%</span></span>
-<span id="cb48-308"><a href="#cb48-308"></a><span class="in">  ggplot(aes(x = reorder(label, count), y = count, fill = label)) +</span></span>
-<span id="cb48-309"><a href="#cb48-309"></a><span class="in">  geom_col() +</span></span>
-<span id="cb48-310"><a href="#cb48-310"></a><span class="in">  labs(</span></span>
-<span id="cb48-311"><a href="#cb48-311"></a><span class="in">    x = &quot;Labels&quot;,</span></span>
-<span id="cb48-312"><a href="#cb48-312"></a><span class="in">    y = &quot;Count&quot;</span></span>
-<span id="cb48-313"><a href="#cb48-313"></a><span class="in">  ) +</span></span>
-<span id="cb48-314"><a href="#cb48-314"></a><span class="in">  # sort bars in descending order</span></span>
-<span id="cb48-315"><a href="#cb48-315"></a><span class="in">  scale_x_discrete(limits = df_r_grouped$label[order(df_r_grouped$count, decreasing = TRUE)]) +</span></span>
-<span id="cb48-316"><a href="#cb48-316"></a><span class="in">  scale_fill_brewer(type = &quot;seq&quot;, palette = &quot;RdYlBu&quot;) +</span></span>
-<span id="cb48-317"><a href="#cb48-317"></a><span class="in">  theme_minimal()</span></span>
-<span id="cb48-318"><a href="#cb48-318"></a><span class="in">ggplotly(barchart)</span></span>
-<span id="cb48-319"><a href="#cb48-319"></a><span class="in">```</span></span>
-<span id="cb48-320"><a href="#cb48-320"></a></span>
-<span id="cb48-321"><a href="#cb48-321"></a>It is visible how much the dataset in imbalanced. This means it could be useful to check for the class weight and use this argument during the training.</span>
-<span id="cb48-322"><a href="#cb48-322"></a></span>
-<span id="cb48-323"><a href="#cb48-323"></a><span class="in">```{r, clean_perc}</span></span>
-<span id="cb48-324"><a href="#cb48-324"></a><span class="in">#| echo: false</span></span>
-<span id="cb48-325"><a href="#cb48-325"></a></span>
-<span id="cb48-326"><a href="#cb48-326"></a><span class="in">clean_perc &lt;- df_r_grouped %&gt;%</span></span>
-<span id="cb48-327"><a href="#cb48-327"></a><span class="in">  filter(label == &quot;clean&quot;) %&gt;% </span></span>
-<span id="cb48-328"><a href="#cb48-328"></a><span class="in">  pull(freq)</span></span>
-<span id="cb48-329"><a href="#cb48-329"></a><span class="in">```</span></span>
-<span id="cb48-330"><a href="#cb48-330"></a></span>
-<span id="cb48-331"><a href="#cb48-331"></a>It is clear that most of our text are clean. We are talking about <span class="in">`r clean_perc`</span> of the observations which are clean. Only <span class="in">`r 1 - clean_perc`</span> are toxic comments.</span>
-<span id="cb48-332"><a href="#cb48-332"></a></span>
-<span id="cb48-333"><a href="#cb48-333"></a><span class="fu">## Sequence lenght definition</span></span>
-<span id="cb48-334"><a href="#cb48-334"></a></span>
-<span id="cb48-335"><a href="#cb48-335"></a>To convert the text in a useful input for a NN, it is necessary to use a <span class="in">`TextVectorization layer`</span>. See the @sec-preprocessing section.</span>
-<span id="cb48-336"><a href="#cb48-336"></a></span>
-<span id="cb48-337"><a href="#cb48-337"></a>One of the method is <span class="in">`output_sequence_length`</span>: to better define it, it is useful to analyze our text length. To simulate what the model we do, we are going to remove the punctuation and the new lines from the comments.</span>
-<span id="cb48-338"><a href="#cb48-338"></a></span>
-<span id="cb48-339"><a href="#cb48-339"></a><span class="fu">### Summary</span></span>
-<span id="cb48-340"><a href="#cb48-340"></a></span>
-<span id="cb48-341"><a href="#cb48-341"></a><span class="in">```{r, summary}</span></span>
-<span id="cb48-342"><a href="#cb48-342"></a><span class="in">#| label: tbl-summary</span></span>
-<span id="cb48-343"><a href="#cb48-343"></a><span class="in">#| tbl-cap: Summary of text length</span></span>
-<span id="cb48-344"><a href="#cb48-344"></a></span>
-<span id="cb48-345"><a href="#cb48-345"></a><span class="in">library(reticulate)</span></span>
-<span id="cb48-346"><a href="#cb48-346"></a><span class="in">df_r %&gt;% </span></span>
-<span id="cb48-347"><a href="#cb48-347"></a><span class="in">  mutate(</span></span>
-<span id="cb48-348"><a href="#cb48-348"></a><span class="in">    comment_text_clean = comment_text %&gt;%</span></span>
-<span id="cb48-349"><a href="#cb48-349"></a><span class="in">      tolower() %&gt;% </span></span>
-<span id="cb48-350"><a href="#cb48-350"></a><span class="in">      str_remove_all(&quot;[[:punct:]]&quot;) %&gt;% </span></span>
-<span id="cb48-351"><a href="#cb48-351"></a><span class="in">      str_replace_all(&quot;\n&quot;, &quot; &quot;),</span></span>
-<span id="cb48-352"><a href="#cb48-352"></a><span class="in">    text_length = comment_text_clean %&gt;% str_count()</span></span>
-<span id="cb48-353"><a href="#cb48-353"></a><span class="in">    ) %&gt;% </span></span>
-<span id="cb48-354"><a href="#cb48-354"></a><span class="in">  pull(text_length) %&gt;% </span></span>
-<span id="cb48-355"><a href="#cb48-355"></a><span class="in">  summary() %&gt;% </span></span>
-<span id="cb48-356"><a href="#cb48-356"></a><span class="in">  as.list() %&gt;% </span></span>
-<span id="cb48-357"><a href="#cb48-357"></a><span class="in">  as_tibble() %&gt;% </span></span>
-<span id="cb48-358"><a href="#cb48-358"></a><span class="in">  gt() %&gt;% </span></span>
-<span id="cb48-359"><a href="#cb48-359"></a><span class="in">  tab_header(</span></span>
-<span id="cb48-360"><a href="#cb48-360"></a><span class="in">    title = &quot;Summary Statistics&quot;,</span></span>
-<span id="cb48-361"><a href="#cb48-361"></a><span class="in">    subtitle = &quot;of text length&quot;</span></span>
-<span id="cb48-362"><a href="#cb48-362"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-363"><a href="#cb48-363"></a><span class="in">  fmt_number(</span></span>
-<span id="cb48-364"><a href="#cb48-364"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
-<span id="cb48-365"><a href="#cb48-365"></a><span class="in">    drop_trailing_dec_mark = TRUE,</span></span>
-<span id="cb48-366"><a href="#cb48-366"></a><span class="in">    use_seps = TRUE</span></span>
-<span id="cb48-367"><a href="#cb48-367"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-368"><a href="#cb48-368"></a><span class="in">  cols_align(</span></span>
-<span id="cb48-369"><a href="#cb48-369"></a><span class="in">    align = &quot;center&quot;,</span></span>
-<span id="cb48-370"><a href="#cb48-370"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-371"><a href="#cb48-371"></a><span class="in">  cols_label(</span></span>
-<span id="cb48-372"><a href="#cb48-372"></a><span class="in">    Min. = &quot;Min&quot;,</span></span>
-<span id="cb48-373"><a href="#cb48-373"></a><span class="in">    `1st Qu.` = &quot;Q1&quot;,</span></span>
-<span id="cb48-374"><a href="#cb48-374"></a><span class="in">    Median = &quot;Median&quot;,</span></span>
-<span id="cb48-375"><a href="#cb48-375"></a><span class="in">    `3rd Qu.` = &quot;Q3&quot;,</span></span>
-<span id="cb48-376"><a href="#cb48-376"></a><span class="in">    Max. = &quot;Max&quot;</span></span>
-<span id="cb48-377"><a href="#cb48-377"></a><span class="in">  )</span></span>
-<span id="cb48-378"><a href="#cb48-378"></a><span class="in">  </span></span>
-<span id="cb48-379"><a href="#cb48-379"></a><span class="in">```</span></span>
-<span id="cb48-380"><a href="#cb48-380"></a></span>
-<span id="cb48-381"><a href="#cb48-381"></a><span class="fu">### Boxplot</span></span>
-<span id="cb48-382"><a href="#cb48-382"></a></span>
-<span id="cb48-383"><a href="#cb48-383"></a><span class="in">```{r, boxplot}</span></span>
-<span id="cb48-384"><a href="#cb48-384"></a><span class="in">#| label: fig-boxplot</span></span>
-<span id="cb48-385"><a href="#cb48-385"></a><span class="in">#| fig.cap: &quot;Text length boxplot&quot;</span></span>
-<span id="cb48-386"><a href="#cb48-386"></a><span class="in">#| fig.width: 10</span></span>
-<span id="cb48-387"><a href="#cb48-387"></a><span class="in">#| fig.height: 14</span></span>
-<span id="cb48-388"><a href="#cb48-388"></a></span>
-<span id="cb48-389"><a href="#cb48-389"></a><span class="in">library(reticulate)</span></span>
-<span id="cb48-390"><a href="#cb48-390"></a><span class="in">boxplot &lt;- df_r %&gt;% </span></span>
-<span id="cb48-391"><a href="#cb48-391"></a><span class="in">  mutate(</span></span>
-<span id="cb48-392"><a href="#cb48-392"></a><span class="in">    comment_text_clean = comment_text %&gt;%</span></span>
-<span id="cb48-393"><a href="#cb48-393"></a><span class="in">      tolower() %&gt;% </span></span>
-<span id="cb48-394"><a href="#cb48-394"></a><span class="in">      str_remove_all(&quot;[[:punct:]]&quot;) %&gt;% </span></span>
-<span id="cb48-395"><a href="#cb48-395"></a><span class="in">      str_replace_all(&quot;\n&quot;, &quot; &quot;),</span></span>
-<span id="cb48-396"><a href="#cb48-396"></a><span class="in">    text_length = comment_text_clean %&gt;% str_count()</span></span>
-<span id="cb48-397"><a href="#cb48-397"></a><span class="in">    ) %&gt;% </span></span>
-<span id="cb48-398"><a href="#cb48-398"></a><span class="in">  # pull(text_length) %&gt;% </span></span>
-<span id="cb48-399"><a href="#cb48-399"></a><span class="in">  ggplot(aes(y = text_length)) +</span></span>
-<span id="cb48-400"><a href="#cb48-400"></a><span class="in">  geom_boxplot() +</span></span>
-<span id="cb48-401"><a href="#cb48-401"></a><span class="in">  theme_minimal()</span></span>
-<span id="cb48-402"><a href="#cb48-402"></a><span class="in">ggplotly(boxplot)</span></span>
-<span id="cb48-403"><a href="#cb48-403"></a><span class="in">```</span></span>
-<span id="cb48-404"><a href="#cb48-404"></a></span>
-<span id="cb48-405"><a href="#cb48-405"></a><span class="fu">### Histogram</span></span>
-<span id="cb48-406"><a href="#cb48-406"></a></span>
-<span id="cb48-407"><a href="#cb48-407"></a><span class="in">```{r, histogram}</span></span>
-<span id="cb48-408"><a href="#cb48-408"></a><span class="in">#| label: fig-histogram</span></span>
-<span id="cb48-409"><a href="#cb48-409"></a><span class="in">#| fig.cap: &quot;Text length histogram with boxplot upper fence&quot;</span></span>
-<span id="cb48-410"><a href="#cb48-410"></a><span class="in">#| fig.width: 10</span></span>
-<span id="cb48-411"><a href="#cb48-411"></a><span class="in">#| fig.height: 6</span></span>
+<span id="cb48-69"><a href="#cb48-69"></a><span class="in">Sys.setenv(RETICULATE_PYTHON = &quot;~/R/blog/posts/toxic_comment_filter/.venv/bin/python&quot;)</span></span>
+<span id="cb48-70"><a href="#cb48-70"></a></span>
+<span id="cb48-71"><a href="#cb48-71"></a><span class="in">```</span></span>
+<span id="cb48-72"><a href="#cb48-72"></a></span>
+<span id="cb48-73"><a href="#cb48-73"></a><span class="fu">## Import Python packages</span></span>
+<span id="cb48-74"><a href="#cb48-74"></a></span>
+<span id="cb48-75"><a href="#cb48-75"></a><span class="in">```{python, import_py}</span></span>
+<span id="cb48-76"><a href="#cb48-76"></a><span class="in">import pandas as pd</span></span>
+<span id="cb48-77"><a href="#cb48-77"></a><span class="in">import numpy as np</span></span>
+<span id="cb48-78"><a href="#cb48-78"></a><span class="in">import matplotlib.pyplot as plt</span></span>
+<span id="cb48-79"><a href="#cb48-79"></a><span class="in">import tensorflow as tf</span></span>
+<span id="cb48-80"><a href="#cb48-80"></a><span class="in">import keras</span></span>
+<span id="cb48-81"><a href="#cb48-81"></a><span class="in">import keras_nlp</span></span>
+<span id="cb48-82"><a href="#cb48-82"></a></span>
+<span id="cb48-83"><a href="#cb48-83"></a><span class="in">from keras.backend import clear_session</span></span>
+<span id="cb48-84"><a href="#cb48-84"></a><span class="in">from keras.models import Model, load_model</span></span>
+<span id="cb48-85"><a href="#cb48-85"></a><span class="in">from keras.layers import TextVectorization, Input, Dense, Embedding, Dropout, GlobalAveragePooling1D, LSTM, Bidirectional, GlobalMaxPool1D, Flatten, Attention, LayerNormalization</span></span>
+<span id="cb48-86"><a href="#cb48-86"></a><span class="in">from keras.metrics import Precision, Recall, AUC, SensitivityAtSpecificity, SpecificityAtSensitivity, F1Score</span></span>
+<span id="cb48-87"><a href="#cb48-87"></a></span>
+<span id="cb48-88"><a href="#cb48-88"></a><span class="in">from sklearn.model_selection import train_test_split, KFold</span></span>
+<span id="cb48-89"><a href="#cb48-89"></a><span class="in">from sklearn.metrics import multilabel_confusion_matrix, classification_report, ConfusionMatrixDisplay, precision_recall_curve, f1_score, recall_score, roc_auc_score</span></span>
+<span id="cb48-90"><a href="#cb48-90"></a><span class="in">```</span></span>
+<span id="cb48-91"><a href="#cb48-91"></a></span>
+<span id="cb48-94"><a href="#cb48-94"></a><span class="in">```{python}</span></span>
+<span id="cb48-95"><a href="#cb48-95"></a><span class="bu">print</span>(<span class="st">&quot;Num GPUs Available: &quot;</span>, <span class="bu">len</span>(tf.config.list_physical_devices(<span class="st">&#39;GPU&#39;</span>)))</span>
+<span id="cb48-96"><a href="#cb48-96"></a><span class="in">```</span></span>
+<span id="cb48-97"><a href="#cb48-97"></a></span>
+<span id="cb48-98"><a href="#cb48-98"></a>Create a Config class to store all the useful parameters for the model and for the project.</span>
+<span id="cb48-99"><a href="#cb48-99"></a></span>
+<span id="cb48-100"><a href="#cb48-100"></a><span class="fu">## Class Config</span></span>
+<span id="cb48-101"><a href="#cb48-101"></a></span>
+<span id="cb48-102"><a href="#cb48-102"></a>I created a <span class="in">`class`</span> with all the basic configuration of the model, to improve the readability.</span>
+<span id="cb48-103"><a href="#cb48-103"></a></span>
+<span id="cb48-104"><a href="#cb48-104"></a><span class="in">```{python, config}</span></span>
+<span id="cb48-105"><a href="#cb48-105"></a><span class="in">class Config():</span></span>
+<span id="cb48-106"><a href="#cb48-106"></a><span class="in">    def __init__(self):</span></span>
+<span id="cb48-107"><a href="#cb48-107"></a><span class="in">        self.url = &quot;https://s3.eu-west-3.amazonaws.com/profession.ai/datasets/Filter_Toxic_Comments_dataset.csv&quot;</span></span>
+<span id="cb48-108"><a href="#cb48-108"></a><span class="in">        self.max_tokens = 20000</span></span>
+<span id="cb48-109"><a href="#cb48-109"></a><span class="in">        self.output_sequence_length = 911 # check the analysis done to establish this value</span></span>
+<span id="cb48-110"><a href="#cb48-110"></a><span class="in">        self.embedding_dim = 128</span></span>
+<span id="cb48-111"><a href="#cb48-111"></a><span class="in">        self.batch_size = 32</span></span>
+<span id="cb48-112"><a href="#cb48-112"></a><span class="in">        self.epochs = 100</span></span>
+<span id="cb48-113"><a href="#cb48-113"></a><span class="in">        self.temp_split = 0.3</span></span>
+<span id="cb48-114"><a href="#cb48-114"></a><span class="in">        self.test_split = 0.5</span></span>
+<span id="cb48-115"><a href="#cb48-115"></a><span class="in">        self.random_state = 42</span></span>
+<span id="cb48-116"><a href="#cb48-116"></a><span class="in">        self.total_samples = 159571 # total train samples</span></span>
+<span id="cb48-117"><a href="#cb48-117"></a><span class="in">        self.train_samples = 111699</span></span>
+<span id="cb48-118"><a href="#cb48-118"></a><span class="in">        self.val_samples = 23936</span></span>
+<span id="cb48-119"><a href="#cb48-119"></a><span class="in">        self.features = &#39;comment_text&#39;</span></span>
+<span id="cb48-120"><a href="#cb48-120"></a><span class="in">        self.labels = [&#39;toxic&#39;, &#39;severe_toxic&#39;, &#39;obscene&#39;, &#39;threat&#39;, &#39;insult&#39;, &#39;identity_hate&#39;]</span></span>
+<span id="cb48-121"><a href="#cb48-121"></a><span class="in">        self.new_labels = [&#39;toxic&#39;, &#39;severe_toxic&#39;, &#39;obscene&#39;, &#39;threat&#39;, &#39;insult&#39;, &#39;identity_hate&#39;, &quot;clean&quot;]</span></span>
+<span id="cb48-122"><a href="#cb48-122"></a><span class="in">        self.label_mapping = {label: i for i, label in enumerate(self.labels)}</span></span>
+<span id="cb48-123"><a href="#cb48-123"></a><span class="in">        self.new_label_mapping = {label: i for i, label in enumerate(self.labels)}</span></span>
+<span id="cb48-124"><a href="#cb48-124"></a><span class="in">        self.path = &quot;/Users/simonebrazzi/R/blog/posts/toxic_comment_filter/history/f1score/&quot;</span></span>
+<span id="cb48-125"><a href="#cb48-125"></a><span class="in">        self.model =  self.path + &quot;model_f1.keras&quot;</span></span>
+<span id="cb48-126"><a href="#cb48-126"></a><span class="in">        self.checkpoint = self.path + &quot;checkpoint.lstm_model_f1.keras&quot;</span></span>
+<span id="cb48-127"><a href="#cb48-127"></a><span class="in">        self.history = self.path + &quot;lstm_model_f1.xlsx&quot;</span></span>
+<span id="cb48-128"><a href="#cb48-128"></a><span class="in">        </span></span>
+<span id="cb48-129"><a href="#cb48-129"></a><span class="in">        self.metrics = [</span></span>
+<span id="cb48-130"><a href="#cb48-130"></a><span class="in">            Precision(name=&#39;precision&#39;),</span></span>
+<span id="cb48-131"><a href="#cb48-131"></a><span class="in">            Recall(name=&#39;recall&#39;),</span></span>
+<span id="cb48-132"><a href="#cb48-132"></a><span class="in">            AUC(name=&#39;auc&#39;, multi_label=True, num_labels=len(self.labels)),</span></span>
+<span id="cb48-133"><a href="#cb48-133"></a><span class="in">            F1Score(name=&quot;f1&quot;, average=&quot;macro&quot;)</span></span>
+<span id="cb48-134"><a href="#cb48-134"></a><span class="in">            </span></span>
+<span id="cb48-135"><a href="#cb48-135"></a><span class="in">        ]</span></span>
+<span id="cb48-136"><a href="#cb48-136"></a><span class="in">    def get_early_stopping(self):</span></span>
+<span id="cb48-137"><a href="#cb48-137"></a><span class="in">        early_stopping = keras.callbacks.EarlyStopping(</span></span>
+<span id="cb48-138"><a href="#cb48-138"></a><span class="in">            monitor=&quot;val_f1&quot;, # &quot;val_recall&quot;,</span></span>
+<span id="cb48-139"><a href="#cb48-139"></a><span class="in">            min_delta=0.2,</span></span>
+<span id="cb48-140"><a href="#cb48-140"></a><span class="in">            patience=10,</span></span>
+<span id="cb48-141"><a href="#cb48-141"></a><span class="in">            verbose=0,</span></span>
+<span id="cb48-142"><a href="#cb48-142"></a><span class="in">            mode=&quot;max&quot;,</span></span>
+<span id="cb48-143"><a href="#cb48-143"></a><span class="in">            restore_best_weights=True,</span></span>
+<span id="cb48-144"><a href="#cb48-144"></a><span class="in">            start_from_epoch=3</span></span>
+<span id="cb48-145"><a href="#cb48-145"></a><span class="in">        )</span></span>
+<span id="cb48-146"><a href="#cb48-146"></a><span class="in">        return early_stopping</span></span>
+<span id="cb48-147"><a href="#cb48-147"></a></span>
+<span id="cb48-148"><a href="#cb48-148"></a><span class="in">    def get_model_checkpoint(self, filepath):</span></span>
+<span id="cb48-149"><a href="#cb48-149"></a><span class="in">        model_checkpoint = keras.callbacks.ModelCheckpoint(</span></span>
+<span id="cb48-150"><a href="#cb48-150"></a><span class="in">            filepath=filepath,</span></span>
+<span id="cb48-151"><a href="#cb48-151"></a><span class="in">            monitor=&quot;val_f1&quot;, # &quot;val_recall&quot;,</span></span>
+<span id="cb48-152"><a href="#cb48-152"></a><span class="in">            verbose=0,</span></span>
+<span id="cb48-153"><a href="#cb48-153"></a><span class="in">            save_best_only=True,</span></span>
+<span id="cb48-154"><a href="#cb48-154"></a><span class="in">            save_weights_only=False,</span></span>
+<span id="cb48-155"><a href="#cb48-155"></a><span class="in">            mode=&quot;max&quot;,</span></span>
+<span id="cb48-156"><a href="#cb48-156"></a><span class="in">            save_freq=&quot;epoch&quot;</span></span>
+<span id="cb48-157"><a href="#cb48-157"></a><span class="in">        )</span></span>
+<span id="cb48-158"><a href="#cb48-158"></a><span class="in">        return model_checkpoint</span></span>
+<span id="cb48-159"><a href="#cb48-159"></a></span>
+<span id="cb48-160"><a href="#cb48-160"></a><span class="in">    def find_optimal_threshold_cv(self, ytrue, yproba, metric, thresholds=np.arange(.05, .35, .05), n_splits=7):</span></span>
+<span id="cb48-161"><a href="#cb48-161"></a></span>
+<span id="cb48-162"><a href="#cb48-162"></a><span class="in">      # instantiate KFold</span></span>
+<span id="cb48-163"><a href="#cb48-163"></a><span class="in">      kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)</span></span>
+<span id="cb48-164"><a href="#cb48-164"></a><span class="in">      threshold_scores = []</span></span>
+<span id="cb48-165"><a href="#cb48-165"></a></span>
+<span id="cb48-166"><a href="#cb48-166"></a><span class="in">      for threshold in thresholds:</span></span>
+<span id="cb48-167"><a href="#cb48-167"></a></span>
+<span id="cb48-168"><a href="#cb48-168"></a><span class="in">        cv_scores = []</span></span>
+<span id="cb48-169"><a href="#cb48-169"></a><span class="in">        for train_index, val_index in kf.split(ytrue):</span></span>
+<span id="cb48-170"><a href="#cb48-170"></a></span>
+<span id="cb48-171"><a href="#cb48-171"></a><span class="in">          ytrue_val = ytrue[val_index]</span></span>
+<span id="cb48-172"><a href="#cb48-172"></a><span class="in">          yproba_val = yproba[val_index]</span></span>
+<span id="cb48-173"><a href="#cb48-173"></a></span>
+<span id="cb48-174"><a href="#cb48-174"></a><span class="in">          ypred_val = (yproba_val &gt;= threshold).astype(int)</span></span>
+<span id="cb48-175"><a href="#cb48-175"></a><span class="in">          score = metric(ytrue_val, ypred_val, average=&quot;macro&quot;)</span></span>
+<span id="cb48-176"><a href="#cb48-176"></a><span class="in">          cv_scores.append(score)</span></span>
+<span id="cb48-177"><a href="#cb48-177"></a></span>
+<span id="cb48-178"><a href="#cb48-178"></a><span class="in">        mean_score = np.mean(cv_scores)</span></span>
+<span id="cb48-179"><a href="#cb48-179"></a><span class="in">        threshold_scores.append((threshold, mean_score))</span></span>
+<span id="cb48-180"><a href="#cb48-180"></a></span>
+<span id="cb48-181"><a href="#cb48-181"></a><span class="in">        # Find the threshold with the highest mean score</span></span>
+<span id="cb48-182"><a href="#cb48-182"></a><span class="in">        best_threshold, best_score = max(threshold_scores, key=lambda x: x[1])</span></span>
+<span id="cb48-183"><a href="#cb48-183"></a><span class="in">      return best_threshold, best_score</span></span>
+<span id="cb48-184"><a href="#cb48-184"></a></span>
+<span id="cb48-185"><a href="#cb48-185"></a><span class="in">config = Config()</span></span>
+<span id="cb48-186"><a href="#cb48-186"></a><span class="in">```</span></span>
+<span id="cb48-187"><a href="#cb48-187"></a></span>
+<span id="cb48-188"><a href="#cb48-188"></a><span class="fu"># Data</span></span>
+<span id="cb48-189"><a href="#cb48-189"></a></span>
+<span id="cb48-190"><a href="#cb48-190"></a>The dataset is accessible using <span class="in">`tf.keras.utils.get_file`</span> to get the file from the url. *N.B.* For reproducibility purpose, I also downloaded the dataset. There was time in which the link was not available.</span>
+<span id="cb48-191"><a href="#cb48-191"></a></span>
+<span id="cb48-192"><a href="#cb48-192"></a><span class="in">```{python, read_data}</span></span>
+<span id="cb48-193"><a href="#cb48-193"></a><span class="in"># df = pd.read_csv(config.path)</span></span>
+<span id="cb48-194"><a href="#cb48-194"></a><span class="in">file = tf.keras.utils.get_file(&quot;Filter_Toxic_Comments_dataset.csv&quot;, config.url)</span></span>
+<span id="cb48-195"><a href="#cb48-195"></a><span class="in">df = pd.read_csv(file)</span></span>
+<span id="cb48-196"><a href="#cb48-196"></a><span class="in">```</span></span>
+<span id="cb48-197"><a href="#cb48-197"></a></span>
+<span id="cb48-198"><a href="#cb48-198"></a><span class="in">```{r, tbl_head}</span></span>
+<span id="cb48-199"><a href="#cb48-199"></a><span class="in">#| label: tbl-head</span></span>
+<span id="cb48-200"><a href="#cb48-200"></a><span class="in">#| tbl-cap: First 5 elemtns</span></span>
+<span id="cb48-201"><a href="#cb48-201"></a></span>
+<span id="cb48-202"><a href="#cb48-202"></a><span class="in">library(reticulate)</span></span>
+<span id="cb48-203"><a href="#cb48-203"></a></span>
+<span id="cb48-204"><a href="#cb48-204"></a><span class="in">py$df %&gt;%</span></span>
+<span id="cb48-205"><a href="#cb48-205"></a><span class="in">  tibble() %&gt;% </span></span>
+<span id="cb48-206"><a href="#cb48-206"></a><span class="in">  head(5) %&gt;% </span></span>
+<span id="cb48-207"><a href="#cb48-207"></a><span class="in">  gt() %&gt;% </span></span>
+<span id="cb48-208"><a href="#cb48-208"></a><span class="in">  tab_header(</span></span>
+<span id="cb48-209"><a href="#cb48-209"></a><span class="in">    title = &quot;First five observations&quot;</span></span>
+<span id="cb48-210"><a href="#cb48-210"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-211"><a href="#cb48-211"></a><span class="in">   cols_align(</span></span>
+<span id="cb48-212"><a href="#cb48-212"></a><span class="in">    align = &quot;center&quot;,</span></span>
+<span id="cb48-213"><a href="#cb48-213"></a><span class="in">    columns = c(&quot;toxic&quot;, &quot;severe_toxic&quot;, &quot;obscene&quot;, &quot;threat&quot;, &quot;insult&quot;, &quot;identity_hate&quot;, &quot;sum_injurious&quot;)</span></span>
+<span id="cb48-214"><a href="#cb48-214"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-215"><a href="#cb48-215"></a><span class="in">  cols_align(</span></span>
+<span id="cb48-216"><a href="#cb48-216"></a><span class="in">    align = &quot;left&quot;,</span></span>
+<span id="cb48-217"><a href="#cb48-217"></a><span class="in">    columns = comment_text</span></span>
+<span id="cb48-218"><a href="#cb48-218"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-219"><a href="#cb48-219"></a><span class="in">  cols_label(</span></span>
+<span id="cb48-220"><a href="#cb48-220"></a><span class="in">    comment_text = &quot;Comments&quot;,</span></span>
+<span id="cb48-221"><a href="#cb48-221"></a><span class="in">    toxic = &quot;Toxic&quot;,</span></span>
+<span id="cb48-222"><a href="#cb48-222"></a><span class="in">    severe_toxic = &quot;Severe Toxic&quot;,</span></span>
+<span id="cb48-223"><a href="#cb48-223"></a><span class="in">    obscene = &quot;Obscene&quot;,</span></span>
+<span id="cb48-224"><a href="#cb48-224"></a><span class="in">    threat = &quot;Threat&quot;,</span></span>
+<span id="cb48-225"><a href="#cb48-225"></a><span class="in">    insult = &quot;Insult&quot;,</span></span>
+<span id="cb48-226"><a href="#cb48-226"></a><span class="in">    identity_hate = &quot;Identity Hate&quot;,</span></span>
+<span id="cb48-227"><a href="#cb48-227"></a><span class="in">    sum_injurious = &quot;Sum Injurious&quot;</span></span>
+<span id="cb48-228"><a href="#cb48-228"></a><span class="in">    )</span></span>
+<span id="cb48-229"><a href="#cb48-229"></a><span class="in">```</span></span>
+<span id="cb48-230"><a href="#cb48-230"></a></span>
+<span id="cb48-231"><a href="#cb48-231"></a>Lets create a *clean* variable for EDA purpose: I want to visually see how many observation are clean vs the others labels.</span>
+<span id="cb48-232"><a href="#cb48-232"></a></span>
+<span id="cb48-233"><a href="#cb48-233"></a><span class="in">```{python, clean}</span></span>
+<span id="cb48-234"><a href="#cb48-234"></a><span class="in">df.loc[df.sum_injurious == 0, &quot;clean&quot;] = 1</span></span>
+<span id="cb48-235"><a href="#cb48-235"></a><span class="in">df.loc[df.sum_injurious != 0, &quot;clean&quot;] = 0</span></span>
+<span id="cb48-236"><a href="#cb48-236"></a><span class="in">```</span></span>
+<span id="cb48-237"><a href="#cb48-237"></a></span>
+<span id="cb48-238"><a href="#cb48-238"></a><span class="fu">## EDA</span></span>
+<span id="cb48-239"><a href="#cb48-239"></a></span>
+<span id="cb48-240"><a href="#cb48-240"></a>First a check on the dataset to find possible missing values and imbalances.</span>
+<span id="cb48-241"><a href="#cb48-241"></a></span>
+<span id="cb48-242"><a href="#cb48-242"></a><span class="fu">### Frequency</span></span>
+<span id="cb48-243"><a href="#cb48-243"></a></span>
+<span id="cb48-244"><a href="#cb48-244"></a><span class="in">```{r, tbl_freq}</span></span>
+<span id="cb48-245"><a href="#cb48-245"></a><span class="in">#| label: tbl-frequency</span></span>
+<span id="cb48-246"><a href="#cb48-246"></a><span class="in">#| tbl-cap: Absolute and relative labels frequency</span></span>
+<span id="cb48-247"><a href="#cb48-247"></a></span>
+<span id="cb48-248"><a href="#cb48-248"></a><span class="in">library(reticulate)</span></span>
+<span id="cb48-249"><a href="#cb48-249"></a><span class="in">df_r &lt;- py$df</span></span>
+<span id="cb48-250"><a href="#cb48-250"></a><span class="in">new_labels_r &lt;- py$config$new_labels</span></span>
+<span id="cb48-251"><a href="#cb48-251"></a></span>
+<span id="cb48-252"><a href="#cb48-252"></a><span class="in">df_r_grouped &lt;- df_r %&gt;% </span></span>
+<span id="cb48-253"><a href="#cb48-253"></a><span class="in">  select(all_of(new_labels_r)) %&gt;%</span></span>
+<span id="cb48-254"><a href="#cb48-254"></a><span class="in">  pivot_longer(</span></span>
+<span id="cb48-255"><a href="#cb48-255"></a><span class="in">    cols = all_of(new_labels_r),</span></span>
+<span id="cb48-256"><a href="#cb48-256"></a><span class="in">    names_to = &quot;label&quot;,</span></span>
+<span id="cb48-257"><a href="#cb48-257"></a><span class="in">    values_to = &quot;value&quot;</span></span>
+<span id="cb48-258"><a href="#cb48-258"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-259"><a href="#cb48-259"></a><span class="in">  group_by(label) %&gt;%</span></span>
+<span id="cb48-260"><a href="#cb48-260"></a><span class="in">  summarise(count = sum(value)) %&gt;% </span></span>
+<span id="cb48-261"><a href="#cb48-261"></a><span class="in">  mutate(freq = round(count / sum(count), 4))</span></span>
+<span id="cb48-262"><a href="#cb48-262"></a></span>
+<span id="cb48-263"><a href="#cb48-263"></a><span class="in">df_r_grouped %&gt;% </span></span>
+<span id="cb48-264"><a href="#cb48-264"></a><span class="in">  gt() %&gt;% </span></span>
+<span id="cb48-265"><a href="#cb48-265"></a><span class="in">  tab_header(</span></span>
+<span id="cb48-266"><a href="#cb48-266"></a><span class="in">    title = &quot;Labels frequency&quot;,</span></span>
+<span id="cb48-267"><a href="#cb48-267"></a><span class="in">    subtitle = &quot;Absolute and relative frequency&quot;</span></span>
+<span id="cb48-268"><a href="#cb48-268"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-269"><a href="#cb48-269"></a><span class="in">  fmt_number(</span></span>
+<span id="cb48-270"><a href="#cb48-270"></a><span class="in">    columns = &quot;count&quot;,</span></span>
+<span id="cb48-271"><a href="#cb48-271"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
+<span id="cb48-272"><a href="#cb48-272"></a><span class="in">    drop_trailing_dec_mark = TRUE,</span></span>
+<span id="cb48-273"><a href="#cb48-273"></a><span class="in">    use_seps = TRUE</span></span>
+<span id="cb48-274"><a href="#cb48-274"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-275"><a href="#cb48-275"></a><span class="in">  fmt_percent(</span></span>
+<span id="cb48-276"><a href="#cb48-276"></a><span class="in">    columns = &quot;freq&quot;,</span></span>
+<span id="cb48-277"><a href="#cb48-277"></a><span class="in">    decimals = 2,</span></span>
+<span id="cb48-278"><a href="#cb48-278"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
+<span id="cb48-279"><a href="#cb48-279"></a><span class="in">    drop_trailing_dec_mark = FALSE</span></span>
+<span id="cb48-280"><a href="#cb48-280"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-281"><a href="#cb48-281"></a><span class="in">  cols_align(</span></span>
+<span id="cb48-282"><a href="#cb48-282"></a><span class="in">    align = &quot;center&quot;,</span></span>
+<span id="cb48-283"><a href="#cb48-283"></a><span class="in">    columns = c(&quot;count&quot;, &quot;freq&quot;)</span></span>
+<span id="cb48-284"><a href="#cb48-284"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-285"><a href="#cb48-285"></a><span class="in">  cols_align(</span></span>
+<span id="cb48-286"><a href="#cb48-286"></a><span class="in">    align = &quot;left&quot;,</span></span>
+<span id="cb48-287"><a href="#cb48-287"></a><span class="in">    columns = label</span></span>
+<span id="cb48-288"><a href="#cb48-288"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-289"><a href="#cb48-289"></a><span class="in">  cols_label(</span></span>
+<span id="cb48-290"><a href="#cb48-290"></a><span class="in">    label = &quot;Label&quot;,</span></span>
+<span id="cb48-291"><a href="#cb48-291"></a><span class="in">    count = &quot;Absolute Frequency&quot;,</span></span>
+<span id="cb48-292"><a href="#cb48-292"></a><span class="in">    freq = &quot;Relative frequency&quot;</span></span>
+<span id="cb48-293"><a href="#cb48-293"></a><span class="in">  )</span></span>
+<span id="cb48-294"><a href="#cb48-294"></a><span class="in">```</span></span>
+<span id="cb48-295"><a href="#cb48-295"></a></span>
+<span id="cb48-296"><a href="#cb48-296"></a><span class="fu">### Barchart</span></span>
+<span id="cb48-297"><a href="#cb48-297"></a></span>
+<span id="cb48-298"><a href="#cb48-298"></a><span class="in">```{r, barchart}</span></span>
+<span id="cb48-299"><a href="#cb48-299"></a><span class="in">#| label: fig-barchart</span></span>
+<span id="cb48-300"><a href="#cb48-300"></a><span class="in">#| fig.cap: &quot;Imbalance in the dataset with clean variable&quot;</span></span>
+<span id="cb48-301"><a href="#cb48-301"></a><span class="in">#| fig.width: 10</span></span>
+<span id="cb48-302"><a href="#cb48-302"></a><span class="in">#| fig.height: 6</span></span>
+<span id="cb48-303"><a href="#cb48-303"></a><span class="in">#| fig-responsive: true</span></span>
+<span id="cb48-304"><a href="#cb48-304"></a></span>
+<span id="cb48-305"><a href="#cb48-305"></a><span class="in">library(reticulate)</span></span>
+<span id="cb48-306"><a href="#cb48-306"></a><span class="in">barchart &lt;- df_r_grouped %&gt;%</span></span>
+<span id="cb48-307"><a href="#cb48-307"></a><span class="in">  ggplot(aes(x = reorder(label, count), y = count, fill = label)) +</span></span>
+<span id="cb48-308"><a href="#cb48-308"></a><span class="in">  geom_col() +</span></span>
+<span id="cb48-309"><a href="#cb48-309"></a><span class="in">  labs(</span></span>
+<span id="cb48-310"><a href="#cb48-310"></a><span class="in">    x = &quot;Labels&quot;,</span></span>
+<span id="cb48-311"><a href="#cb48-311"></a><span class="in">    y = &quot;Count&quot;</span></span>
+<span id="cb48-312"><a href="#cb48-312"></a><span class="in">  ) +</span></span>
+<span id="cb48-313"><a href="#cb48-313"></a><span class="in">  # sort bars in descending order</span></span>
+<span id="cb48-314"><a href="#cb48-314"></a><span class="in">  scale_x_discrete(limits = df_r_grouped$label[order(df_r_grouped$count, decreasing = TRUE)]) +</span></span>
+<span id="cb48-315"><a href="#cb48-315"></a><span class="in">  scale_fill_brewer(type = &quot;seq&quot;, palette = &quot;RdYlBu&quot;) +</span></span>
+<span id="cb48-316"><a href="#cb48-316"></a><span class="in">  theme_minimal()</span></span>
+<span id="cb48-317"><a href="#cb48-317"></a><span class="in">ggplotly(barchart)</span></span>
+<span id="cb48-318"><a href="#cb48-318"></a><span class="in">```</span></span>
+<span id="cb48-319"><a href="#cb48-319"></a></span>
+<span id="cb48-320"><a href="#cb48-320"></a>It is visible how much the dataset in imbalanced. This means it could be useful to check for the class weight and use this argument during the training.</span>
+<span id="cb48-321"><a href="#cb48-321"></a></span>
+<span id="cb48-322"><a href="#cb48-322"></a><span class="in">```{r, clean_perc}</span></span>
+<span id="cb48-323"><a href="#cb48-323"></a><span class="in">#| echo: false</span></span>
+<span id="cb48-324"><a href="#cb48-324"></a></span>
+<span id="cb48-325"><a href="#cb48-325"></a><span class="in">clean_perc &lt;- df_r_grouped %&gt;%</span></span>
+<span id="cb48-326"><a href="#cb48-326"></a><span class="in">  filter(label == &quot;clean&quot;) %&gt;% </span></span>
+<span id="cb48-327"><a href="#cb48-327"></a><span class="in">  pull(freq)</span></span>
+<span id="cb48-328"><a href="#cb48-328"></a><span class="in">```</span></span>
+<span id="cb48-329"><a href="#cb48-329"></a></span>
+<span id="cb48-330"><a href="#cb48-330"></a>It is clear that most of our text are clean. We are talking about <span class="in">`r clean_perc`</span> of the observations which are clean. Only <span class="in">`r 1 - clean_perc`</span> are toxic comments.</span>
+<span id="cb48-331"><a href="#cb48-331"></a></span>
+<span id="cb48-332"><a href="#cb48-332"></a><span class="fu">## Sequence lenght definition</span></span>
+<span id="cb48-333"><a href="#cb48-333"></a></span>
+<span id="cb48-334"><a href="#cb48-334"></a>To convert the text in a useful input for a NN, it is necessary to use a <span class="in">`TextVectorization layer`</span>. See the @sec-preprocessing section.</span>
+<span id="cb48-335"><a href="#cb48-335"></a></span>
+<span id="cb48-336"><a href="#cb48-336"></a>One of the method is <span class="in">`output_sequence_length`</span>: to better define it, it is useful to analyze our text length. To simulate what the model we do, we are going to remove the punctuation and the new lines from the comments.</span>
+<span id="cb48-337"><a href="#cb48-337"></a></span>
+<span id="cb48-338"><a href="#cb48-338"></a><span class="fu">### Summary</span></span>
+<span id="cb48-339"><a href="#cb48-339"></a></span>
+<span id="cb48-340"><a href="#cb48-340"></a><span class="in">```{r, summary}</span></span>
+<span id="cb48-341"><a href="#cb48-341"></a><span class="in">#| label: tbl-summary</span></span>
+<span id="cb48-342"><a href="#cb48-342"></a><span class="in">#| tbl-cap: Summary of text length</span></span>
+<span id="cb48-343"><a href="#cb48-343"></a></span>
+<span id="cb48-344"><a href="#cb48-344"></a><span class="in">library(reticulate)</span></span>
+<span id="cb48-345"><a href="#cb48-345"></a><span class="in">df_r %&gt;% </span></span>
+<span id="cb48-346"><a href="#cb48-346"></a><span class="in">  mutate(</span></span>
+<span id="cb48-347"><a href="#cb48-347"></a><span class="in">    comment_text_clean = comment_text %&gt;%</span></span>
+<span id="cb48-348"><a href="#cb48-348"></a><span class="in">      tolower() %&gt;% </span></span>
+<span id="cb48-349"><a href="#cb48-349"></a><span class="in">      str_remove_all(&quot;[[:punct:]]&quot;) %&gt;% </span></span>
+<span id="cb48-350"><a href="#cb48-350"></a><span class="in">      str_replace_all(&quot;\n&quot;, &quot; &quot;),</span></span>
+<span id="cb48-351"><a href="#cb48-351"></a><span class="in">    text_length = comment_text_clean %&gt;% str_count()</span></span>
+<span id="cb48-352"><a href="#cb48-352"></a><span class="in">    ) %&gt;% </span></span>
+<span id="cb48-353"><a href="#cb48-353"></a><span class="in">  pull(text_length) %&gt;% </span></span>
+<span id="cb48-354"><a href="#cb48-354"></a><span class="in">  summary() %&gt;% </span></span>
+<span id="cb48-355"><a href="#cb48-355"></a><span class="in">  as.list() %&gt;% </span></span>
+<span id="cb48-356"><a href="#cb48-356"></a><span class="in">  as_tibble() %&gt;% </span></span>
+<span id="cb48-357"><a href="#cb48-357"></a><span class="in">  gt() %&gt;% </span></span>
+<span id="cb48-358"><a href="#cb48-358"></a><span class="in">  tab_header(</span></span>
+<span id="cb48-359"><a href="#cb48-359"></a><span class="in">    title = &quot;Summary Statistics&quot;,</span></span>
+<span id="cb48-360"><a href="#cb48-360"></a><span class="in">    subtitle = &quot;of text length&quot;</span></span>
+<span id="cb48-361"><a href="#cb48-361"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-362"><a href="#cb48-362"></a><span class="in">  fmt_number(</span></span>
+<span id="cb48-363"><a href="#cb48-363"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
+<span id="cb48-364"><a href="#cb48-364"></a><span class="in">    drop_trailing_dec_mark = TRUE,</span></span>
+<span id="cb48-365"><a href="#cb48-365"></a><span class="in">    use_seps = TRUE</span></span>
+<span id="cb48-366"><a href="#cb48-366"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-367"><a href="#cb48-367"></a><span class="in">  cols_align(</span></span>
+<span id="cb48-368"><a href="#cb48-368"></a><span class="in">    align = &quot;center&quot;,</span></span>
+<span id="cb48-369"><a href="#cb48-369"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-370"><a href="#cb48-370"></a><span class="in">  cols_label(</span></span>
+<span id="cb48-371"><a href="#cb48-371"></a><span class="in">    Min. = &quot;Min&quot;,</span></span>
+<span id="cb48-372"><a href="#cb48-372"></a><span class="in">    `1st Qu.` = &quot;Q1&quot;,</span></span>
+<span id="cb48-373"><a href="#cb48-373"></a><span class="in">    Median = &quot;Median&quot;,</span></span>
+<span id="cb48-374"><a href="#cb48-374"></a><span class="in">    `3rd Qu.` = &quot;Q3&quot;,</span></span>
+<span id="cb48-375"><a href="#cb48-375"></a><span class="in">    Max. = &quot;Max&quot;</span></span>
+<span id="cb48-376"><a href="#cb48-376"></a><span class="in">  )</span></span>
+<span id="cb48-377"><a href="#cb48-377"></a><span class="in">  </span></span>
+<span id="cb48-378"><a href="#cb48-378"></a><span class="in">```</span></span>
+<span id="cb48-379"><a href="#cb48-379"></a></span>
+<span id="cb48-380"><a href="#cb48-380"></a><span class="fu">### Boxplot</span></span>
+<span id="cb48-381"><a href="#cb48-381"></a></span>
+<span id="cb48-382"><a href="#cb48-382"></a><span class="in">```{r, boxplot}</span></span>
+<span id="cb48-383"><a href="#cb48-383"></a><span class="in">#| label: fig-boxplot</span></span>
+<span id="cb48-384"><a href="#cb48-384"></a><span class="in">#| fig.cap: &quot;Text length boxplot&quot;</span></span>
+<span id="cb48-385"><a href="#cb48-385"></a><span class="in">#| fig.width: 10</span></span>
+<span id="cb48-386"><a href="#cb48-386"></a><span class="in">#| fig.height: 14</span></span>
+<span id="cb48-387"><a href="#cb48-387"></a></span>
+<span id="cb48-388"><a href="#cb48-388"></a><span class="in">library(reticulate)</span></span>
+<span id="cb48-389"><a href="#cb48-389"></a><span class="in">boxplot &lt;- df_r %&gt;% </span></span>
+<span id="cb48-390"><a href="#cb48-390"></a><span class="in">  mutate(</span></span>
+<span id="cb48-391"><a href="#cb48-391"></a><span class="in">    comment_text_clean = comment_text %&gt;%</span></span>
+<span id="cb48-392"><a href="#cb48-392"></a><span class="in">      tolower() %&gt;% </span></span>
+<span id="cb48-393"><a href="#cb48-393"></a><span class="in">      str_remove_all(&quot;[[:punct:]]&quot;) %&gt;% </span></span>
+<span id="cb48-394"><a href="#cb48-394"></a><span class="in">      str_replace_all(&quot;\n&quot;, &quot; &quot;),</span></span>
+<span id="cb48-395"><a href="#cb48-395"></a><span class="in">    text_length = comment_text_clean %&gt;% str_count()</span></span>
+<span id="cb48-396"><a href="#cb48-396"></a><span class="in">    ) %&gt;% </span></span>
+<span id="cb48-397"><a href="#cb48-397"></a><span class="in">  # pull(text_length) %&gt;% </span></span>
+<span id="cb48-398"><a href="#cb48-398"></a><span class="in">  ggplot(aes(y = text_length)) +</span></span>
+<span id="cb48-399"><a href="#cb48-399"></a><span class="in">  geom_boxplot() +</span></span>
+<span id="cb48-400"><a href="#cb48-400"></a><span class="in">  theme_minimal()</span></span>
+<span id="cb48-401"><a href="#cb48-401"></a><span class="in">ggplotly(boxplot)</span></span>
+<span id="cb48-402"><a href="#cb48-402"></a><span class="in">```</span></span>
+<span id="cb48-403"><a href="#cb48-403"></a></span>
+<span id="cb48-404"><a href="#cb48-404"></a><span class="fu">### Histogram</span></span>
+<span id="cb48-405"><a href="#cb48-405"></a></span>
+<span id="cb48-406"><a href="#cb48-406"></a><span class="in">```{r, histogram}</span></span>
+<span id="cb48-407"><a href="#cb48-407"></a><span class="in">#| label: fig-histogram</span></span>
+<span id="cb48-408"><a href="#cb48-408"></a><span class="in">#| fig.cap: &quot;Text length histogram with boxplot upper fence&quot;</span></span>
+<span id="cb48-409"><a href="#cb48-409"></a><span class="in">#| fig.width: 10</span></span>
+<span id="cb48-410"><a href="#cb48-410"></a><span class="in">#| fig.height: 6</span></span>
+<span id="cb48-411"><a href="#cb48-411"></a></span>
 <span id="cb48-412"><a href="#cb48-412"></a></span>
-<span id="cb48-413"><a href="#cb48-413"></a></span>
-<span id="cb48-414"><a href="#cb48-414"></a><span class="in">df_ &lt;- df_r %&gt;% </span></span>
-<span id="cb48-415"><a href="#cb48-415"></a><span class="in">  mutate(</span></span>
-<span id="cb48-416"><a href="#cb48-416"></a><span class="in">    comment_text_clean = comment_text %&gt;%</span></span>
-<span id="cb48-417"><a href="#cb48-417"></a><span class="in">      tolower() %&gt;% </span></span>
-<span id="cb48-418"><a href="#cb48-418"></a><span class="in">      str_remove_all(&quot;[[:punct:]]&quot;) %&gt;% </span></span>
-<span id="cb48-419"><a href="#cb48-419"></a><span class="in">      str_replace_all(&quot;\n&quot;, &quot; &quot;),</span></span>
-<span id="cb48-420"><a href="#cb48-420"></a><span class="in">    text_length = comment_text_clean %&gt;% str_count()</span></span>
-<span id="cb48-421"><a href="#cb48-421"></a><span class="in">  )</span></span>
-<span id="cb48-422"><a href="#cb48-422"></a></span>
-<span id="cb48-423"><a href="#cb48-423"></a><span class="in">Q1 &lt;- quantile(df_$text_length, 0.25)</span></span>
-<span id="cb48-424"><a href="#cb48-424"></a><span class="in">Q3 &lt;- quantile(df_$text_length, 0.75)</span></span>
-<span id="cb48-425"><a href="#cb48-425"></a><span class="in">IQR &lt;- Q3 - Q1</span></span>
-<span id="cb48-426"><a href="#cb48-426"></a><span class="in">upper_fence &lt;- as.integer(Q3 + 1.5 * IQR)</span></span>
-<span id="cb48-427"><a href="#cb48-427"></a></span>
-<span id="cb48-428"><a href="#cb48-428"></a><span class="in">histogram &lt;- df_ %&gt;% </span></span>
-<span id="cb48-429"><a href="#cb48-429"></a><span class="in">  ggplot(aes(x = text_length)) +</span></span>
-<span id="cb48-430"><a href="#cb48-430"></a><span class="in">  geom_histogram(bins = 50) +</span></span>
-<span id="cb48-431"><a href="#cb48-431"></a><span class="in">  geom_vline(aes(xintercept = upper_fence), color = &quot;red&quot;, linetype = &quot;dashed&quot;, linewidth = 1) +</span></span>
-<span id="cb48-432"><a href="#cb48-432"></a><span class="in">  theme_minimal() +</span></span>
-<span id="cb48-433"><a href="#cb48-433"></a><span class="in">  xlab(&quot;Text Length&quot;) +</span></span>
-<span id="cb48-434"><a href="#cb48-434"></a><span class="in">  ylab(&quot;Frequency&quot;) +</span></span>
-<span id="cb48-435"><a href="#cb48-435"></a><span class="in">  xlim(0, max(df_$text_length, upper_fence))</span></span>
-<span id="cb48-436"><a href="#cb48-436"></a><span class="in">ggplotly(histogram)</span></span>
-<span id="cb48-437"><a href="#cb48-437"></a><span class="in">```</span></span>
-<span id="cb48-438"><a href="#cb48-438"></a></span>
-<span id="cb48-439"><a href="#cb48-439"></a>Considering all the above analysis, I think a good starting value for the <span class="in">`output_sequence_length`</span> is <span class="in">`r upper_fence`</span>, the upper fence of the boxplot. In the last plot, it is the dashed red vertical line.. Doing so, we are removing the outliers, which are a small part of our dataset.</span>
-<span id="cb48-440"><a href="#cb48-440"></a></span>
-<span id="cb48-441"><a href="#cb48-441"></a><span class="fu">## Dataset</span></span>
-<span id="cb48-442"><a href="#cb48-442"></a></span>
-<span id="cb48-443"><a href="#cb48-443"></a>Now we can split the dataset in 3: *train*, *test* and *validation* sets. Considering there is not a function in sklearn which lets split in these 3 sets, we can do the following: - split between a *train* and *temp*orary set with a 0.3 split. - split the *temp*orary set in 2 equal sized *test* and *val* sets.</span>
-<span id="cb48-444"><a href="#cb48-444"></a></span>
-<span id="cb48-447"><a href="#cb48-447"></a><span class="in">```{python}</span></span>
-<span id="cb48-448"><a href="#cb48-448"></a>x <span class="op">=</span> df[config.features].values</span>
-<span id="cb48-449"><a href="#cb48-449"></a>y <span class="op">=</span> df[config.labels].values</span>
-<span id="cb48-450"><a href="#cb48-450"></a></span>
-<span id="cb48-451"><a href="#cb48-451"></a>xtrain, xtemp, ytrain, ytemp <span class="op">=</span> train_test_split(</span>
-<span id="cb48-452"><a href="#cb48-452"></a>  x,</span>
-<span id="cb48-453"><a href="#cb48-453"></a>  y,</span>
-<span id="cb48-454"><a href="#cb48-454"></a>  test_size<span class="op">=</span>config.temp_split, <span class="co"># .3</span></span>
-<span id="cb48-455"><a href="#cb48-455"></a>  random_state<span class="op">=</span>config.random_state</span>
-<span id="cb48-456"><a href="#cb48-456"></a>  )</span>
-<span id="cb48-457"><a href="#cb48-457"></a>xtest, xval, ytest, yval <span class="op">=</span> train_test_split(</span>
-<span id="cb48-458"><a href="#cb48-458"></a>  xtemp,</span>
-<span id="cb48-459"><a href="#cb48-459"></a>  ytemp,</span>
-<span id="cb48-460"><a href="#cb48-460"></a>  test_size<span class="op">=</span>config.test_split, <span class="co"># .5</span></span>
-<span id="cb48-461"><a href="#cb48-461"></a>  random_state<span class="op">=</span>config.random_state</span>
-<span id="cb48-462"><a href="#cb48-462"></a>  )</span>
-<span id="cb48-463"><a href="#cb48-463"></a><span class="in">```</span></span>
-<span id="cb48-464"><a href="#cb48-464"></a></span>
-<span id="cb48-465"><a href="#cb48-465"></a>xtrain shape: <span class="in">`py$xtrain.shape`</span> ytrain shape: <span class="in">`py$ytrain.shape`</span> xtest shape: <span class="in">`py$xtest.shape`</span> ytest shape: <span class="in">`py$ytest.shape`</span> xval shape: <span class="in">`py$xval.shape`</span> yval shape: <span class="in">`py$yval.shape`</span></span>
-<span id="cb48-466"><a href="#cb48-466"></a></span>
-<span id="cb48-467"><a href="#cb48-467"></a>The datasets are created using the <span class="in">`tf.data.Dataset`</span> function. It creates a data input pipeline. The <span class="in">`tf.data`</span> API makes it possible to handle large amounts of data, read from different data formats, and perform complex transformations. The <span class="in">`tf.data.Dataset`</span> is an abstraction that represents a sequence of elements, in which each element consists of one or more components. Here each dataset is creates using <span class="in">`from_tensor_slices`</span>. It create a tf.data.Dataset from a tuple (features, labels). <span class="in">`.batch`</span> let us work in batches to improve performance, while <span class="in">`.prefetch`</span> overlaps the preprocessing and model execution of a training step. While the model is executing training step s, the input pipeline is reading the data for step s+1. Check the <span class="co">[</span><span class="ot">documentation</span><span class="co">](https://www.tensorflow.org/guide/data_performance)</span> for further informations.</span>
-<span id="cb48-468"><a href="#cb48-468"></a></span>
-<span id="cb48-469"><a href="#cb48-469"></a><span class="in">```{python, datasets}</span></span>
-<span id="cb48-470"><a href="#cb48-470"></a><span class="in">train_ds = (</span></span>
-<span id="cb48-471"><a href="#cb48-471"></a><span class="in">    tf.data.Dataset</span></span>
-<span id="cb48-472"><a href="#cb48-472"></a><span class="in">    .from_tensor_slices((xtrain, ytrain))</span></span>
-<span id="cb48-473"><a href="#cb48-473"></a><span class="in">    .shuffle(xtrain.shape[0])</span></span>
-<span id="cb48-474"><a href="#cb48-474"></a><span class="in">    .batch(config.batch_size)</span></span>
-<span id="cb48-475"><a href="#cb48-475"></a><span class="in">    .prefetch(tf.data.experimental.AUTOTUNE)</span></span>
-<span id="cb48-476"><a href="#cb48-476"></a><span class="in">)</span></span>
-<span id="cb48-477"><a href="#cb48-477"></a></span>
-<span id="cb48-478"><a href="#cb48-478"></a><span class="in">test_ds = (</span></span>
-<span id="cb48-479"><a href="#cb48-479"></a><span class="in">    tf.data.Dataset</span></span>
-<span id="cb48-480"><a href="#cb48-480"></a><span class="in">    .from_tensor_slices((xtest, ytest))</span></span>
-<span id="cb48-481"><a href="#cb48-481"></a><span class="in">    .batch(config.batch_size)</span></span>
-<span id="cb48-482"><a href="#cb48-482"></a><span class="in">    .prefetch(tf.data.experimental.AUTOTUNE)</span></span>
-<span id="cb48-483"><a href="#cb48-483"></a><span class="in">)</span></span>
-<span id="cb48-484"><a href="#cb48-484"></a></span>
-<span id="cb48-485"><a href="#cb48-485"></a><span class="in">val_ds = (</span></span>
-<span id="cb48-486"><a href="#cb48-486"></a><span class="in">    tf.data.Dataset</span></span>
-<span id="cb48-487"><a href="#cb48-487"></a><span class="in">    .from_tensor_slices((xval, yval))</span></span>
-<span id="cb48-488"><a href="#cb48-488"></a><span class="in">    .batch(config.batch_size)</span></span>
-<span id="cb48-489"><a href="#cb48-489"></a><span class="in">    .prefetch(tf.data.experimental.AUTOTUNE)</span></span>
-<span id="cb48-490"><a href="#cb48-490"></a><span class="in">)</span></span>
-<span id="cb48-491"><a href="#cb48-491"></a></span>
-<span id="cb48-492"><a href="#cb48-492"></a><span class="in">```</span></span>
-<span id="cb48-493"><a href="#cb48-493"></a></span>
-<span id="cb48-496"><a href="#cb48-496"></a><span class="in">```{python}</span></span>
-<span id="cb48-497"><a href="#cb48-497"></a><span class="bu">print</span>(</span>
-<span id="cb48-498"><a href="#cb48-498"></a>  <span class="ss">f&quot;train_ds cardinality: </span><span class="sc">{</span>train_ds<span class="sc">.</span>cardinality()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
-<span id="cb48-499"><a href="#cb48-499"></a>  <span class="ss">f&quot;val_ds cardinality: </span><span class="sc">{</span>val_ds<span class="sc">.</span>cardinality()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
-<span id="cb48-500"><a href="#cb48-500"></a>  <span class="ss">f&quot;test_ds cardinality: </span><span class="sc">{</span>test_ds<span class="sc">.</span>cardinality()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
-<span id="cb48-501"><a href="#cb48-501"></a>  )</span>
-<span id="cb48-502"><a href="#cb48-502"></a><span class="in">```</span></span>
-<span id="cb48-503"><a href="#cb48-503"></a></span>
-<span id="cb48-504"><a href="#cb48-504"></a>Check the first element of the dataset to be sure that the preprocessing is done correctly.</span>
-<span id="cb48-505"><a href="#cb48-505"></a></span>
-<span id="cb48-508"><a href="#cb48-508"></a><span class="in">```{python}</span></span>
-<span id="cb48-509"><a href="#cb48-509"></a>train_ds.as_numpy_iterator().<span class="bu">next</span>()</span>
-<span id="cb48-510"><a href="#cb48-510"></a><span class="in">```</span></span>
-<span id="cb48-511"><a href="#cb48-511"></a></span>
-<span id="cb48-512"><a href="#cb48-512"></a>And we check also the shape. We expect a feature of shape (batch, ) and a target of shape (batch, number of labels).</span>
-<span id="cb48-513"><a href="#cb48-513"></a></span>
-<span id="cb48-516"><a href="#cb48-516"></a><span class="in">```{python}</span></span>
-<span id="cb48-517"><a href="#cb48-517"></a><span class="bu">print</span>(</span>
-<span id="cb48-518"><a href="#cb48-518"></a>  <span class="ss">f&quot;text train shape: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">0</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
-<span id="cb48-519"><a href="#cb48-519"></a>  <span class="ss">f&quot; text train type: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">0</span>]<span class="sc">.</span>dtype<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
-<span id="cb48-520"><a href="#cb48-520"></a>  <span class="ss">f&quot;label train shape: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">1</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
-<span id="cb48-521"><a href="#cb48-521"></a>  <span class="ss">f&quot;label train type: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">1</span>]<span class="sc">.</span>dtype<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
-<span id="cb48-522"><a href="#cb48-522"></a>  )</span>
-<span id="cb48-523"><a href="#cb48-523"></a><span class="in">```</span></span>
-<span id="cb48-524"><a href="#cb48-524"></a></span>
-<span id="cb48-525"><a href="#cb48-525"></a><span class="fu"># Preprocessing {#sec-preprocessing}</span></span>
-<span id="cb48-526"><a href="#cb48-526"></a></span>
-<span id="cb48-527"><a href="#cb48-527"></a>Of course preprocessing! Text is not the type of input a NN can handle. The *`TextVectorization`* layer is meant to handle natural language inputs. The processing of each example contains the following steps: 1. <span class="in">`Standardize`</span> each example (usually lowercasing + punctuation stripping) 2. <span class="in">`Split`</span> each example into substrings (usually words) 3. Recombine substrings into <span class="in">`tokens`</span> (usually ngrams) 4. <span class="in">`Index`</span> tokens (associate a unique int value with each token) 5. <span class="in">`Transform`</span> each example using this index, either into a vector of ints or a dense float vector.</span>
-<span id="cb48-528"><a href="#cb48-528"></a></span>
-<span id="cb48-529"><a href="#cb48-529"></a>For more reference, see the documentation at the following <span class="co">[</span><span class="ot">link</span><span class="co">](https://keras.io/api/layers/preprocessing_layers/text/text_vectorization/)</span>.</span>
-<span id="cb48-530"><a href="#cb48-530"></a></span>
-<span id="cb48-531"><a href="#cb48-531"></a><span class="in">```{python, text_vec}</span></span>
-<span id="cb48-532"><a href="#cb48-532"></a><span class="in">text_vectorization = TextVectorization(</span></span>
-<span id="cb48-533"><a href="#cb48-533"></a><span class="in">  max_tokens=config.max_tokens,</span></span>
-<span id="cb48-534"><a href="#cb48-534"></a><span class="in">  standardize=&quot;lower_and_strip_punctuation&quot;,</span></span>
-<span id="cb48-535"><a href="#cb48-535"></a><span class="in">  split=&quot;whitespace&quot;,</span></span>
-<span id="cb48-536"><a href="#cb48-536"></a><span class="in">  output_mode=&quot;int&quot;,</span></span>
-<span id="cb48-537"><a href="#cb48-537"></a><span class="in">  output_sequence_length=config.output_sequence_length,</span></span>
-<span id="cb48-538"><a href="#cb48-538"></a><span class="in">  pad_to_max_tokens=True</span></span>
-<span id="cb48-539"><a href="#cb48-539"></a><span class="in">  )</span></span>
-<span id="cb48-540"><a href="#cb48-540"></a></span>
-<span id="cb48-541"><a href="#cb48-541"></a><span class="in"># prepare a dataset that only yields raw text inputs (no labels)</span></span>
-<span id="cb48-542"><a href="#cb48-542"></a><span class="in">text_train_ds = train_ds.map(lambda x, y: x)</span></span>
-<span id="cb48-543"><a href="#cb48-543"></a><span class="in"># adapt the text vectorization layer to the text data to index the dataset vocabulary</span></span>
-<span id="cb48-544"><a href="#cb48-544"></a><span class="in">text_vectorization.adapt(text_train_ds)</span></span>
-<span id="cb48-545"><a href="#cb48-545"></a><span class="in">```</span></span>
-<span id="cb48-546"><a href="#cb48-546"></a></span>
-<span id="cb48-547"><a href="#cb48-547"></a>This layer is set to: - <span class="in">`max_tokens`</span>: 20000. It is common for text classification. It is the *maximum size* of the vocabulary for this layer. - <span class="in">`output_sequence_length`</span>: <span class="in">`r upper_fence`</span>. See @fig-histogram for the reason why. Only valid in <span class="in">`&quot;int&quot;`</span> mode. - <span class="in">`output_mode`</span>: outputs integer indices, one integer index per split string token. When output_mode == &quot;int&quot;, 0 is reserved for masked locations; this reduces the vocab size to max_tokens - 2 instead of max_tokens - 1. - <span class="in">`standardize`</span>: <span class="in">`&quot;lower_and_strip_punctuation&quot;`</span>. - <span class="in">`split`</span>: on whitespace.</span>
-<span id="cb48-548"><a href="#cb48-548"></a></span>
-<span id="cb48-549"><a href="#cb48-549"></a>To preserve the original comments as text and also have a tf.data.Dataset in which the text is preprocessed by the TextVectorization function, it is possible to map it to the features of each dataset.</span>
-<span id="cb48-550"><a href="#cb48-550"></a></span>
-<span id="cb48-551"><a href="#cb48-551"></a><span class="in">```{python, processed_datasets}</span></span>
-<span id="cb48-552"><a href="#cb48-552"></a><span class="in">processed_train_ds = train_ds.map(</span></span>
-<span id="cb48-553"><a href="#cb48-553"></a><span class="in">    lambda x, y: (text_vectorization(x), y),</span></span>
-<span id="cb48-554"><a href="#cb48-554"></a><span class="in">    num_parallel_calls=tf.data.experimental.AUTOTUNE</span></span>
-<span id="cb48-555"><a href="#cb48-555"></a><span class="in">)</span></span>
-<span id="cb48-556"><a href="#cb48-556"></a><span class="in">processed_val_ds = val_ds.map(</span></span>
-<span id="cb48-557"><a href="#cb48-557"></a><span class="in">    lambda x, y: (text_vectorization(x), y),</span></span>
-<span id="cb48-558"><a href="#cb48-558"></a><span class="in">    num_parallel_calls=tf.data.experimental.AUTOTUNE</span></span>
-<span id="cb48-559"><a href="#cb48-559"></a><span class="in">)</span></span>
-<span id="cb48-560"><a href="#cb48-560"></a><span class="in">processed_test_ds = test_ds.map(</span></span>
-<span id="cb48-561"><a href="#cb48-561"></a><span class="in">    lambda x, y: (text_vectorization(x), y),</span></span>
-<span id="cb48-562"><a href="#cb48-562"></a><span class="in">    num_parallel_calls=tf.data.experimental.AUTOTUNE</span></span>
-<span id="cb48-563"><a href="#cb48-563"></a><span class="in">)</span></span>
-<span id="cb48-564"><a href="#cb48-564"></a><span class="in">```</span></span>
-<span id="cb48-565"><a href="#cb48-565"></a></span>
-<span id="cb48-566"><a href="#cb48-566"></a><span class="fu"># Model</span></span>
-<span id="cb48-567"><a href="#cb48-567"></a></span>
-<span id="cb48-568"><a href="#cb48-568"></a><span class="fu">## Definition</span></span>
-<span id="cb48-569"><a href="#cb48-569"></a></span>
-<span id="cb48-570"><a href="#cb48-570"></a>Define the model using the *Functional* API.</span>
-<span id="cb48-571"><a href="#cb48-571"></a></span>
-<span id="cb48-572"><a href="#cb48-572"></a><span class="in">```{python, get_deeper_lstm_model}</span></span>
-<span id="cb48-573"><a href="#cb48-573"></a><span class="in">#| eval: false</span></span>
-<span id="cb48-574"><a href="#cb48-574"></a></span>
-<span id="cb48-575"><a href="#cb48-575"></a><span class="in">def get_deeper_lstm_model():</span></span>
-<span id="cb48-576"><a href="#cb48-576"></a><span class="in">    </span></span>
-<span id="cb48-577"><a href="#cb48-577"></a><span class="in">    clear_session()</span></span>
-<span id="cb48-578"><a href="#cb48-578"></a><span class="in">    </span></span>
-<span id="cb48-579"><a href="#cb48-579"></a><span class="in">    inputs = Input(shape=(None,), dtype=tf.int64, name=&quot;inputs&quot;)</span></span>
-<span id="cb48-580"><a href="#cb48-580"></a><span class="in">    </span></span>
-<span id="cb48-581"><a href="#cb48-581"></a><span class="in">    embedding = Embedding(</span></span>
-<span id="cb48-582"><a href="#cb48-582"></a><span class="in">        input_dim=config.max_tokens,</span></span>
-<span id="cb48-583"><a href="#cb48-583"></a><span class="in">        output_dim=config.embedding_dim,</span></span>
-<span id="cb48-584"><a href="#cb48-584"></a><span class="in">        mask_zero=True,</span></span>
-<span id="cb48-585"><a href="#cb48-585"></a><span class="in">        name=&quot;embedding&quot;</span></span>
-<span id="cb48-586"><a href="#cb48-586"></a><span class="in">    )(inputs)</span></span>
-<span id="cb48-587"><a href="#cb48-587"></a><span class="in">    x = Bidirectional(LSTM(256, return_sequences=True, name=&quot;bilstm_1&quot;))(embedding)</span></span>
-<span id="cb48-588"><a href="#cb48-588"></a><span class="in">    x = Bidirectional(LSTM(128, return_sequences=True, name=&quot;bilstm_2&quot;))(x)</span></span>
-<span id="cb48-589"><a href="#cb48-589"></a><span class="in">    # Global average pooling</span></span>
-<span id="cb48-590"><a href="#cb48-590"></a><span class="in">    x = GlobalAveragePooling1D()(x)</span></span>
-<span id="cb48-591"><a href="#cb48-591"></a><span class="in">    # Add regularization</span></span>
-<span id="cb48-592"><a href="#cb48-592"></a><span class="in">    x = Dropout(0.3)(x)</span></span>
-<span id="cb48-593"><a href="#cb48-593"></a><span class="in">    x = Dense(64, activation=&#39;relu&#39;, kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)</span></span>
-<span id="cb48-594"><a href="#cb48-594"></a><span class="in">    x = LayerNormalization()(x)</span></span>
-<span id="cb48-595"><a href="#cb48-595"></a><span class="in">    </span></span>
-<span id="cb48-596"><a href="#cb48-596"></a><span class="in">    outputs = Dense(len(config.labels), activation=&#39;sigmoid&#39;, name=&quot;outputs&quot;)(x)</span></span>
-<span id="cb48-597"><a href="#cb48-597"></a><span class="in">    </span></span>
-<span id="cb48-598"><a href="#cb48-598"></a><span class="in">    model = Model(inputs, outputs)</span></span>
-<span id="cb48-599"><a href="#cb48-599"></a><span class="in">    model.compile(</span></span>
-<span id="cb48-600"><a href="#cb48-600"></a><span class="in">      optimizer=&#39;adam&#39;,</span></span>
-<span id="cb48-601"><a href="#cb48-601"></a><span class="in">      loss=&quot;binary_crossentropy&quot;,</span></span>
-<span id="cb48-602"><a href="#cb48-602"></a><span class="in">      metrics=config.metrics,</span></span>
-<span id="cb48-603"><a href="#cb48-603"></a><span class="in">      steps_per_execution=32</span></span>
-<span id="cb48-604"><a href="#cb48-604"></a><span class="in">      )</span></span>
-<span id="cb48-605"><a href="#cb48-605"></a><span class="in">    </span></span>
-<span id="cb48-606"><a href="#cb48-606"></a><span class="in">    return model</span></span>
-<span id="cb48-607"><a href="#cb48-607"></a></span>
-<span id="cb48-608"><a href="#cb48-608"></a><span class="in">lstm_model = get_deeper_lstm_model()</span></span>
-<span id="cb48-609"><a href="#cb48-609"></a><span class="in">lstm_model.summary()</span></span>
-<span id="cb48-610"><a href="#cb48-610"></a><span class="in">```</span></span>
-<span id="cb48-611"><a href="#cb48-611"></a></span>
-<span id="cb48-612"><a href="#cb48-612"></a><span class="fu">## Callbacks</span></span>
-<span id="cb48-613"><a href="#cb48-613"></a></span>
-<span id="cb48-614"><a href="#cb48-614"></a>Finally, the model has been trained using 2 callbacks: - Early Stopping, to avoid to consume the kaggle GPU time. - Model Checkpoint, to retrieve the best model training information.</span>
-<span id="cb48-615"><a href="#cb48-615"></a></span>
-<span id="cb48-616"><a href="#cb48-616"></a><span class="in">```{python, callbacks}</span></span>
-<span id="cb48-617"><a href="#cb48-617"></a><span class="in">my_es = config.get_early_stopping()</span></span>
-<span id="cb48-618"><a href="#cb48-618"></a><span class="in">my_mc = config.get_model_checkpoint(filepath=&quot;/checkpoint.keras&quot;)</span></span>
-<span id="cb48-619"><a href="#cb48-619"></a><span class="in">callbacks = [my_es, my_mc]</span></span>
-<span id="cb48-620"><a href="#cb48-620"></a><span class="in">```</span></span>
-<span id="cb48-621"><a href="#cb48-621"></a></span>
-<span id="cb48-622"><a href="#cb48-622"></a><span class="fu">## Final preparation before fit</span></span>
-<span id="cb48-623"><a href="#cb48-623"></a></span>
-<span id="cb48-624"><a href="#cb48-624"></a>Considering the dataset is imbalanced, to increase the performance we need to calculate the class weight. This will be passed during the training of the model.</span>
-<span id="cb48-625"><a href="#cb48-625"></a></span>
-<span id="cb48-626"><a href="#cb48-626"></a><span class="in">```{python, class_weight}</span></span>
-<span id="cb48-627"><a href="#cb48-627"></a><span class="in">lab = pd.DataFrame(columns=config.labels, data=ytrain)</span></span>
-<span id="cb48-628"><a href="#cb48-628"></a><span class="in">r = lab.sum() / len(ytrain)</span></span>
-<span id="cb48-629"><a href="#cb48-629"></a><span class="in">class_weight = dict(zip(range(len(config.labels)), r))</span></span>
-<span id="cb48-630"><a href="#cb48-630"></a><span class="in">df_class_weight = pd.DataFrame.from_dict(</span></span>
-<span id="cb48-631"><a href="#cb48-631"></a><span class="in">  data=class_weight,</span></span>
-<span id="cb48-632"><a href="#cb48-632"></a><span class="in">  orient=&#39;index&#39;,</span></span>
-<span id="cb48-633"><a href="#cb48-633"></a><span class="in">  columns=[&#39;class_weight&#39;]</span></span>
-<span id="cb48-634"><a href="#cb48-634"></a><span class="in">  )</span></span>
-<span id="cb48-635"><a href="#cb48-635"></a><span class="in">df_class_weight.index = config.labels</span></span>
-<span id="cb48-636"><a href="#cb48-636"></a><span class="in">```</span></span>
-<span id="cb48-637"><a href="#cb48-637"></a></span>
-<span id="cb48-638"><a href="#cb48-638"></a><span class="in">```{r, table_class_weight}</span></span>
-<span id="cb48-639"><a href="#cb48-639"></a><span class="in">#| label: tbl-class_weight</span></span>
-<span id="cb48-640"><a href="#cb48-640"></a><span class="in">#| tbl-cap: Class weight</span></span>
+<span id="cb48-413"><a href="#cb48-413"></a><span class="in">df_ &lt;- df_r %&gt;% </span></span>
+<span id="cb48-414"><a href="#cb48-414"></a><span class="in">  mutate(</span></span>
+<span id="cb48-415"><a href="#cb48-415"></a><span class="in">    comment_text_clean = comment_text %&gt;%</span></span>
+<span id="cb48-416"><a href="#cb48-416"></a><span class="in">      tolower() %&gt;% </span></span>
+<span id="cb48-417"><a href="#cb48-417"></a><span class="in">      str_remove_all(&quot;[[:punct:]]&quot;) %&gt;% </span></span>
+<span id="cb48-418"><a href="#cb48-418"></a><span class="in">      str_replace_all(&quot;\n&quot;, &quot; &quot;),</span></span>
+<span id="cb48-419"><a href="#cb48-419"></a><span class="in">    text_length = comment_text_clean %&gt;% str_count()</span></span>
+<span id="cb48-420"><a href="#cb48-420"></a><span class="in">  )</span></span>
+<span id="cb48-421"><a href="#cb48-421"></a></span>
+<span id="cb48-422"><a href="#cb48-422"></a><span class="in">Q1 &lt;- quantile(df_$text_length, 0.25)</span></span>
+<span id="cb48-423"><a href="#cb48-423"></a><span class="in">Q3 &lt;- quantile(df_$text_length, 0.75)</span></span>
+<span id="cb48-424"><a href="#cb48-424"></a><span class="in">IQR &lt;- Q3 - Q1</span></span>
+<span id="cb48-425"><a href="#cb48-425"></a><span class="in">upper_fence &lt;- as.integer(Q3 + 1.5 * IQR)</span></span>
+<span id="cb48-426"><a href="#cb48-426"></a></span>
+<span id="cb48-427"><a href="#cb48-427"></a><span class="in">histogram &lt;- df_ %&gt;% </span></span>
+<span id="cb48-428"><a href="#cb48-428"></a><span class="in">  ggplot(aes(x = text_length)) +</span></span>
+<span id="cb48-429"><a href="#cb48-429"></a><span class="in">  geom_histogram(bins = 50) +</span></span>
+<span id="cb48-430"><a href="#cb48-430"></a><span class="in">  geom_vline(aes(xintercept = upper_fence), color = &quot;red&quot;, linetype = &quot;dashed&quot;, linewidth = 1) +</span></span>
+<span id="cb48-431"><a href="#cb48-431"></a><span class="in">  theme_minimal() +</span></span>
+<span id="cb48-432"><a href="#cb48-432"></a><span class="in">  xlab(&quot;Text Length&quot;) +</span></span>
+<span id="cb48-433"><a href="#cb48-433"></a><span class="in">  ylab(&quot;Frequency&quot;) +</span></span>
+<span id="cb48-434"><a href="#cb48-434"></a><span class="in">  xlim(0, max(df_$text_length, upper_fence))</span></span>
+<span id="cb48-435"><a href="#cb48-435"></a><span class="in">ggplotly(histogram)</span></span>
+<span id="cb48-436"><a href="#cb48-436"></a><span class="in">```</span></span>
+<span id="cb48-437"><a href="#cb48-437"></a></span>
+<span id="cb48-438"><a href="#cb48-438"></a>Considering all the above analysis, I think a good starting value for the <span class="in">`output_sequence_length`</span> is <span class="in">`r upper_fence`</span>, the upper fence of the boxplot. In the last plot, it is the dashed red vertical line.. Doing so, we are removing the outliers, which are a small part of our dataset.</span>
+<span id="cb48-439"><a href="#cb48-439"></a></span>
+<span id="cb48-440"><a href="#cb48-440"></a><span class="fu">## Dataset</span></span>
+<span id="cb48-441"><a href="#cb48-441"></a></span>
+<span id="cb48-442"><a href="#cb48-442"></a>Now we can split the dataset in 3: *train*, *test* and *validation* sets. Considering there is not a function in sklearn which lets split in these 3 sets, we can do the following: - split between a *train* and *temp*orary set with a 0.3 split. - split the *temp*orary set in 2 equal sized *test* and *val* sets.</span>
+<span id="cb48-443"><a href="#cb48-443"></a></span>
+<span id="cb48-446"><a href="#cb48-446"></a><span class="in">```{python}</span></span>
+<span id="cb48-447"><a href="#cb48-447"></a>x <span class="op">=</span> df[config.features].values</span>
+<span id="cb48-448"><a href="#cb48-448"></a>y <span class="op">=</span> df[config.labels].values</span>
+<span id="cb48-449"><a href="#cb48-449"></a></span>
+<span id="cb48-450"><a href="#cb48-450"></a>xtrain, xtemp, ytrain, ytemp <span class="op">=</span> train_test_split(</span>
+<span id="cb48-451"><a href="#cb48-451"></a>  x,</span>
+<span id="cb48-452"><a href="#cb48-452"></a>  y,</span>
+<span id="cb48-453"><a href="#cb48-453"></a>  test_size<span class="op">=</span>config.temp_split, <span class="co"># .3</span></span>
+<span id="cb48-454"><a href="#cb48-454"></a>  random_state<span class="op">=</span>config.random_state</span>
+<span id="cb48-455"><a href="#cb48-455"></a>  )</span>
+<span id="cb48-456"><a href="#cb48-456"></a>xtest, xval, ytest, yval <span class="op">=</span> train_test_split(</span>
+<span id="cb48-457"><a href="#cb48-457"></a>  xtemp,</span>
+<span id="cb48-458"><a href="#cb48-458"></a>  ytemp,</span>
+<span id="cb48-459"><a href="#cb48-459"></a>  test_size<span class="op">=</span>config.test_split, <span class="co"># .5</span></span>
+<span id="cb48-460"><a href="#cb48-460"></a>  random_state<span class="op">=</span>config.random_state</span>
+<span id="cb48-461"><a href="#cb48-461"></a>  )</span>
+<span id="cb48-462"><a href="#cb48-462"></a><span class="in">```</span></span>
+<span id="cb48-463"><a href="#cb48-463"></a></span>
+<span id="cb48-464"><a href="#cb48-464"></a>xtrain shape: <span class="in">`py$xtrain.shape`</span> ytrain shape: <span class="in">`py$ytrain.shape`</span> xtest shape: <span class="in">`py$xtest.shape`</span> ytest shape: <span class="in">`py$ytest.shape`</span> xval shape: <span class="in">`py$xval.shape`</span> yval shape: <span class="in">`py$yval.shape`</span></span>
+<span id="cb48-465"><a href="#cb48-465"></a></span>
+<span id="cb48-466"><a href="#cb48-466"></a>The datasets are created using the <span class="in">`tf.data.Dataset`</span> function. It creates a data input pipeline. The <span class="in">`tf.data`</span> API makes it possible to handle large amounts of data, read from different data formats, and perform complex transformations. The <span class="in">`tf.data.Dataset`</span> is an abstraction that represents a sequence of elements, in which each element consists of one or more components. Here each dataset is creates using <span class="in">`from_tensor_slices`</span>. It create a tf.data.Dataset from a tuple (features, labels). <span class="in">`.batch`</span> let us work in batches to improve performance, while <span class="in">`.prefetch`</span> overlaps the preprocessing and model execution of a training step. While the model is executing training step s, the input pipeline is reading the data for step s+1. Check the <span class="co">[</span><span class="ot">documentation</span><span class="co">](https://www.tensorflow.org/guide/data_performance)</span> for further informations.</span>
+<span id="cb48-467"><a href="#cb48-467"></a></span>
+<span id="cb48-468"><a href="#cb48-468"></a><span class="in">```{python, datasets}</span></span>
+<span id="cb48-469"><a href="#cb48-469"></a><span class="in">train_ds = (</span></span>
+<span id="cb48-470"><a href="#cb48-470"></a><span class="in">    tf.data.Dataset</span></span>
+<span id="cb48-471"><a href="#cb48-471"></a><span class="in">    .from_tensor_slices((xtrain, ytrain))</span></span>
+<span id="cb48-472"><a href="#cb48-472"></a><span class="in">    .shuffle(xtrain.shape[0])</span></span>
+<span id="cb48-473"><a href="#cb48-473"></a><span class="in">    .batch(config.batch_size)</span></span>
+<span id="cb48-474"><a href="#cb48-474"></a><span class="in">    .prefetch(tf.data.experimental.AUTOTUNE)</span></span>
+<span id="cb48-475"><a href="#cb48-475"></a><span class="in">)</span></span>
+<span id="cb48-476"><a href="#cb48-476"></a></span>
+<span id="cb48-477"><a href="#cb48-477"></a><span class="in">test_ds = (</span></span>
+<span id="cb48-478"><a href="#cb48-478"></a><span class="in">    tf.data.Dataset</span></span>
+<span id="cb48-479"><a href="#cb48-479"></a><span class="in">    .from_tensor_slices((xtest, ytest))</span></span>
+<span id="cb48-480"><a href="#cb48-480"></a><span class="in">    .batch(config.batch_size)</span></span>
+<span id="cb48-481"><a href="#cb48-481"></a><span class="in">    .prefetch(tf.data.experimental.AUTOTUNE)</span></span>
+<span id="cb48-482"><a href="#cb48-482"></a><span class="in">)</span></span>
+<span id="cb48-483"><a href="#cb48-483"></a></span>
+<span id="cb48-484"><a href="#cb48-484"></a><span class="in">val_ds = (</span></span>
+<span id="cb48-485"><a href="#cb48-485"></a><span class="in">    tf.data.Dataset</span></span>
+<span id="cb48-486"><a href="#cb48-486"></a><span class="in">    .from_tensor_slices((xval, yval))</span></span>
+<span id="cb48-487"><a href="#cb48-487"></a><span class="in">    .batch(config.batch_size)</span></span>
+<span id="cb48-488"><a href="#cb48-488"></a><span class="in">    .prefetch(tf.data.experimental.AUTOTUNE)</span></span>
+<span id="cb48-489"><a href="#cb48-489"></a><span class="in">)</span></span>
+<span id="cb48-490"><a href="#cb48-490"></a></span>
+<span id="cb48-491"><a href="#cb48-491"></a><span class="in">```</span></span>
+<span id="cb48-492"><a href="#cb48-492"></a></span>
+<span id="cb48-495"><a href="#cb48-495"></a><span class="in">```{python}</span></span>
+<span id="cb48-496"><a href="#cb48-496"></a><span class="bu">print</span>(</span>
+<span id="cb48-497"><a href="#cb48-497"></a>  <span class="ss">f&quot;train_ds cardinality: </span><span class="sc">{</span>train_ds<span class="sc">.</span>cardinality()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
+<span id="cb48-498"><a href="#cb48-498"></a>  <span class="ss">f&quot;val_ds cardinality: </span><span class="sc">{</span>val_ds<span class="sc">.</span>cardinality()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
+<span id="cb48-499"><a href="#cb48-499"></a>  <span class="ss">f&quot;test_ds cardinality: </span><span class="sc">{</span>test_ds<span class="sc">.</span>cardinality()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb48-500"><a href="#cb48-500"></a>  )</span>
+<span id="cb48-501"><a href="#cb48-501"></a><span class="in">```</span></span>
+<span id="cb48-502"><a href="#cb48-502"></a></span>
+<span id="cb48-503"><a href="#cb48-503"></a>Check the first element of the dataset to be sure that the preprocessing is done correctly.</span>
+<span id="cb48-504"><a href="#cb48-504"></a></span>
+<span id="cb48-507"><a href="#cb48-507"></a><span class="in">```{python}</span></span>
+<span id="cb48-508"><a href="#cb48-508"></a>train_ds.as_numpy_iterator().<span class="bu">next</span>()</span>
+<span id="cb48-509"><a href="#cb48-509"></a><span class="in">```</span></span>
+<span id="cb48-510"><a href="#cb48-510"></a></span>
+<span id="cb48-511"><a href="#cb48-511"></a>And we check also the shape. We expect a feature of shape (batch, ) and a target of shape (batch, number of labels).</span>
+<span id="cb48-512"><a href="#cb48-512"></a></span>
+<span id="cb48-515"><a href="#cb48-515"></a><span class="in">```{python}</span></span>
+<span id="cb48-516"><a href="#cb48-516"></a><span class="bu">print</span>(</span>
+<span id="cb48-517"><a href="#cb48-517"></a>  <span class="ss">f&quot;text train shape: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">0</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
+<span id="cb48-518"><a href="#cb48-518"></a>  <span class="ss">f&quot; text train type: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">0</span>]<span class="sc">.</span>dtype<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
+<span id="cb48-519"><a href="#cb48-519"></a>  <span class="ss">f&quot;label train shape: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">1</span>]<span class="sc">.</span>shape<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span>,</span>
+<span id="cb48-520"><a href="#cb48-520"></a>  <span class="ss">f&quot;label train type: </span><span class="sc">{</span>train_ds<span class="sc">.</span>as_numpy_iterator()<span class="sc">.</span><span class="bu">next</span>()[<span class="dv">1</span>]<span class="sc">.</span>dtype<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb48-521"><a href="#cb48-521"></a>  )</span>
+<span id="cb48-522"><a href="#cb48-522"></a><span class="in">```</span></span>
+<span id="cb48-523"><a href="#cb48-523"></a></span>
+<span id="cb48-524"><a href="#cb48-524"></a><span class="fu"># Preprocessing {#sec-preprocessing}</span></span>
+<span id="cb48-525"><a href="#cb48-525"></a></span>
+<span id="cb48-526"><a href="#cb48-526"></a>Of course preprocessing! Text is not the type of input a NN can handle. The *`TextVectorization`* layer is meant to handle natural language inputs. The processing of each example contains the following steps: 1. <span class="in">`Standardize`</span> each example (usually lowercasing + punctuation stripping) 2. <span class="in">`Split`</span> each example into substrings (usually words) 3. Recombine substrings into <span class="in">`tokens`</span> (usually ngrams) 4. <span class="in">`Index`</span> tokens (associate a unique int value with each token) 5. <span class="in">`Transform`</span> each example using this index, either into a vector of ints or a dense float vector.</span>
+<span id="cb48-527"><a href="#cb48-527"></a></span>
+<span id="cb48-528"><a href="#cb48-528"></a>For more reference, see the documentation at the following <span class="co">[</span><span class="ot">link</span><span class="co">](https://keras.io/api/layers/preprocessing_layers/text/text_vectorization/)</span>.</span>
+<span id="cb48-529"><a href="#cb48-529"></a></span>
+<span id="cb48-530"><a href="#cb48-530"></a><span class="in">```{python, text_vec}</span></span>
+<span id="cb48-531"><a href="#cb48-531"></a><span class="in">text_vectorization = TextVectorization(</span></span>
+<span id="cb48-532"><a href="#cb48-532"></a><span class="in">  max_tokens=config.max_tokens,</span></span>
+<span id="cb48-533"><a href="#cb48-533"></a><span class="in">  standardize=&quot;lower_and_strip_punctuation&quot;,</span></span>
+<span id="cb48-534"><a href="#cb48-534"></a><span class="in">  split=&quot;whitespace&quot;,</span></span>
+<span id="cb48-535"><a href="#cb48-535"></a><span class="in">  output_mode=&quot;int&quot;,</span></span>
+<span id="cb48-536"><a href="#cb48-536"></a><span class="in">  output_sequence_length=config.output_sequence_length,</span></span>
+<span id="cb48-537"><a href="#cb48-537"></a><span class="in">  pad_to_max_tokens=True</span></span>
+<span id="cb48-538"><a href="#cb48-538"></a><span class="in">  )</span></span>
+<span id="cb48-539"><a href="#cb48-539"></a></span>
+<span id="cb48-540"><a href="#cb48-540"></a><span class="in"># prepare a dataset that only yields raw text inputs (no labels)</span></span>
+<span id="cb48-541"><a href="#cb48-541"></a><span class="in">text_train_ds = train_ds.map(lambda x, y: x)</span></span>
+<span id="cb48-542"><a href="#cb48-542"></a><span class="in"># adapt the text vectorization layer to the text data to index the dataset vocabulary</span></span>
+<span id="cb48-543"><a href="#cb48-543"></a><span class="in">text_vectorization.adapt(text_train_ds)</span></span>
+<span id="cb48-544"><a href="#cb48-544"></a><span class="in">```</span></span>
+<span id="cb48-545"><a href="#cb48-545"></a></span>
+<span id="cb48-546"><a href="#cb48-546"></a>This layer is set to: - <span class="in">`max_tokens`</span>: 20000. It is common for text classification. It is the *maximum size* of the vocabulary for this layer. - <span class="in">`output_sequence_length`</span>: <span class="in">`r upper_fence`</span>. See @fig-histogram for the reason why. Only valid in <span class="in">`&quot;int&quot;`</span> mode. - <span class="in">`output_mode`</span>: outputs integer indices, one integer index per split string token. When output_mode == &quot;int&quot;, 0 is reserved for masked locations; this reduces the vocab size to max_tokens - 2 instead of max_tokens - 1. - <span class="in">`standardize`</span>: <span class="in">`&quot;lower_and_strip_punctuation&quot;`</span>. - <span class="in">`split`</span>: on whitespace.</span>
+<span id="cb48-547"><a href="#cb48-547"></a></span>
+<span id="cb48-548"><a href="#cb48-548"></a>To preserve the original comments as text and also have a tf.data.Dataset in which the text is preprocessed by the TextVectorization function, it is possible to map it to the features of each dataset.</span>
+<span id="cb48-549"><a href="#cb48-549"></a></span>
+<span id="cb48-550"><a href="#cb48-550"></a><span class="in">```{python, processed_datasets}</span></span>
+<span id="cb48-551"><a href="#cb48-551"></a><span class="in">processed_train_ds = train_ds.map(</span></span>
+<span id="cb48-552"><a href="#cb48-552"></a><span class="in">    lambda x, y: (text_vectorization(x), y),</span></span>
+<span id="cb48-553"><a href="#cb48-553"></a><span class="in">    num_parallel_calls=tf.data.experimental.AUTOTUNE</span></span>
+<span id="cb48-554"><a href="#cb48-554"></a><span class="in">)</span></span>
+<span id="cb48-555"><a href="#cb48-555"></a><span class="in">processed_val_ds = val_ds.map(</span></span>
+<span id="cb48-556"><a href="#cb48-556"></a><span class="in">    lambda x, y: (text_vectorization(x), y),</span></span>
+<span id="cb48-557"><a href="#cb48-557"></a><span class="in">    num_parallel_calls=tf.data.experimental.AUTOTUNE</span></span>
+<span id="cb48-558"><a href="#cb48-558"></a><span class="in">)</span></span>
+<span id="cb48-559"><a href="#cb48-559"></a><span class="in">processed_test_ds = test_ds.map(</span></span>
+<span id="cb48-560"><a href="#cb48-560"></a><span class="in">    lambda x, y: (text_vectorization(x), y),</span></span>
+<span id="cb48-561"><a href="#cb48-561"></a><span class="in">    num_parallel_calls=tf.data.experimental.AUTOTUNE</span></span>
+<span id="cb48-562"><a href="#cb48-562"></a><span class="in">)</span></span>
+<span id="cb48-563"><a href="#cb48-563"></a><span class="in">```</span></span>
+<span id="cb48-564"><a href="#cb48-564"></a></span>
+<span id="cb48-565"><a href="#cb48-565"></a><span class="fu"># Model</span></span>
+<span id="cb48-566"><a href="#cb48-566"></a></span>
+<span id="cb48-567"><a href="#cb48-567"></a><span class="fu">## Definition</span></span>
+<span id="cb48-568"><a href="#cb48-568"></a></span>
+<span id="cb48-569"><a href="#cb48-569"></a>Define the model using the *Functional* API.</span>
+<span id="cb48-570"><a href="#cb48-570"></a></span>
+<span id="cb48-571"><a href="#cb48-571"></a><span class="in">```{python, get_deeper_lstm_model}</span></span>
+<span id="cb48-572"><a href="#cb48-572"></a><span class="in">#| eval: false</span></span>
+<span id="cb48-573"><a href="#cb48-573"></a></span>
+<span id="cb48-574"><a href="#cb48-574"></a><span class="in">def get_deeper_lstm_model():</span></span>
+<span id="cb48-575"><a href="#cb48-575"></a><span class="in">    </span></span>
+<span id="cb48-576"><a href="#cb48-576"></a><span class="in">    clear_session()</span></span>
+<span id="cb48-577"><a href="#cb48-577"></a><span class="in">    </span></span>
+<span id="cb48-578"><a href="#cb48-578"></a><span class="in">    inputs = Input(shape=(None,), dtype=tf.int64, name=&quot;inputs&quot;)</span></span>
+<span id="cb48-579"><a href="#cb48-579"></a><span class="in">    </span></span>
+<span id="cb48-580"><a href="#cb48-580"></a><span class="in">    embedding = Embedding(</span></span>
+<span id="cb48-581"><a href="#cb48-581"></a><span class="in">        input_dim=config.max_tokens,</span></span>
+<span id="cb48-582"><a href="#cb48-582"></a><span class="in">        output_dim=config.embedding_dim,</span></span>
+<span id="cb48-583"><a href="#cb48-583"></a><span class="in">        mask_zero=True,</span></span>
+<span id="cb48-584"><a href="#cb48-584"></a><span class="in">        name=&quot;embedding&quot;</span></span>
+<span id="cb48-585"><a href="#cb48-585"></a><span class="in">    )(inputs)</span></span>
+<span id="cb48-586"><a href="#cb48-586"></a><span class="in">    x = Bidirectional(LSTM(256, return_sequences=True, name=&quot;bilstm_1&quot;))(embedding)</span></span>
+<span id="cb48-587"><a href="#cb48-587"></a><span class="in">    x = Bidirectional(LSTM(128, return_sequences=True, name=&quot;bilstm_2&quot;))(x)</span></span>
+<span id="cb48-588"><a href="#cb48-588"></a><span class="in">    # Global average pooling</span></span>
+<span id="cb48-589"><a href="#cb48-589"></a><span class="in">    x = GlobalAveragePooling1D()(x)</span></span>
+<span id="cb48-590"><a href="#cb48-590"></a><span class="in">    # Add regularization</span></span>
+<span id="cb48-591"><a href="#cb48-591"></a><span class="in">    x = Dropout(0.3)(x)</span></span>
+<span id="cb48-592"><a href="#cb48-592"></a><span class="in">    x = Dense(64, activation=&#39;relu&#39;, kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)</span></span>
+<span id="cb48-593"><a href="#cb48-593"></a><span class="in">    x = LayerNormalization()(x)</span></span>
+<span id="cb48-594"><a href="#cb48-594"></a><span class="in">    </span></span>
+<span id="cb48-595"><a href="#cb48-595"></a><span class="in">    outputs = Dense(len(config.labels), activation=&#39;sigmoid&#39;, name=&quot;outputs&quot;)(x)</span></span>
+<span id="cb48-596"><a href="#cb48-596"></a><span class="in">    </span></span>
+<span id="cb48-597"><a href="#cb48-597"></a><span class="in">    model = Model(inputs, outputs)</span></span>
+<span id="cb48-598"><a href="#cb48-598"></a><span class="in">    model.compile(</span></span>
+<span id="cb48-599"><a href="#cb48-599"></a><span class="in">      optimizer=&#39;adam&#39;,</span></span>
+<span id="cb48-600"><a href="#cb48-600"></a><span class="in">      loss=&quot;binary_crossentropy&quot;,</span></span>
+<span id="cb48-601"><a href="#cb48-601"></a><span class="in">      metrics=config.metrics,</span></span>
+<span id="cb48-602"><a href="#cb48-602"></a><span class="in">      steps_per_execution=32</span></span>
+<span id="cb48-603"><a href="#cb48-603"></a><span class="in">      )</span></span>
+<span id="cb48-604"><a href="#cb48-604"></a><span class="in">    </span></span>
+<span id="cb48-605"><a href="#cb48-605"></a><span class="in">    return model</span></span>
+<span id="cb48-606"><a href="#cb48-606"></a></span>
+<span id="cb48-607"><a href="#cb48-607"></a><span class="in">lstm_model = get_deeper_lstm_model()</span></span>
+<span id="cb48-608"><a href="#cb48-608"></a><span class="in">lstm_model.summary()</span></span>
+<span id="cb48-609"><a href="#cb48-609"></a><span class="in">```</span></span>
+<span id="cb48-610"><a href="#cb48-610"></a></span>
+<span id="cb48-611"><a href="#cb48-611"></a><span class="fu">## Callbacks</span></span>
+<span id="cb48-612"><a href="#cb48-612"></a></span>
+<span id="cb48-613"><a href="#cb48-613"></a>Finally, the model has been trained using 2 callbacks: - Early Stopping, to avoid to consume the kaggle GPU time. - Model Checkpoint, to retrieve the best model training information.</span>
+<span id="cb48-614"><a href="#cb48-614"></a></span>
+<span id="cb48-615"><a href="#cb48-615"></a><span class="in">```{python, callbacks}</span></span>
+<span id="cb48-616"><a href="#cb48-616"></a><span class="in">my_es = config.get_early_stopping()</span></span>
+<span id="cb48-617"><a href="#cb48-617"></a><span class="in">my_mc = config.get_model_checkpoint(filepath=&quot;/checkpoint.keras&quot;)</span></span>
+<span id="cb48-618"><a href="#cb48-618"></a><span class="in">callbacks = [my_es, my_mc]</span></span>
+<span id="cb48-619"><a href="#cb48-619"></a><span class="in">```</span></span>
+<span id="cb48-620"><a href="#cb48-620"></a></span>
+<span id="cb48-621"><a href="#cb48-621"></a><span class="fu">## Final preparation before fit</span></span>
+<span id="cb48-622"><a href="#cb48-622"></a></span>
+<span id="cb48-623"><a href="#cb48-623"></a>Considering the dataset is imbalanced, to increase the performance we need to calculate the class weight. This will be passed during the training of the model.</span>
+<span id="cb48-624"><a href="#cb48-624"></a></span>
+<span id="cb48-625"><a href="#cb48-625"></a><span class="in">```{python, class_weight}</span></span>
+<span id="cb48-626"><a href="#cb48-626"></a><span class="in">lab = pd.DataFrame(columns=config.labels, data=ytrain)</span></span>
+<span id="cb48-627"><a href="#cb48-627"></a><span class="in">r = lab.sum() / len(ytrain)</span></span>
+<span id="cb48-628"><a href="#cb48-628"></a><span class="in">class_weight = dict(zip(range(len(config.labels)), r))</span></span>
+<span id="cb48-629"><a href="#cb48-629"></a><span class="in">df_class_weight = pd.DataFrame.from_dict(</span></span>
+<span id="cb48-630"><a href="#cb48-630"></a><span class="in">  data=class_weight,</span></span>
+<span id="cb48-631"><a href="#cb48-631"></a><span class="in">  orient=&#39;index&#39;,</span></span>
+<span id="cb48-632"><a href="#cb48-632"></a><span class="in">  columns=[&#39;class_weight&#39;]</span></span>
+<span id="cb48-633"><a href="#cb48-633"></a><span class="in">  )</span></span>
+<span id="cb48-634"><a href="#cb48-634"></a><span class="in">df_class_weight.index = config.labels</span></span>
+<span id="cb48-635"><a href="#cb48-635"></a><span class="in">```</span></span>
+<span id="cb48-636"><a href="#cb48-636"></a></span>
+<span id="cb48-637"><a href="#cb48-637"></a><span class="in">```{r, table_class_weight}</span></span>
+<span id="cb48-638"><a href="#cb48-638"></a><span class="in">#| label: tbl-class_weight</span></span>
+<span id="cb48-639"><a href="#cb48-639"></a><span class="in">#| tbl-cap: Class weight</span></span>
+<span id="cb48-640"><a href="#cb48-640"></a></span>
 <span id="cb48-641"><a href="#cb48-641"></a></span>
-<span id="cb48-642"><a href="#cb48-642"></a></span>
-<span id="cb48-643"><a href="#cb48-643"></a><span class="in">py$df_class_weight %&gt;% </span></span>
-<span id="cb48-644"><a href="#cb48-644"></a><span class="in">  gt() %&gt;% </span></span>
-<span id="cb48-645"><a href="#cb48-645"></a><span class="in">  fmt_percent(</span></span>
-<span id="cb48-646"><a href="#cb48-646"></a><span class="in">    decimals = 2,</span></span>
-<span id="cb48-647"><a href="#cb48-647"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
-<span id="cb48-648"><a href="#cb48-648"></a><span class="in">    drop_trailing_dec_mark = TRUE</span></span>
-<span id="cb48-649"><a href="#cb48-649"></a><span class="in">  )</span></span>
-<span id="cb48-650"><a href="#cb48-650"></a><span class="in">```</span></span>
-<span id="cb48-651"><a href="#cb48-651"></a></span>
-<span id="cb48-652"><a href="#cb48-652"></a>It is also useful to define the steps per epoch for train and validation dataset. This step is required to avoid to not consume entirely the dataset during the fit, which happened to me.</span>
-<span id="cb48-653"><a href="#cb48-653"></a></span>
-<span id="cb48-654"><a href="#cb48-654"></a><span class="in">```{python, val_steps}</span></span>
-<span id="cb48-655"><a href="#cb48-655"></a><span class="in">steps_per_epoch = config.train_samples // config.batch_size</span></span>
-<span id="cb48-656"><a href="#cb48-656"></a><span class="in">validation_steps = config.val_samples // config.batch_size</span></span>
-<span id="cb48-657"><a href="#cb48-657"></a><span class="in">```</span></span>
-<span id="cb48-658"><a href="#cb48-658"></a></span>
-<span id="cb48-659"><a href="#cb48-659"></a><span class="fu">## Fit</span></span>
-<span id="cb48-660"><a href="#cb48-660"></a></span>
-<span id="cb48-661"><a href="#cb48-661"></a>The fit has been done on Kaggle to levarage the GPU. Some considerations about the model:</span>
-<span id="cb48-662"><a href="#cb48-662"></a></span>
-<span id="cb48-663"><a href="#cb48-663"></a><span class="ss">-   </span><span class="in">`.repeat()`</span> ensure the model sees all the dataset.</span>
-<span id="cb48-664"><a href="#cb48-664"></a><span class="ss">-   </span><span class="in">`epocs`</span> is set to 100.</span>
-<span id="cb48-665"><a href="#cb48-665"></a><span class="ss">-   </span><span class="in">`validation_data`</span> has the same repeat.</span>
-<span id="cb48-666"><a href="#cb48-666"></a><span class="ss">-   </span><span class="in">`callbacks`</span> are the one defined before.</span>
-<span id="cb48-667"><a href="#cb48-667"></a><span class="ss">-   </span><span class="in">`class_weight`</span> ensure the model is trained using the frequency of each class, because our dataset is imbalanced.</span>
-<span id="cb48-668"><a href="#cb48-668"></a><span class="ss">-   </span><span class="in">`steps_per_epoch`</span> and <span class="in">`validation_steps`</span> depend on the use of <span class="in">`repeat`</span>.</span>
-<span id="cb48-669"><a href="#cb48-669"></a></span>
-<span id="cb48-670"><a href="#cb48-670"></a><span class="in">```{python, fit}</span></span>
-<span id="cb48-671"><a href="#cb48-671"></a><span class="in">#| eval: false</span></span>
-<span id="cb48-672"><a href="#cb48-672"></a></span>
-<span id="cb48-673"><a href="#cb48-673"></a><span class="in">history = model.fit(</span></span>
-<span id="cb48-674"><a href="#cb48-674"></a><span class="in">  processed_train_ds.repeat(),</span></span>
-<span id="cb48-675"><a href="#cb48-675"></a><span class="in">  epochs=config.epochs,</span></span>
-<span id="cb48-676"><a href="#cb48-676"></a><span class="in">  validation_data=processed_val_ds.repeat(),</span></span>
-<span id="cb48-677"><a href="#cb48-677"></a><span class="in">  callbacks=callbacks,</span></span>
-<span id="cb48-678"><a href="#cb48-678"></a><span class="in">  class_weight=class_weight,</span></span>
-<span id="cb48-679"><a href="#cb48-679"></a><span class="in">  steps_per_epoch=steps_per_epoch,</span></span>
-<span id="cb48-680"><a href="#cb48-680"></a><span class="in">  validation_steps=validation_steps</span></span>
-<span id="cb48-681"><a href="#cb48-681"></a><span class="in">  )</span></span>
-<span id="cb48-682"><a href="#cb48-682"></a><span class="in">```</span></span>
-<span id="cb48-683"><a href="#cb48-683"></a></span>
-<span id="cb48-684"><a href="#cb48-684"></a>Now we can import the model and the history trained on Kaggle.</span>
-<span id="cb48-685"><a href="#cb48-685"></a></span>
-<span id="cb48-686"><a href="#cb48-686"></a><span class="in">```{python, load_model_history}</span></span>
-<span id="cb48-687"><a href="#cb48-687"></a><span class="in">model = load_model(filepath=config.model)</span></span>
-<span id="cb48-688"><a href="#cb48-688"></a><span class="in">history = pd.read_excel(config.history)</span></span>
-<span id="cb48-689"><a href="#cb48-689"></a><span class="in">```</span></span>
-<span id="cb48-690"><a href="#cb48-690"></a></span>
-<span id="cb48-691"><a href="#cb48-691"></a><span class="fu">## Evaluate</span></span>
-<span id="cb48-692"><a href="#cb48-692"></a></span>
-<span id="cb48-693"><a href="#cb48-693"></a><span class="in">```{python, validation}</span></span>
-<span id="cb48-694"><a href="#cb48-694"></a><span class="in">validation = model.evaluate(</span></span>
-<span id="cb48-695"><a href="#cb48-695"></a><span class="in">  processed_val_ds.repeat(),</span></span>
-<span id="cb48-696"><a href="#cb48-696"></a><span class="in">  steps=validation_steps, # 748</span></span>
-<span id="cb48-697"><a href="#cb48-697"></a><span class="in">  verbose=0</span></span>
-<span id="cb48-698"><a href="#cb48-698"></a><span class="in">  )</span></span>
-<span id="cb48-699"><a href="#cb48-699"></a><span class="in">```</span></span>
-<span id="cb48-700"><a href="#cb48-700"></a></span>
-<span id="cb48-701"><a href="#cb48-701"></a><span class="in">```{r, val_metrics}</span></span>
-<span id="cb48-702"><a href="#cb48-702"></a><span class="in">#| label: tbl-val-metrics</span></span>
-<span id="cb48-703"><a href="#cb48-703"></a><span class="in">#| tbl-cap: Model validation metric</span></span>
-<span id="cb48-704"><a href="#cb48-704"></a></span>
-<span id="cb48-705"><a href="#cb48-705"></a><span class="in">val_metrics &lt;- tibble(</span></span>
-<span id="cb48-706"><a href="#cb48-706"></a><span class="in">  metric = c(&quot;loss&quot;, &quot;precision&quot;, &quot;recall&quot;, &quot;auc&quot;, &quot;f1_score&quot;),</span></span>
-<span id="cb48-707"><a href="#cb48-707"></a><span class="in">  value = py$validation</span></span>
-<span id="cb48-708"><a href="#cb48-708"></a><span class="in">  )</span></span>
-<span id="cb48-709"><a href="#cb48-709"></a><span class="in">val_metrics %&gt;% </span></span>
-<span id="cb48-710"><a href="#cb48-710"></a><span class="in">  gt() %&gt;% </span></span>
-<span id="cb48-711"><a href="#cb48-711"></a><span class="in">  fmt_number(</span></span>
-<span id="cb48-712"><a href="#cb48-712"></a><span class="in">    columns = c(&quot;value&quot;),</span></span>
-<span id="cb48-713"><a href="#cb48-713"></a><span class="in">    decimals = 4,</span></span>
-<span id="cb48-714"><a href="#cb48-714"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
-<span id="cb48-715"><a href="#cb48-715"></a><span class="in">    drop_trailing_dec_mark = TRUE</span></span>
-<span id="cb48-716"><a href="#cb48-716"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-717"><a href="#cb48-717"></a><span class="in">  cols_align(</span></span>
-<span id="cb48-718"><a href="#cb48-718"></a><span class="in">    align = &quot;left&quot;,</span></span>
-<span id="cb48-719"><a href="#cb48-719"></a><span class="in">    columns = metric</span></span>
-<span id="cb48-720"><a href="#cb48-720"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-721"><a href="#cb48-721"></a><span class="in">  cols_align(</span></span>
-<span id="cb48-722"><a href="#cb48-722"></a><span class="in">    align = &quot;center&quot;,</span></span>
-<span id="cb48-723"><a href="#cb48-723"></a><span class="in">    columns = value</span></span>
-<span id="cb48-724"><a href="#cb48-724"></a><span class="in">  ) %&gt;% </span></span>
-<span id="cb48-725"><a href="#cb48-725"></a><span class="in">  cols_label(</span></span>
-<span id="cb48-726"><a href="#cb48-726"></a><span class="in">    metric = &quot;Metric&quot;,</span></span>
-<span id="cb48-727"><a href="#cb48-727"></a><span class="in">    value = &quot;Value&quot;</span></span>
-<span id="cb48-728"><a href="#cb48-728"></a><span class="in">  )</span></span>
-<span id="cb48-729"><a href="#cb48-729"></a><span class="in">  </span></span>
-<span id="cb48-730"><a href="#cb48-730"></a><span class="in">```</span></span>
-<span id="cb48-731"><a href="#cb48-731"></a></span>
-<span id="cb48-732"><a href="#cb48-732"></a><span class="fu">## Predict</span></span>
-<span id="cb48-733"><a href="#cb48-733"></a></span>
-<span id="cb48-734"><a href="#cb48-734"></a>For the prediction, the model does not need to repeat the dataset, because it has already been trained on all of the train data. Now it has just to consume the new data to make the prediction.</span>
-<span id="cb48-735"><a href="#cb48-735"></a></span>
-<span id="cb48-736"><a href="#cb48-736"></a><span class="in">```{python, predict}</span></span>
-<span id="cb48-737"><a href="#cb48-737"></a><span class="in">predictions = model.predict(processed_test_ds, verbose=0)</span></span>
-<span id="cb48-738"><a href="#cb48-738"></a><span class="in">```</span></span>
-<span id="cb48-739"><a href="#cb48-739"></a></span>
-<span id="cb48-740"><a href="#cb48-740"></a><span class="fu">## Confusion Matrix</span></span>
-<span id="cb48-741"><a href="#cb48-741"></a></span>
-<span id="cb48-742"><a href="#cb48-742"></a>The best way to assess the performance of a multi label classification is using a confusion matrix. Sklearn has a specific function to create a multi label classification matrix to handle the fact that there could be multiple labels for one prediction.</span>
-<span id="cb48-743"><a href="#cb48-743"></a></span>
-<span id="cb48-744"><a href="#cb48-744"></a><span class="fu">### Grid Search Cross Validation for best threshold</span></span>
-<span id="cb48-745"><a href="#cb48-745"></a></span>
-<span id="cb48-746"><a href="#cb48-746"></a>Grid Search CV is a technique for fine-tuning hyperparameter of a ML model. It systematically search through a set of hyperparamenter values to find the combination which led to the best model performance. In this case, I am using a <span class="in">`KFold`</span> Cross Validation is a resempling technique to split the data into k consecutive folds. Each fold is used once as a validation while the k - 1 remaining folds are the training set. See the <span class="co">[</span><span class="ot">documentation</span><span class="co">](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html)</span> for more information.</span>
-<span id="cb48-747"><a href="#cb48-747"></a></span>
-<span id="cb48-748"><a href="#cb48-748"></a>The model is trained to optimize the recall. The decision was made because the cost of missing a True Positive is greater than a False Positive. In this case, missing a injurious observation is worst than classifying a clean one as bad.</span>
-<span id="cb48-749"><a href="#cb48-749"></a></span>
-<span id="cb48-750"><a href="#cb48-750"></a><span class="fu">### Confidence threshold and Precision-Recall trade off</span></span>
-<span id="cb48-751"><a href="#cb48-751"></a></span>
-<span id="cb48-752"><a href="#cb48-752"></a>Whilst the KFold GDCV technique is usefull to test multiple hyperparameter, it is important to understand the problem we are facing. A multi label deep learning classifier outputs a vector of **per-class** probabilities. These need to be converted to a **binary vector** using a **confidence threshold**.</span>
-<span id="cb48-753"><a href="#cb48-753"></a></span>
-<span id="cb48-754"><a href="#cb48-754"></a><span class="ss">-   </span>The higher the threshold, the less classes the model predicts, increasing model confidence <span class="sc">\[</span>higher Precision<span class="sc">\]</span> and increasing missed classes <span class="sc">\[</span>lower Recall<span class="sc">\]</span>.</span>
-<span id="cb48-755"><a href="#cb48-755"></a><span class="ss">-   </span>The lower the threshold, the more classes the model predicts, decreasing model confidence <span class="sc">\[</span>lower Precision<span class="sc">\]</span> and decreasing missed classes <span class="sc">\[</span>higher Recall<span class="sc">\]</span>.</span>
-<span id="cb48-756"><a href="#cb48-756"></a></span>
-<span id="cb48-757"><a href="#cb48-757"></a>Threshold selection mean we have to decide which metric to prioritize, based on the problem we are facing and the relative cost of misduging. We can consider the toxic comment filtering a problem similiar to cancer diagnostic. It is better to predict cancer in people who do not have it <span class="sc">\[</span>False Positive<span class="sc">\]</span> and perform further analysis than do not predict cancer when the patient has the disease <span class="sc">\[</span>False Negative<span class="sc">\]</span>.</span>
-<span id="cb48-758"><a href="#cb48-758"></a></span>
-<span id="cb48-759"><a href="#cb48-759"></a>I decide to train the model on the F1 score to have a balanced model in both precision and recall and leave to the threshold selection to increase the recall performance.</span>
-<span id="cb48-760"><a href="#cb48-760"></a></span>
-<span id="cb48-761"><a href="#cb48-761"></a>Moreover, the model has been trained on the **macro avarage F1 score**, which is a single performance indicator obtained by the mean of the Precision and Recall scores of **individual classses**.</span>
-<span id="cb48-762"><a href="#cb48-762"></a></span>
-<span id="cb48-763"><a href="#cb48-763"></a>$$</span>
-<span id="cb48-764"><a href="#cb48-764"></a>F1\ macro\ avg = \frac{\sum_{i=1}^{n} F1_i}{n}</span>
-<span id="cb48-765"><a href="#cb48-765"></a>$$</span>
-<span id="cb48-766"><a href="#cb48-766"></a></span>
-<span id="cb48-767"><a href="#cb48-767"></a>It is useful with **imbalanced** classes, because it weights each classes equally. It is not influenced by the number of samples of each classes. This is sette both in the <span class="in">`config.metrics`</span> and <span class="in">`find_optimal_threshold_cv`</span>.</span>
-<span id="cb48-768"><a href="#cb48-768"></a></span>
-<span id="cb48-769"><a href="#cb48-769"></a><span class="fu">#### f1_score</span></span>
-<span id="cb48-770"><a href="#cb48-770"></a></span>
-<span id="cb48-773"><a href="#cb48-773"></a><span class="in">```{python}</span></span>
-<span id="cb48-774"><a href="#cb48-774"></a><span class="co">#| eval: true</span></span>
-<span id="cb48-775"><a href="#cb48-775"></a></span>
-<span id="cb48-776"><a href="#cb48-776"></a>ytrue <span class="op">=</span> ytest.astype(<span class="bu">int</span>)</span>
-<span id="cb48-777"><a href="#cb48-777"></a>y_pred_proba <span class="op">=</span> predictions</span>
-<span id="cb48-778"><a href="#cb48-778"></a>optimal_threshold_f1, best_score_f1 <span class="op">=</span> config.find_optimal_threshold_cv(ytrue, y_pred_proba, f1_score)</span>
-<span id="cb48-779"><a href="#cb48-779"></a></span>
-<span id="cb48-780"><a href="#cb48-780"></a><span class="bu">print</span>(<span class="ss">f&quot;Optimal threshold: </span><span class="sc">{</span>optimal_threshold_f1<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb48-781"><a href="#cb48-781"></a><span class="bu">print</span>(<span class="ss">f&quot;Best score: </span><span class="sc">{</span>best_score_f1<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb48-782"><a href="#cb48-782"></a></span>
-<span id="cb48-783"><a href="#cb48-783"></a><span class="co"># Use the optimal threshold to make predictions</span></span>
-<span id="cb48-784"><a href="#cb48-784"></a>final_predictions_f1 <span class="op">=</span> (y_pred_proba <span class="op">&gt;=</span> optimal_threshold_f1).astype(<span class="bu">int</span>)</span>
-<span id="cb48-785"><a href="#cb48-785"></a><span class="in">```</span></span>
-<span id="cb48-786"><a href="#cb48-786"></a></span>
-<span id="cb48-787"><a href="#cb48-787"></a>Optimal threshold f1 score: <span class="in">`r py$optimal_threshold_f1`</span>. Best score: <span class="in">`r py$best_score_f1`</span>.</span>
-<span id="cb48-788"><a href="#cb48-788"></a></span>
-<span id="cb48-789"><a href="#cb48-789"></a><span class="fu">#### recall_score</span></span>
-<span id="cb48-790"><a href="#cb48-790"></a></span>
-<span id="cb48-793"><a href="#cb48-793"></a><span class="in">```{python}</span></span>
-<span id="cb48-794"><a href="#cb48-794"></a><span class="co">#| eval: true</span></span>
-<span id="cb48-795"><a href="#cb48-795"></a></span>
-<span id="cb48-796"><a href="#cb48-796"></a>ytrue <span class="op">=</span> ytest.astype(<span class="bu">int</span>)</span>
-<span id="cb48-797"><a href="#cb48-797"></a>y_pred_proba <span class="op">=</span> predictions</span>
-<span id="cb48-798"><a href="#cb48-798"></a>optimal_threshold_recall, best_score_recall <span class="op">=</span> config.find_optimal_threshold_cv(ytrue, y_pred_proba, recall_score)</span>
-<span id="cb48-799"><a href="#cb48-799"></a></span>
-<span id="cb48-800"><a href="#cb48-800"></a><span class="co"># Use the optimal threshold to make predictions</span></span>
-<span id="cb48-801"><a href="#cb48-801"></a>final_predictions_recall <span class="op">=</span> (y_pred_proba <span class="op">&gt;=</span> optimal_threshold_recall).astype(<span class="bu">int</span>)</span>
-<span id="cb48-802"><a href="#cb48-802"></a><span class="in">```</span></span>
-<span id="cb48-803"><a href="#cb48-803"></a></span>
-<span id="cb48-804"><a href="#cb48-804"></a>Optimal threshold recall: <span class="in">`r py$optimal_threshold_recall`</span>. Best score: <span class="in">`r py$best_score_recall`</span>.</span>
-<span id="cb48-805"><a href="#cb48-805"></a></span>
-<span id="cb48-806"><a href="#cb48-806"></a><span class="fu">#### roc_auc_score</span></span>
-<span id="cb48-807"><a href="#cb48-807"></a></span>
-<span id="cb48-810"><a href="#cb48-810"></a><span class="in">```{python}</span></span>
-<span id="cb48-811"><a href="#cb48-811"></a><span class="co">#| eval: true</span></span>
-<span id="cb48-812"><a href="#cb48-812"></a></span>
-<span id="cb48-813"><a href="#cb48-813"></a>ytrue <span class="op">=</span> ytest.astype(<span class="bu">int</span>)</span>
-<span id="cb48-814"><a href="#cb48-814"></a>y_pred_proba <span class="op">=</span> predictions</span>
-<span id="cb48-815"><a href="#cb48-815"></a>optimal_threshold_roc, best_score_roc <span class="op">=</span> config.find_optimal_threshold_cv(ytrue, y_pred_proba, roc_auc_score)</span>
-<span id="cb48-816"><a href="#cb48-816"></a></span>
-<span id="cb48-817"><a href="#cb48-817"></a><span class="bu">print</span>(<span class="ss">f&quot;Optimal threshold: </span><span class="sc">{</span>optimal_threshold_roc<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb48-818"><a href="#cb48-818"></a><span class="bu">print</span>(<span class="ss">f&quot;Best score: </span><span class="sc">{</span>best_score_roc<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb48-819"><a href="#cb48-819"></a></span>
-<span id="cb48-820"><a href="#cb48-820"></a><span class="co"># Use the optimal threshold to make predictions</span></span>
-<span id="cb48-821"><a href="#cb48-821"></a>final_predictions_roc <span class="op">=</span> (y_pred_proba <span class="op">&gt;=</span> optimal_threshold_roc).astype(<span class="bu">int</span>)</span>
-<span id="cb48-822"><a href="#cb48-822"></a><span class="in">```</span></span>
-<span id="cb48-823"><a href="#cb48-823"></a></span>
-<span id="cb48-824"><a href="#cb48-824"></a>Optimal threshold roc: <span class="in">`r py$optimal_threshold_roc`</span>. Best score: <span class="in">`r py$best_score_roc`</span>.</span>
-<span id="cb48-825"><a href="#cb48-825"></a></span>
-<span id="cb48-826"><a href="#cb48-826"></a><span class="fu">### Confusion Matrix Plot</span></span>
-<span id="cb48-827"><a href="#cb48-827"></a></span>
-<span id="cb48-828"><a href="#cb48-828"></a><span class="in">```{python, confusion_matrix}</span></span>
-<span id="cb48-829"><a href="#cb48-829"></a><span class="in">#| fig.cap: &quot;Multi Label Confusion matrix&quot;</span></span>
-<span id="cb48-830"><a href="#cb48-830"></a><span class="in">#| label: fig-mcm</span></span>
-<span id="cb48-831"><a href="#cb48-831"></a><span class="in">#| fig.width: 10</span></span>
-<span id="cb48-832"><a href="#cb48-832"></a><span class="in">#| fig.height: 6</span></span>
-<span id="cb48-833"><a href="#cb48-833"></a></span>
-<span id="cb48-834"><a href="#cb48-834"></a><span class="in"># convert probability predictions to predictions</span></span>
-<span id="cb48-835"><a href="#cb48-835"></a><span class="in">ypred = predictions &gt;=  optimal_threshold_recall # .05</span></span>
-<span id="cb48-836"><a href="#cb48-836"></a><span class="in">ypred = ypred.astype(int)</span></span>
-<span id="cb48-837"><a href="#cb48-837"></a></span>
-<span id="cb48-838"><a href="#cb48-838"></a><span class="in"># create a plot with 3 by 2 subplots</span></span>
-<span id="cb48-839"><a href="#cb48-839"></a><span class="in">fig, axes = plt.subplots(3, 2, figsize=(15, 15))</span></span>
-<span id="cb48-840"><a href="#cb48-840"></a><span class="in">axes = axes.flatten()</span></span>
-<span id="cb48-841"><a href="#cb48-841"></a><span class="in">mcm = multilabel_confusion_matrix(ytrue, ypred)</span></span>
-<span id="cb48-842"><a href="#cb48-842"></a><span class="in"># plot the confusion matrices for each label</span></span>
-<span id="cb48-843"><a href="#cb48-843"></a><span class="in">for i, (cm, label) in enumerate(zip(mcm, config.labels)):</span></span>
-<span id="cb48-844"><a href="#cb48-844"></a><span class="in">    disp = ConfusionMatrixDisplay(confusion_matrix=cm)</span></span>
-<span id="cb48-845"><a href="#cb48-845"></a><span class="in">    disp.plot(ax=axes[i], colorbar=False)</span></span>
-<span id="cb48-846"><a href="#cb48-846"></a><span class="in">    axes[i].set_title(f&quot;Confusion matrix for label: {label}&quot;)</span></span>
-<span id="cb48-847"><a href="#cb48-847"></a><span class="in">plt.tight_layout()</span></span>
-<span id="cb48-848"><a href="#cb48-848"></a><span class="in">plt.show()</span></span>
-<span id="cb48-849"><a href="#cb48-849"></a><span class="in">```</span></span>
-<span id="cb48-850"><a href="#cb48-850"></a></span>
-<span id="cb48-851"><a href="#cb48-851"></a><span class="fu">## Classification Report</span></span>
-<span id="cb48-852"><a href="#cb48-852"></a></span>
-<span id="cb48-853"><a href="#cb48-853"></a><span class="in">```{python, classification_report}</span></span>
-<span id="cb48-854"><a href="#cb48-854"></a><span class="in">#| output: false</span></span>
-<span id="cb48-855"><a href="#cb48-855"></a></span>
-<span id="cb48-856"><a href="#cb48-856"></a><span class="in">cr = classification_report(</span></span>
-<span id="cb48-857"><a href="#cb48-857"></a><span class="in">  ytrue,</span></span>
-<span id="cb48-858"><a href="#cb48-858"></a><span class="in">  ypred,</span></span>
-<span id="cb48-859"><a href="#cb48-859"></a><span class="in">  target_names=config.labels,</span></span>
-<span id="cb48-860"><a href="#cb48-860"></a><span class="in">  digits=4,</span></span>
-<span id="cb48-861"><a href="#cb48-861"></a><span class="in">  output_dict=True</span></span>
-<span id="cb48-862"><a href="#cb48-862"></a><span class="in">  )</span></span>
-<span id="cb48-863"><a href="#cb48-863"></a><span class="in">df_cr = pd.DataFrame.from_dict(cr).reset_index()</span></span>
-<span id="cb48-864"><a href="#cb48-864"></a><span class="in">```</span></span>
-<span id="cb48-865"><a href="#cb48-865"></a></span>
-<span id="cb48-868"><a href="#cb48-868"></a><span class="in">```{r}</span></span>
-<span id="cb48-869"><a href="#cb48-869"></a><span class="co">#| label: tbl-classification-report</span></span>
-<span id="cb48-870"><a href="#cb48-870"></a><span class="co">#| tbl-cap: Classification report</span></span>
-<span id="cb48-871"><a href="#cb48-871"></a></span>
-<span id="cb48-872"><a href="#cb48-872"></a><span class="fu">library</span>(reticulate)</span>
-<span id="cb48-873"><a href="#cb48-873"></a>df_cr <span class="ot">&lt;-</span> py<span class="sc">$</span>df_cr <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">names =</span> index)</span>
-<span id="cb48-874"><a href="#cb48-874"></a>cols <span class="ot">&lt;-</span> df_cr <span class="sc">%&gt;%</span> <span class="fu">colnames</span>()</span>
-<span id="cb48-875"><a href="#cb48-875"></a>df_cr <span class="sc">%&gt;%</span> </span>
-<span id="cb48-876"><a href="#cb48-876"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb48-877"><a href="#cb48-877"></a>    <span class="at">cols =</span> <span class="sc">-</span>names,</span>
-<span id="cb48-878"><a href="#cb48-878"></a>    <span class="at">names_to =</span> <span class="st">&quot;metrics&quot;</span>,</span>
-<span id="cb48-879"><a href="#cb48-879"></a>    <span class="at">values_to =</span> <span class="st">&quot;values&quot;</span></span>
-<span id="cb48-880"><a href="#cb48-880"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-881"><a href="#cb48-881"></a>  <span class="fu">pivot_wider</span>(</span>
-<span id="cb48-882"><a href="#cb48-882"></a>    <span class="at">names_from =</span> names,</span>
-<span id="cb48-883"><a href="#cb48-883"></a>    <span class="at">values_from =</span> values</span>
-<span id="cb48-884"><a href="#cb48-884"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-885"><a href="#cb48-885"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb48-886"><a href="#cb48-886"></a>  <span class="fu">tab_header</span>(</span>
-<span id="cb48-887"><a href="#cb48-887"></a>    <span class="at">title =</span> <span class="st">&quot;Confusion Matrix&quot;</span>,</span>
-<span id="cb48-888"><a href="#cb48-888"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Threshold optimization favoring recall&quot;</span></span>
-<span id="cb48-889"><a href="#cb48-889"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-890"><a href="#cb48-890"></a>  <span class="fu">fmt_number</span>(</span>
-<span id="cb48-891"><a href="#cb48-891"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;precision&quot;</span>, <span class="st">&quot;recall&quot;</span>, <span class="st">&quot;f1-score&quot;</span>, <span class="st">&quot;support&quot;</span>),</span>
-<span id="cb48-892"><a href="#cb48-892"></a>    <span class="at">decimals =</span> <span class="dv">2</span>,</span>
-<span id="cb48-893"><a href="#cb48-893"></a>    <span class="at">drop_trailing_zeros =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb48-894"><a href="#cb48-894"></a>    <span class="at">drop_trailing_dec_mark =</span> <span class="cn">FALSE</span></span>
-<span id="cb48-895"><a href="#cb48-895"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-896"><a href="#cb48-896"></a>  <span class="fu">cols_align</span>(</span>
-<span id="cb48-897"><a href="#cb48-897"></a>    <span class="at">align =</span> <span class="st">&quot;center&quot;</span>,</span>
-<span id="cb48-898"><a href="#cb48-898"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;precision&quot;</span>, <span class="st">&quot;recall&quot;</span>, <span class="st">&quot;f1-score&quot;</span>, <span class="st">&quot;support&quot;</span>)</span>
-<span id="cb48-899"><a href="#cb48-899"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-900"><a href="#cb48-900"></a>  <span class="fu">cols_align</span>(</span>
-<span id="cb48-901"><a href="#cb48-901"></a>    <span class="at">align =</span> <span class="st">&quot;left&quot;</span>,</span>
-<span id="cb48-902"><a href="#cb48-902"></a>    <span class="at">columns =</span> metrics</span>
-<span id="cb48-903"><a href="#cb48-903"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb48-904"><a href="#cb48-904"></a>  <span class="fu">cols_label</span>(</span>
-<span id="cb48-905"><a href="#cb48-905"></a>    <span class="at">metrics =</span> <span class="st">&quot;Metrics&quot;</span>,</span>
-<span id="cb48-906"><a href="#cb48-906"></a>    <span class="at">precision =</span> <span class="st">&quot;Precision&quot;</span>,</span>
-<span id="cb48-907"><a href="#cb48-907"></a>    <span class="at">recall =</span> <span class="st">&quot;Recall&quot;</span>,</span>
-<span id="cb48-908"><a href="#cb48-908"></a>    <span class="st">`</span><span class="at">f1-score</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;F1-Score&quot;</span>,</span>
-<span id="cb48-909"><a href="#cb48-909"></a>    <span class="at">support =</span> <span class="st">&quot;Support&quot;</span></span>
-<span id="cb48-910"><a href="#cb48-910"></a>  )</span>
-<span id="cb48-911"><a href="#cb48-911"></a><span class="in">```</span></span>
-<span id="cb48-912"><a href="#cb48-912"></a></span>
-<span id="cb48-913"><a href="#cb48-913"></a><span class="fu"># Conclusions</span></span>
-<span id="cb48-914"><a href="#cb48-914"></a></span>
-<span id="cb48-915"><a href="#cb48-915"></a>The BiLSTM model is optimized to have an high recall is performing good enough to make predictions for each label. Considering the low support for the *threat* label, the performance is not bad. See @tbl-frequency and @fig-barchart: the threat label is only 0.27 % of the observations. The model has been optimized for recall because the cost of not identifying a injurious comment as such is higher than the cost of considering a clean comment as injurious.</span>
-<span id="cb48-916"><a href="#cb48-916"></a></span>
-<span id="cb48-917"><a href="#cb48-917"></a>Possibile improvements could be to increase the number of observations, expecially for the threat one. In general there are too many clean comments. This could be avoided doing an undersampling of the clean comment, which I explicitly avoided to check the performance on the BiLSTM with an imbalanced dataset, leveraging the class weight method.</span>
+<span id="cb48-642"><a href="#cb48-642"></a><span class="in">py$df_class_weight %&gt;% </span></span>
+<span id="cb48-643"><a href="#cb48-643"></a><span class="in">  gt() %&gt;% </span></span>
+<span id="cb48-644"><a href="#cb48-644"></a><span class="in">  fmt_percent(</span></span>
+<span id="cb48-645"><a href="#cb48-645"></a><span class="in">    decimals = 2,</span></span>
+<span id="cb48-646"><a href="#cb48-646"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
+<span id="cb48-647"><a href="#cb48-647"></a><span class="in">    drop_trailing_dec_mark = TRUE</span></span>
+<span id="cb48-648"><a href="#cb48-648"></a><span class="in">  )</span></span>
+<span id="cb48-649"><a href="#cb48-649"></a><span class="in">```</span></span>
+<span id="cb48-650"><a href="#cb48-650"></a></span>
+<span id="cb48-651"><a href="#cb48-651"></a>It is also useful to define the steps per epoch for train and validation dataset. This step is required to avoid to not consume entirely the dataset during the fit, which happened to me.</span>
+<span id="cb48-652"><a href="#cb48-652"></a></span>
+<span id="cb48-653"><a href="#cb48-653"></a><span class="in">```{python, val_steps}</span></span>
+<span id="cb48-654"><a href="#cb48-654"></a><span class="in">steps_per_epoch = config.train_samples // config.batch_size</span></span>
+<span id="cb48-655"><a href="#cb48-655"></a><span class="in">validation_steps = config.val_samples // config.batch_size</span></span>
+<span id="cb48-656"><a href="#cb48-656"></a><span class="in">```</span></span>
+<span id="cb48-657"><a href="#cb48-657"></a></span>
+<span id="cb48-658"><a href="#cb48-658"></a><span class="fu">## Fit</span></span>
+<span id="cb48-659"><a href="#cb48-659"></a></span>
+<span id="cb48-660"><a href="#cb48-660"></a>The fit has been done on Kaggle to levarage the GPU. Some considerations about the model:</span>
+<span id="cb48-661"><a href="#cb48-661"></a></span>
+<span id="cb48-662"><a href="#cb48-662"></a><span class="ss">-   </span><span class="in">`.repeat()`</span> ensure the model sees all the dataset.</span>
+<span id="cb48-663"><a href="#cb48-663"></a><span class="ss">-   </span><span class="in">`epocs`</span> is set to 100.</span>
+<span id="cb48-664"><a href="#cb48-664"></a><span class="ss">-   </span><span class="in">`validation_data`</span> has the same repeat.</span>
+<span id="cb48-665"><a href="#cb48-665"></a><span class="ss">-   </span><span class="in">`callbacks`</span> are the one defined before.</span>
+<span id="cb48-666"><a href="#cb48-666"></a><span class="ss">-   </span><span class="in">`class_weight`</span> ensure the model is trained using the frequency of each class, because our dataset is imbalanced.</span>
+<span id="cb48-667"><a href="#cb48-667"></a><span class="ss">-   </span><span class="in">`steps_per_epoch`</span> and <span class="in">`validation_steps`</span> depend on the use of <span class="in">`repeat`</span>.</span>
+<span id="cb48-668"><a href="#cb48-668"></a></span>
+<span id="cb48-669"><a href="#cb48-669"></a><span class="in">```{python, fit}</span></span>
+<span id="cb48-670"><a href="#cb48-670"></a><span class="in">#| eval: false</span></span>
+<span id="cb48-671"><a href="#cb48-671"></a></span>
+<span id="cb48-672"><a href="#cb48-672"></a><span class="in">history = model.fit(</span></span>
+<span id="cb48-673"><a href="#cb48-673"></a><span class="in">  processed_train_ds.repeat(),</span></span>
+<span id="cb48-674"><a href="#cb48-674"></a><span class="in">  epochs=config.epochs,</span></span>
+<span id="cb48-675"><a href="#cb48-675"></a><span class="in">  validation_data=processed_val_ds.repeat(),</span></span>
+<span id="cb48-676"><a href="#cb48-676"></a><span class="in">  callbacks=callbacks,</span></span>
+<span id="cb48-677"><a href="#cb48-677"></a><span class="in">  class_weight=class_weight,</span></span>
+<span id="cb48-678"><a href="#cb48-678"></a><span class="in">  steps_per_epoch=steps_per_epoch,</span></span>
+<span id="cb48-679"><a href="#cb48-679"></a><span class="in">  validation_steps=validation_steps</span></span>
+<span id="cb48-680"><a href="#cb48-680"></a><span class="in">  )</span></span>
+<span id="cb48-681"><a href="#cb48-681"></a><span class="in">```</span></span>
+<span id="cb48-682"><a href="#cb48-682"></a></span>
+<span id="cb48-683"><a href="#cb48-683"></a>Now we can import the model and the history trained on Kaggle.</span>
+<span id="cb48-684"><a href="#cb48-684"></a></span>
+<span id="cb48-685"><a href="#cb48-685"></a><span class="in">```{python, load_model_history}</span></span>
+<span id="cb48-686"><a href="#cb48-686"></a><span class="in">model = load_model(filepath=config.model)</span></span>
+<span id="cb48-687"><a href="#cb48-687"></a><span class="in">history = pd.read_excel(config.history)</span></span>
+<span id="cb48-688"><a href="#cb48-688"></a><span class="in">```</span></span>
+<span id="cb48-689"><a href="#cb48-689"></a></span>
+<span id="cb48-690"><a href="#cb48-690"></a><span class="fu">## Evaluate</span></span>
+<span id="cb48-691"><a href="#cb48-691"></a></span>
+<span id="cb48-692"><a href="#cb48-692"></a><span class="in">```{python, validation}</span></span>
+<span id="cb48-693"><a href="#cb48-693"></a><span class="in">validation = model.evaluate(</span></span>
+<span id="cb48-694"><a href="#cb48-694"></a><span class="in">  processed_val_ds.repeat(),</span></span>
+<span id="cb48-695"><a href="#cb48-695"></a><span class="in">  steps=validation_steps, # 748</span></span>
+<span id="cb48-696"><a href="#cb48-696"></a><span class="in">  verbose=0</span></span>
+<span id="cb48-697"><a href="#cb48-697"></a><span class="in">  )</span></span>
+<span id="cb48-698"><a href="#cb48-698"></a><span class="in">```</span></span>
+<span id="cb48-699"><a href="#cb48-699"></a></span>
+<span id="cb48-700"><a href="#cb48-700"></a><span class="in">```{r, val_metrics}</span></span>
+<span id="cb48-701"><a href="#cb48-701"></a><span class="in">#| label: tbl-val-metrics</span></span>
+<span id="cb48-702"><a href="#cb48-702"></a><span class="in">#| tbl-cap: Model validation metric</span></span>
+<span id="cb48-703"><a href="#cb48-703"></a></span>
+<span id="cb48-704"><a href="#cb48-704"></a><span class="in">val_metrics &lt;- tibble(</span></span>
+<span id="cb48-705"><a href="#cb48-705"></a><span class="in">  metric = c(&quot;loss&quot;, &quot;precision&quot;, &quot;recall&quot;, &quot;auc&quot;, &quot;f1_score&quot;),</span></span>
+<span id="cb48-706"><a href="#cb48-706"></a><span class="in">  value = py$validation</span></span>
+<span id="cb48-707"><a href="#cb48-707"></a><span class="in">  )</span></span>
+<span id="cb48-708"><a href="#cb48-708"></a><span class="in">val_metrics %&gt;% </span></span>
+<span id="cb48-709"><a href="#cb48-709"></a><span class="in">  gt() %&gt;% </span></span>
+<span id="cb48-710"><a href="#cb48-710"></a><span class="in">  fmt_number(</span></span>
+<span id="cb48-711"><a href="#cb48-711"></a><span class="in">    columns = c(&quot;value&quot;),</span></span>
+<span id="cb48-712"><a href="#cb48-712"></a><span class="in">    decimals = 4,</span></span>
+<span id="cb48-713"><a href="#cb48-713"></a><span class="in">    drop_trailing_zeros = TRUE,</span></span>
+<span id="cb48-714"><a href="#cb48-714"></a><span class="in">    drop_trailing_dec_mark = TRUE</span></span>
+<span id="cb48-715"><a href="#cb48-715"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-716"><a href="#cb48-716"></a><span class="in">  cols_align(</span></span>
+<span id="cb48-717"><a href="#cb48-717"></a><span class="in">    align = &quot;left&quot;,</span></span>
+<span id="cb48-718"><a href="#cb48-718"></a><span class="in">    columns = metric</span></span>
+<span id="cb48-719"><a href="#cb48-719"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-720"><a href="#cb48-720"></a><span class="in">  cols_align(</span></span>
+<span id="cb48-721"><a href="#cb48-721"></a><span class="in">    align = &quot;center&quot;,</span></span>
+<span id="cb48-722"><a href="#cb48-722"></a><span class="in">    columns = value</span></span>
+<span id="cb48-723"><a href="#cb48-723"></a><span class="in">  ) %&gt;% </span></span>
+<span id="cb48-724"><a href="#cb48-724"></a><span class="in">  cols_label(</span></span>
+<span id="cb48-725"><a href="#cb48-725"></a><span class="in">    metric = &quot;Metric&quot;,</span></span>
+<span id="cb48-726"><a href="#cb48-726"></a><span class="in">    value = &quot;Value&quot;</span></span>
+<span id="cb48-727"><a href="#cb48-727"></a><span class="in">  )</span></span>
+<span id="cb48-728"><a href="#cb48-728"></a><span class="in">  </span></span>
+<span id="cb48-729"><a href="#cb48-729"></a><span class="in">```</span></span>
+<span id="cb48-730"><a href="#cb48-730"></a></span>
+<span id="cb48-731"><a href="#cb48-731"></a><span class="fu">## Predict</span></span>
+<span id="cb48-732"><a href="#cb48-732"></a></span>
+<span id="cb48-733"><a href="#cb48-733"></a>For the prediction, the model does not need to repeat the dataset, because it has already been trained on all of the train data. Now it has just to consume the new data to make the prediction.</span>
+<span id="cb48-734"><a href="#cb48-734"></a></span>
+<span id="cb48-735"><a href="#cb48-735"></a><span class="in">```{python, predict}</span></span>
+<span id="cb48-736"><a href="#cb48-736"></a><span class="in">predictions = model.predict(processed_test_ds, verbose=0)</span></span>
+<span id="cb48-737"><a href="#cb48-737"></a><span class="in">```</span></span>
+<span id="cb48-738"><a href="#cb48-738"></a></span>
+<span id="cb48-739"><a href="#cb48-739"></a><span class="fu">## Confusion Matrix</span></span>
+<span id="cb48-740"><a href="#cb48-740"></a></span>
+<span id="cb48-741"><a href="#cb48-741"></a>The best way to assess the performance of a multi label classification is using a confusion matrix. Sklearn has a specific function to create a multi label classification matrix to handle the fact that there could be multiple labels for one prediction.</span>
+<span id="cb48-742"><a href="#cb48-742"></a></span>
+<span id="cb48-743"><a href="#cb48-743"></a><span class="fu">### Grid Search Cross Validation for best threshold</span></span>
+<span id="cb48-744"><a href="#cb48-744"></a></span>
+<span id="cb48-745"><a href="#cb48-745"></a>Grid Search CV is a technique for fine-tuning hyperparameter of a ML model. It systematically search through a set of hyperparamenter values to find the combination which led to the best model performance. In this case, I am using a <span class="in">`KFold`</span> Cross Validation is a resempling technique to split the data into k consecutive folds. Each fold is used once as a validation while the k - 1 remaining folds are the training set. See the <span class="co">[</span><span class="ot">documentation</span><span class="co">](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html)</span> for more information.</span>
+<span id="cb48-746"><a href="#cb48-746"></a></span>
+<span id="cb48-747"><a href="#cb48-747"></a>The model is trained to optimize the recall. The decision was made because the cost of missing a True Positive is greater than a False Positive. In this case, missing a injurious observation is worst than classifying a clean one as bad.</span>
+<span id="cb48-748"><a href="#cb48-748"></a></span>
+<span id="cb48-749"><a href="#cb48-749"></a><span class="fu">### Confidence threshold and Precision-Recall trade off</span></span>
+<span id="cb48-750"><a href="#cb48-750"></a></span>
+<span id="cb48-751"><a href="#cb48-751"></a>Whilst the KFold GDCV technique is usefull to test multiple hyperparameter, it is important to understand the problem we are facing. A multi label deep learning classifier outputs a vector of **per-class** probabilities. These need to be converted to a **binary vector** using a **confidence threshold**.</span>
+<span id="cb48-752"><a href="#cb48-752"></a></span>
+<span id="cb48-753"><a href="#cb48-753"></a><span class="ss">-   </span>The higher the threshold, the less classes the model predicts, increasing model confidence <span class="sc">\[</span>higher Precision<span class="sc">\]</span> and increasing missed classes <span class="sc">\[</span>lower Recall<span class="sc">\]</span>.</span>
+<span id="cb48-754"><a href="#cb48-754"></a><span class="ss">-   </span>The lower the threshold, the more classes the model predicts, decreasing model confidence <span class="sc">\[</span>lower Precision<span class="sc">\]</span> and decreasing missed classes <span class="sc">\[</span>higher Recall<span class="sc">\]</span>.</span>
+<span id="cb48-755"><a href="#cb48-755"></a></span>
+<span id="cb48-756"><a href="#cb48-756"></a>Threshold selection mean we have to decide which metric to prioritize, based on the problem we are facing and the relative cost of misduging. We can consider the toxic comment filtering a problem similiar to cancer diagnostic. It is better to predict cancer in people who do not have it <span class="sc">\[</span>False Positive<span class="sc">\]</span> and perform further analysis than do not predict cancer when the patient has the disease <span class="sc">\[</span>False Negative<span class="sc">\]</span>.</span>
+<span id="cb48-757"><a href="#cb48-757"></a></span>
+<span id="cb48-758"><a href="#cb48-758"></a>I decide to train the model on the F1 score to have a balanced model in both precision and recall and leave to the threshold selection to increase the recall performance.</span>
+<span id="cb48-759"><a href="#cb48-759"></a></span>
+<span id="cb48-760"><a href="#cb48-760"></a>Moreover, the model has been trained on the **macro avarage F1 score**, which is a single performance indicator obtained by the mean of the Precision and Recall scores of **individual classses**.</span>
+<span id="cb48-761"><a href="#cb48-761"></a></span>
+<span id="cb48-762"><a href="#cb48-762"></a>$$</span>
+<span id="cb48-763"><a href="#cb48-763"></a>F1\ macro\ avg = \frac{\sum_{i=1}^{n} F1_i}{n}</span>
+<span id="cb48-764"><a href="#cb48-764"></a>$$</span>
+<span id="cb48-765"><a href="#cb48-765"></a></span>
+<span id="cb48-766"><a href="#cb48-766"></a>It is useful with **imbalanced** classes, because it weights each classes equally. It is not influenced by the number of samples of each classes. This is sette both in the <span class="in">`config.metrics`</span> and <span class="in">`find_optimal_threshold_cv`</span>.</span>
+<span id="cb48-767"><a href="#cb48-767"></a></span>
+<span id="cb48-768"><a href="#cb48-768"></a><span class="fu">#### f1_score</span></span>
+<span id="cb48-769"><a href="#cb48-769"></a></span>
+<span id="cb48-772"><a href="#cb48-772"></a><span class="in">```{python}</span></span>
+<span id="cb48-773"><a href="#cb48-773"></a><span class="co">#| eval: true</span></span>
+<span id="cb48-774"><a href="#cb48-774"></a></span>
+<span id="cb48-775"><a href="#cb48-775"></a>ytrue <span class="op">=</span> ytest.astype(<span class="bu">int</span>)</span>
+<span id="cb48-776"><a href="#cb48-776"></a>y_pred_proba <span class="op">=</span> predictions</span>
+<span id="cb48-777"><a href="#cb48-777"></a>optimal_threshold_f1, best_score_f1 <span class="op">=</span> config.find_optimal_threshold_cv(ytrue, y_pred_proba, f1_score)</span>
+<span id="cb48-778"><a href="#cb48-778"></a></span>
+<span id="cb48-779"><a href="#cb48-779"></a><span class="bu">print</span>(<span class="ss">f&quot;Optimal threshold: </span><span class="sc">{</span>optimal_threshold_f1<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb48-780"><a href="#cb48-780"></a><span class="bu">print</span>(<span class="ss">f&quot;Best score: </span><span class="sc">{</span>best_score_f1<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb48-781"><a href="#cb48-781"></a></span>
+<span id="cb48-782"><a href="#cb48-782"></a><span class="co"># Use the optimal threshold to make predictions</span></span>
+<span id="cb48-783"><a href="#cb48-783"></a>final_predictions_f1 <span class="op">=</span> (y_pred_proba <span class="op">&gt;=</span> optimal_threshold_f1).astype(<span class="bu">int</span>)</span>
+<span id="cb48-784"><a href="#cb48-784"></a><span class="in">```</span></span>
+<span id="cb48-785"><a href="#cb48-785"></a></span>
+<span id="cb48-786"><a href="#cb48-786"></a>Optimal threshold f1 score: <span class="in">`r py$optimal_threshold_f1`</span>. Best score: <span class="in">`r py$best_score_f1`</span>.</span>
+<span id="cb48-787"><a href="#cb48-787"></a></span>
+<span id="cb48-788"><a href="#cb48-788"></a><span class="fu">#### recall_score</span></span>
+<span id="cb48-789"><a href="#cb48-789"></a></span>
+<span id="cb48-792"><a href="#cb48-792"></a><span class="in">```{python}</span></span>
+<span id="cb48-793"><a href="#cb48-793"></a><span class="co">#| eval: true</span></span>
+<span id="cb48-794"><a href="#cb48-794"></a></span>
+<span id="cb48-795"><a href="#cb48-795"></a>ytrue <span class="op">=</span> ytest.astype(<span class="bu">int</span>)</span>
+<span id="cb48-796"><a href="#cb48-796"></a>y_pred_proba <span class="op">=</span> predictions</span>
+<span id="cb48-797"><a href="#cb48-797"></a>optimal_threshold_recall, best_score_recall <span class="op">=</span> config.find_optimal_threshold_cv(ytrue, y_pred_proba, recall_score)</span>
+<span id="cb48-798"><a href="#cb48-798"></a></span>
+<span id="cb48-799"><a href="#cb48-799"></a><span class="co"># Use the optimal threshold to make predictions</span></span>
+<span id="cb48-800"><a href="#cb48-800"></a>final_predictions_recall <span class="op">=</span> (y_pred_proba <span class="op">&gt;=</span> optimal_threshold_recall).astype(<span class="bu">int</span>)</span>
+<span id="cb48-801"><a href="#cb48-801"></a><span class="in">```</span></span>
+<span id="cb48-802"><a href="#cb48-802"></a></span>
+<span id="cb48-803"><a href="#cb48-803"></a>Optimal threshold recall: <span class="in">`r py$optimal_threshold_recall`</span>. Best score: <span class="in">`r py$best_score_recall`</span>.</span>
+<span id="cb48-804"><a href="#cb48-804"></a></span>
+<span id="cb48-805"><a href="#cb48-805"></a><span class="fu">#### roc_auc_score</span></span>
+<span id="cb48-806"><a href="#cb48-806"></a></span>
+<span id="cb48-809"><a href="#cb48-809"></a><span class="in">```{python}</span></span>
+<span id="cb48-810"><a href="#cb48-810"></a><span class="co">#| eval: true</span></span>
+<span id="cb48-811"><a href="#cb48-811"></a></span>
+<span id="cb48-812"><a href="#cb48-812"></a>ytrue <span class="op">=</span> ytest.astype(<span class="bu">int</span>)</span>
+<span id="cb48-813"><a href="#cb48-813"></a>y_pred_proba <span class="op">=</span> predictions</span>
+<span id="cb48-814"><a href="#cb48-814"></a>optimal_threshold_roc, best_score_roc <span class="op">=</span> config.find_optimal_threshold_cv(ytrue, y_pred_proba, roc_auc_score)</span>
+<span id="cb48-815"><a href="#cb48-815"></a></span>
+<span id="cb48-816"><a href="#cb48-816"></a><span class="bu">print</span>(<span class="ss">f&quot;Optimal threshold: </span><span class="sc">{</span>optimal_threshold_roc<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb48-817"><a href="#cb48-817"></a><span class="bu">print</span>(<span class="ss">f&quot;Best score: </span><span class="sc">{</span>best_score_roc<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb48-818"><a href="#cb48-818"></a></span>
+<span id="cb48-819"><a href="#cb48-819"></a><span class="co"># Use the optimal threshold to make predictions</span></span>
+<span id="cb48-820"><a href="#cb48-820"></a>final_predictions_roc <span class="op">=</span> (y_pred_proba <span class="op">&gt;=</span> optimal_threshold_roc).astype(<span class="bu">int</span>)</span>
+<span id="cb48-821"><a href="#cb48-821"></a><span class="in">```</span></span>
+<span id="cb48-822"><a href="#cb48-822"></a></span>
+<span id="cb48-823"><a href="#cb48-823"></a>Optimal threshold roc: <span class="in">`r py$optimal_threshold_roc`</span>. Best score: <span class="in">`r py$best_score_roc`</span>.</span>
+<span id="cb48-824"><a href="#cb48-824"></a></span>
+<span id="cb48-825"><a href="#cb48-825"></a><span class="fu">### Confusion Matrix Plot</span></span>
+<span id="cb48-826"><a href="#cb48-826"></a></span>
+<span id="cb48-827"><a href="#cb48-827"></a><span class="in">```{python, confusion_matrix}</span></span>
+<span id="cb48-828"><a href="#cb48-828"></a><span class="in">#| fig.cap: &quot;Multi Label Confusion matrix&quot;</span></span>
+<span id="cb48-829"><a href="#cb48-829"></a><span class="in">#| label: fig-mcm</span></span>
+<span id="cb48-830"><a href="#cb48-830"></a><span class="in">#| fig.width: 10</span></span>
+<span id="cb48-831"><a href="#cb48-831"></a><span class="in">#| fig.height: 6</span></span>
+<span id="cb48-832"><a href="#cb48-832"></a></span>
+<span id="cb48-833"><a href="#cb48-833"></a><span class="in"># convert probability predictions to predictions</span></span>
+<span id="cb48-834"><a href="#cb48-834"></a><span class="in">ypred = predictions &gt;=  optimal_threshold_recall # .05</span></span>
+<span id="cb48-835"><a href="#cb48-835"></a><span class="in">ypred = ypred.astype(int)</span></span>
+<span id="cb48-836"><a href="#cb48-836"></a></span>
+<span id="cb48-837"><a href="#cb48-837"></a><span class="in"># create a plot with 3 by 2 subplots</span></span>
+<span id="cb48-838"><a href="#cb48-838"></a><span class="in">fig, axes = plt.subplots(3, 2, figsize=(15, 15))</span></span>
+<span id="cb48-839"><a href="#cb48-839"></a><span class="in">axes = axes.flatten()</span></span>
+<span id="cb48-840"><a href="#cb48-840"></a><span class="in">mcm = multilabel_confusion_matrix(ytrue, ypred)</span></span>
+<span id="cb48-841"><a href="#cb48-841"></a><span class="in"># plot the confusion matrices for each label</span></span>
+<span id="cb48-842"><a href="#cb48-842"></a><span class="in">for i, (cm, label) in enumerate(zip(mcm, config.labels)):</span></span>
+<span id="cb48-843"><a href="#cb48-843"></a><span class="in">    disp = ConfusionMatrixDisplay(confusion_matrix=cm)</span></span>
+<span id="cb48-844"><a href="#cb48-844"></a><span class="in">    disp.plot(ax=axes[i], colorbar=False)</span></span>
+<span id="cb48-845"><a href="#cb48-845"></a><span class="in">    axes[i].set_title(f&quot;Confusion matrix for label: {label}&quot;)</span></span>
+<span id="cb48-846"><a href="#cb48-846"></a><span class="in">plt.tight_layout()</span></span>
+<span id="cb48-847"><a href="#cb48-847"></a><span class="in">plt.show()</span></span>
+<span id="cb48-848"><a href="#cb48-848"></a><span class="in">```</span></span>
+<span id="cb48-849"><a href="#cb48-849"></a></span>
+<span id="cb48-850"><a href="#cb48-850"></a><span class="fu">## Classification Report</span></span>
+<span id="cb48-851"><a href="#cb48-851"></a></span>
+<span id="cb48-852"><a href="#cb48-852"></a><span class="in">```{python, classification_report}</span></span>
+<span id="cb48-853"><a href="#cb48-853"></a><span class="in">#| output: false</span></span>
+<span id="cb48-854"><a href="#cb48-854"></a></span>
+<span id="cb48-855"><a href="#cb48-855"></a><span class="in">cr = classification_report(</span></span>
+<span id="cb48-856"><a href="#cb48-856"></a><span class="in">  ytrue,</span></span>
+<span id="cb48-857"><a href="#cb48-857"></a><span class="in">  ypred,</span></span>
+<span id="cb48-858"><a href="#cb48-858"></a><span class="in">  target_names=config.labels,</span></span>
+<span id="cb48-859"><a href="#cb48-859"></a><span class="in">  digits=4,</span></span>
+<span id="cb48-860"><a href="#cb48-860"></a><span class="in">  output_dict=True</span></span>
+<span id="cb48-861"><a href="#cb48-861"></a><span class="in">  )</span></span>
+<span id="cb48-862"><a href="#cb48-862"></a><span class="in">df_cr = pd.DataFrame.from_dict(cr).reset_index()</span></span>
+<span id="cb48-863"><a href="#cb48-863"></a><span class="in">```</span></span>
+<span id="cb48-864"><a href="#cb48-864"></a></span>
+<span id="cb48-867"><a href="#cb48-867"></a><span class="in">```{r}</span></span>
+<span id="cb48-868"><a href="#cb48-868"></a><span class="co">#| label: tbl-classification-report</span></span>
+<span id="cb48-869"><a href="#cb48-869"></a><span class="co">#| tbl-cap: Classification report</span></span>
+<span id="cb48-870"><a href="#cb48-870"></a></span>
+<span id="cb48-871"><a href="#cb48-871"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb48-872"><a href="#cb48-872"></a>df_cr <span class="ot">&lt;-</span> py<span class="sc">$</span>df_cr <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">names =</span> index)</span>
+<span id="cb48-873"><a href="#cb48-873"></a>cols <span class="ot">&lt;-</span> df_cr <span class="sc">%&gt;%</span> <span class="fu">colnames</span>()</span>
+<span id="cb48-874"><a href="#cb48-874"></a>df_cr <span class="sc">%&gt;%</span> </span>
+<span id="cb48-875"><a href="#cb48-875"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb48-876"><a href="#cb48-876"></a>    <span class="at">cols =</span> <span class="sc">-</span>names,</span>
+<span id="cb48-877"><a href="#cb48-877"></a>    <span class="at">names_to =</span> <span class="st">&quot;metrics&quot;</span>,</span>
+<span id="cb48-878"><a href="#cb48-878"></a>    <span class="at">values_to =</span> <span class="st">&quot;values&quot;</span></span>
+<span id="cb48-879"><a href="#cb48-879"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-880"><a href="#cb48-880"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb48-881"><a href="#cb48-881"></a>    <span class="at">names_from =</span> names,</span>
+<span id="cb48-882"><a href="#cb48-882"></a>    <span class="at">values_from =</span> values</span>
+<span id="cb48-883"><a href="#cb48-883"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-884"><a href="#cb48-884"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb48-885"><a href="#cb48-885"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb48-886"><a href="#cb48-886"></a>    <span class="at">title =</span> <span class="st">&quot;Confusion Matrix&quot;</span>,</span>
+<span id="cb48-887"><a href="#cb48-887"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Threshold optimization favoring recall&quot;</span></span>
+<span id="cb48-888"><a href="#cb48-888"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-889"><a href="#cb48-889"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb48-890"><a href="#cb48-890"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;precision&quot;</span>, <span class="st">&quot;recall&quot;</span>, <span class="st">&quot;f1-score&quot;</span>, <span class="st">&quot;support&quot;</span>),</span>
+<span id="cb48-891"><a href="#cb48-891"></a>    <span class="at">decimals =</span> <span class="dv">2</span>,</span>
+<span id="cb48-892"><a href="#cb48-892"></a>    <span class="at">drop_trailing_zeros =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb48-893"><a href="#cb48-893"></a>    <span class="at">drop_trailing_dec_mark =</span> <span class="cn">FALSE</span></span>
+<span id="cb48-894"><a href="#cb48-894"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-895"><a href="#cb48-895"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb48-896"><a href="#cb48-896"></a>    <span class="at">align =</span> <span class="st">&quot;center&quot;</span>,</span>
+<span id="cb48-897"><a href="#cb48-897"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">&quot;precision&quot;</span>, <span class="st">&quot;recall&quot;</span>, <span class="st">&quot;f1-score&quot;</span>, <span class="st">&quot;support&quot;</span>)</span>
+<span id="cb48-898"><a href="#cb48-898"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-899"><a href="#cb48-899"></a>  <span class="fu">cols_align</span>(</span>
+<span id="cb48-900"><a href="#cb48-900"></a>    <span class="at">align =</span> <span class="st">&quot;left&quot;</span>,</span>
+<span id="cb48-901"><a href="#cb48-901"></a>    <span class="at">columns =</span> metrics</span>
+<span id="cb48-902"><a href="#cb48-902"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-903"><a href="#cb48-903"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb48-904"><a href="#cb48-904"></a>    <span class="at">metrics =</span> <span class="st">&quot;Metrics&quot;</span>,</span>
+<span id="cb48-905"><a href="#cb48-905"></a>    <span class="at">precision =</span> <span class="st">&quot;Precision&quot;</span>,</span>
+<span id="cb48-906"><a href="#cb48-906"></a>    <span class="at">recall =</span> <span class="st">&quot;Recall&quot;</span>,</span>
+<span id="cb48-907"><a href="#cb48-907"></a>    <span class="st">`</span><span class="at">f1-score</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;F1-Score&quot;</span>,</span>
+<span id="cb48-908"><a href="#cb48-908"></a>    <span class="at">support =</span> <span class="st">&quot;Support&quot;</span></span>
+<span id="cb48-909"><a href="#cb48-909"></a>  )</span>
+<span id="cb48-910"><a href="#cb48-910"></a><span class="in">```</span></span>
+<span id="cb48-911"><a href="#cb48-911"></a></span>
+<span id="cb48-912"><a href="#cb48-912"></a><span class="fu"># Conclusions</span></span>
+<span id="cb48-913"><a href="#cb48-913"></a></span>
+<span id="cb48-914"><a href="#cb48-914"></a>The BiLSTM model is optimized to have an high recall is performing good enough to make predictions for each label. Considering the low support for the *threat* label, the performance is not bad. See @tbl-frequency and @fig-barchart: the threat label is only 0.27 % of the observations. The model has been optimized for recall because the cost of not identifying a injurious comment as such is higher than the cost of considering a clean comment as injurious.</span>
+<span id="cb48-915"><a href="#cb48-915"></a></span>
+<span id="cb48-916"><a href="#cb48-916"></a>Possibile improvements could be to increase the number of observations, expecially for the threat one. In general there are too many clean comments. This could be avoided doing an undersampling of the clean comment, which I explicitly avoided to check the performance on the BiLSTM with an imbalanced dataset, leveraging the class weight method.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

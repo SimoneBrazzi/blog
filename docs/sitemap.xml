@@ -26,7 +26,11 @@
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/toxic_comment_filter/toxic_comment_filter.html</loc>
+<<<<<<< HEAD
     <lastmod>2025-03-17T16:40:47.991Z</lastmod>
+=======
+    <lastmod>2025-02-10T13:59:10.503Z</lastmod>
+>>>>>>> 61ff7ee417b34af32841c9120931ae1c446e9664
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/eurostat_homicide_rate/eurostat_homicide_rate.html</loc>
@@ -34,11 +38,19 @@
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/credit_score/credit_score.html</loc>
+<<<<<<< HEAD
     <lastmod>2025-03-17T15:09:54.334Z</lastmod>
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/posts/spam_detection/spam_detection.html</loc>
     <lastmod>2025-03-17T15:05:04.564Z</lastmod>
+=======
+    <lastmod>2025-02-10T13:57:24.710Z</lastmod>
+  </url>
+  <url>
+    <loc>https://simonebrazzi.github.io/blog/posts/spam_detection/spam_detection.html</loc>
+    <lastmod>2025-03-10T09:47:18.781Z</lastmod>
+>>>>>>> 61ff7ee417b34af32841c9120931ae1c446e9664
   </url>
   <url>
     <loc>https://simonebrazzi.github.io/blog/index.html</loc>

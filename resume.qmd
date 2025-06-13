@@ -1,3 +1,3 @@
-<iframe width="1000" height="800" src="images/curriculum.pdf">
+<iframe width="1000" height="800" src="images/simone_brazzi_cv.pdf">
 
 </iframe>
